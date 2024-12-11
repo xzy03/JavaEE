@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.TenantProfileMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.TenantProfile.TenantProfile">
+            <id property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+            <result property="tAccount" column="t_account" jdbcType="VARCHAR"/>
+            <result property="tPassword" column="t_password" jdbcType="VARCHAR"/>
+            <result property="tUniversity" column="t_university" jdbcType="VARCHAR"/>
+            <result property="tMajor" column="t_major" jdbcType="VARCHAR"/>
+            <result property="tPhoneNumber" column="t_phone_number" jdbcType="VARCHAR"/>
+            <result property="tEmail" column="t_email" jdbcType="VARCHAR"/>
+            <result property="tIdentityStatus" column="t_identity_status" jdbcType="VARCHAR"/>
+            <result property="tProfilePicture" column="t_profile_picture" jdbcType="VARCHAR"/>
+            <result property="tCardNumber" column="t_card_number" jdbcType="VARCHAR"/>
+            <result property="tName" column="t_name" jdbcType="VARCHAR"/>
+            <result property="tCardImageFront" column="t_card_image_front" jdbcType="VARCHAR"/>
+            <result property="tCatImageBack" column="t_cat_image_back" jdbcType="VARCHAR"/>
+            <result property="tStatus" column="t_status" jdbcType="VARCHAR"/>
+            <result property="tBalance" column="t_balance" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tenant_id,t_account,t_password,
+        t_university,t_major,t_phone_number,
+        t_email,t_identity_status,t_profile_picture,
+        t_card_number,t_name,t_card_image_front,
+        t_cat_image_back,t_status,t_balance
+    </sql>
+</mapper>
