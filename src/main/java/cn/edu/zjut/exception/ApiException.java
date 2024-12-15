@@ -1,7 +1,9 @@
 package cn.edu.zjut.exception;
 
 import cn.edu.zjut.enums.ResultCode;
+import lombok.Getter;
 
+@Getter
 public class ApiException extends RuntimeException {
     private final ResultCode resultCode;
 

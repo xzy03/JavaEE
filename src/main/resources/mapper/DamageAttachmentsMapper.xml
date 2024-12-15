@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.DamageAttachmentsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.DamageAttachments.DamageAttachments">
+            <id property="attachmentId" column="attachment_id" jdbcType="VARCHAR"/>
+            <result property="daType" column="da_type" jdbcType="VARCHAR"/>
+            <result property="daUrl" column="da_url" jdbcType="VARCHAR"/>
+            <result property="daOrder" column="da_order" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        attachment_id,da_type,da_url,
+        da_order
+    </sql>
+</mapper>

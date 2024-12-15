@@ -13,9 +13,9 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 @Builder
 public class AdminsLoginReq {
-    @Schema(description = "用户名")
+    @Schema(description = "手机号")
     @NotBlank
-    private String adUsername;
+    private String adPhone;
 
     @Schema(description = "密码")
     @NotBlank

@@ -6,7 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 大学生租客表
@@ -14,6 +18,9 @@ import lombok.Data;
  */
 @TableName(value ="tenant_profile")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TenantProfile implements Serializable {
     /**
      * 租户ID，唯一标识

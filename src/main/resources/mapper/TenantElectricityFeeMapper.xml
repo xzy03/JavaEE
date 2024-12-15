@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.TenantElectricityFeeMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.TenantElectricityFee.TenantElectricityFee">
+            <id property="tenantElectricityFeeId" column="tenant_electricity_fee_id" jdbcType="VARCHAR"/>
+            <result property="electricityFeeId" column="electricity_fee_id" jdbcType="VARCHAR"/>
+            <result property="transactionId" column="transaction_id" jdbcType="VARCHAR"/>
+            <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+            <result property="teFee" column="te_fee" jdbcType="DECIMAL"/>
+            <result property="teRatio" column="te_ratio" jdbcType="DOUBLE"/>
+            <result property="teStatus" column="te_status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tenant_electricity_fee_id,electricity_fee_id,transaction_id,
+        tenant_id,te_fee,te_ratio,
+        te_status
+    </sql>
+</mapper>

@@ -14,20 +14,14 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 public class AdminsLoginResp {
     @Schema(description = "用户名")
-    @NotBlank
-    @Length(min = 6, max = 24)
     private String adUsername;
 
     @Schema(description = "邮箱")
-    @NotBlank
     private String adEmail;
 
     @Schema(description = "手机号")
-    @NotBlank
-    @Length(min = 11, max = 11)
     private String adPhone;
 
     @Schema(description = "token")
-    @NotBlank
     private String token;
 }

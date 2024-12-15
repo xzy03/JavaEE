@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.LandlordReviewsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.LandlordReviews.LandlordReviews">
+            <id property="llReviewId" column="ll_review_id" jdbcType="VARCHAR"/>
+            <result property="landlordId" column="landlord_id" jdbcType="VARCHAR"/>
+            <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+            <result property="llComment" column="ll_comment" jdbcType="VARCHAR"/>
+            <result property="llScore" column="ll_score" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ll_review_id,landlord_id,tenant_id,
+        ll_comment,ll_score
+    </sql>
+</mapper>

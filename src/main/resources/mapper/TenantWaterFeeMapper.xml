@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.TenantWaterFeeMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.TenantWaterFee.TenantWaterFee">
+            <id property="tenantWaterFeeId" column="tenant_water_fee_id" jdbcType="VARCHAR"/>
+            <result property="waterFeeId" column="water_fee_id" jdbcType="VARCHAR"/>
+            <result property="transactionId" column="transaction_id" jdbcType="VARCHAR"/>
+            <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+            <result property="twFee" column="tw_fee" jdbcType="DECIMAL"/>
+            <result property="twRatio" column="tw_ratio" jdbcType="DOUBLE"/>
+            <result property="twStatus" column="tw_status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tenant_water_fee_id,water_fee_id,transaction_id,
+        tenant_id,tw_fee,tw_ratio,
+        tw_status
+    </sql>
+</mapper>

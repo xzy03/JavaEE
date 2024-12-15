@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
  */
 @TableName(value ="admins")
 @Data
+//下面三个mybatis-plus好像不会自动生成，要自己加一下，不加可能数据库有关操作会报错
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

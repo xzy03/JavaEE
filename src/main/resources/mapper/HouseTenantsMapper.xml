@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.HouseTenantsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.HouseTenants.HouseTenants">
+            <id property="htId" column="ht_id" jdbcType="VARCHAR"/>
+            <result property="houseId" column="house_id" jdbcType="VARCHAR"/>
+            <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+            <result property="htRentAmount" column="ht_rent_amount" jdbcType="DECIMAL"/>
+            <result property="htDepositAmount" column="ht_deposit_amount" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ht_id,house_id,tenant_id,
+        ht_rent_amount,ht_deposit_amount
+    </sql>
+</mapper>

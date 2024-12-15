@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.HouseMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.House.House">
+            <id property="houseId" column="house_id" jdbcType="VARCHAR"/>
+            <result property="communityId" column="community_id" jdbcType="VARCHAR"/>
+            <result property="hTitle" column="h_title" jdbcType="VARCHAR"/>
+            <result property="hLocation" column="h_location" jdbcType="VARCHAR"/>
+            <result property="hRent" column="h_rent" jdbcType="DECIMAL"/>
+            <result property="hArea" column="h_area" jdbcType="DECIMAL"/>
+            <result property="hRooms" column="h_rooms" jdbcType="INTEGER"/>
+            <result property="hStatus" column="h_status" jdbcType="VARCHAR"/>
+            <result property="hAvailableFrom" column="h_available_from" jdbcType="TIMESTAMP"/>
+            <result property="hDirection" column="h_direction" jdbcType="CHAR"/>
+            <result property="hFloor" column="h_floor" jdbcType="INTEGER"/>
+            <result property="hTotalFloors" column="h_total_floors" jdbcType="INTEGER"/>
+            <result property="hFacilities" column="h_facilities" jdbcType="VARCHAR"/>
+            <result property="hPetFriendly" column="h_pet_friendly" jdbcType="TINYINT"/>
+            <result property="hTenantrequired" column="h_tenantrequired" jdbcType="VARCHAR"/>
+            <result property="hTotalTenants" column="h_total_tenants" jdbcType="INTEGER"/>
+            <result property="hRemainingVacancies" column="h_remaining_vacancies" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        house_id,community_id,h_title,
+        h_location,h_rent,h_area,
+        h_rooms,h_status,h_available_from,
+        h_direction,h_floor,h_total_floors,
+        h_facilities,h_pet_friendly,h_tenantrequired,
+        h_total_tenants,h_remaining_vacancies
+    </sql>
+</mapper>

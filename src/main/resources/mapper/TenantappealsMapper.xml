@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.TenantappealsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.Tenantappeals.Tenantappeals">
+            <id property="tAppealId" column="t_appeal_id" jdbcType="VARCHAR"/>
+            <result property="damageId" column="damage_id" jdbcType="VARCHAR"/>
+            <result property="attachmentId" column="attachment_id" jdbcType="VARCHAR"/>
+            <result property="adminId" column="admin_id" jdbcType="VARCHAR"/>
+            <result property="houseId" column="house_id" jdbcType="VARCHAR"/>
+            <result property="transactionId" column="transaction_id" jdbcType="VARCHAR"/>
+            <result property="tenantWaterFeeId" column="tenant_water_fee_id" jdbcType="VARCHAR"/>
+            <result property="tenantElectricityFeeId" column="tenant_electricity_fee_id" jdbcType="VARCHAR"/>
+            <result property="contractId" column="contract_id" jdbcType="VARCHAR"/>
+            <result property="tAppealType" column="t_appeal_type" jdbcType="VARCHAR"/>
+            <result property="tDescription" column="t_description" jdbcType="VARCHAR"/>
+            <result property="tStatus" column="t_status" jdbcType="VARCHAR"/>
+            <result property="tResult" column="t_result" jdbcType="VARCHAR"/>
+            <result property="tResultDescription" column="t_result_description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        t_appeal_id,damage_id,attachment_id,
+        admin_id,house_id,transaction_id,
+        tenant_water_fee_id,tenant_electricity_fee_id,contract_id,
+        t_appeal_type,t_description,t_status,
+        t_result,t_result_description
+    </sql>
+</mapper>

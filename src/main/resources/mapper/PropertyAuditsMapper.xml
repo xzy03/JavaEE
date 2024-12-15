@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.PropertyAuditsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.PropertyAudits.PropertyAudits">
+            <id property="auditId" column="audit_id" jdbcType="VARCHAR"/>
+            <result property="adminId" column="admin_id" jdbcType="VARCHAR"/>
+            <result property="houseId" column="house_id" jdbcType="VARCHAR"/>
+            <result property="paStatus" column="pa_status" jdbcType="VARCHAR"/>
+            <result property="paResult" column="pa_result" jdbcType="VARCHAR"/>
+            <result property="lResultDescription" column="l_result_description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        audit_id,admin_id,house_id,
+        pa_status,pa_result,l_result_description
+    </sql>
+</mapper>

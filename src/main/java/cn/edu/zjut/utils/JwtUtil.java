@@ -1,6 +1,6 @@
 package cn.edu.zjut.utils;
 
-import cn.edu.zjut.entity.admins.dto.AdminsTokenInfoDto;
+import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.exception.apiException.BusiException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -25,18 +25,18 @@ public class JwtUtil {
 
     /**
      * 生成JWT token
-     * @param adminId 管理员用户ID
-     * @param adUsername 管理员用户名
+     * @param userId 用户ID
+     * @param phoneNum 用户手机号
      * @return JWT token字符串
      */
-    public static String generateToken(String adminId, String adUsername) {
+    public static String generateToken(String userId, String phoneNum) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("adminId", adminId);
-        claims.put("adUsername", adUsername);
+        claims.put("userId", userId);
+        claims.put("phoneNum", phoneNum);
 
         return JWT.create()
                 .withClaim("user", claims)
-                .withSubject(adminId)
+                .withSubject(userId)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .withJWTId(UUID.randomUUID().toString().replace("-", ""))
                 .sign(Algorithm.HMAC256(JWT_SECRET));
@@ -45,9 +45,9 @@ public class JwtUtil {
     /**
      * 从JWT token中解析用户信息
      * @param token JWT token字符串
-     * @return AdminsTokenInfoDto 包含用户ID和用户名的对象
+     * @return UserTokenInfoDto 包含用户ID和用户名的对象
      */
-    public static AdminsTokenInfoDto parseToken(String token) {
+    public static UserTokenInfoDto parseToken(String token) {
         try {
             DecodedJWT jwt = JWT.require(Algorithm.HMAC256(JWT_SECRET))
                     .build()
@@ -55,11 +55,11 @@ public class JwtUtil {
 
             Map<String, Object> userClaims = jwt.getClaim("user").asMap();
 
-            AdminsTokenInfoDto adminInfo = new AdminsTokenInfoDto();
-            adminInfo.setAdminId((String) userClaims.get("adminId"));
-            adminInfo.setAdUsername((String) userClaims.get("adUsername"));
+            UserTokenInfoDto userInfo = new UserTokenInfoDto();
+            userInfo.setUserId((String) userClaims.get("userId"));
+            userInfo.setPhoneNum((String) userClaims.get("phoneNum"));
 
-            return adminInfo;
+            return userInfo;
         } catch (TokenExpiredException e) {
             throw new BusiException("Token已过期");
         } catch (Exception e) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.LandlordPropertiesMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.LandlordProperties.LandlordProperties">
+            <id property="ltPropertyId" column="lt_property_id" jdbcType="VARCHAR"/>
+            <result property="houseId" column="house_id" jdbcType="VARCHAR"/>
+            <result property="ltStatus" column="lt_status" jdbcType="VARCHAR"/>
+            <result property="ltStartDate" column="lt_start_date" jdbcType="TIMESTAMP"/>
+            <result property="ltEndDate" column="lt_end_date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        lt_property_id,house_id,lt_status,
+        lt_start_date,lt_end_date
+    </sql>
+</mapper>

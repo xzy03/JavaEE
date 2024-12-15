@@ -1,6 +1,7 @@
 package cn.edu.zjut.service.impl;
 
 import cn.edu.zjut.entity.admins.AdminsConverter;
+import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
 import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
 import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
@@ -32,12 +33,15 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
     @Override
     public Admins qureryByUsername(String adUsername) {
         return adminsService.lambdaQuery().eq(Admins::getAdUsername, adUsername).one();
-
+    }
+    @Override
+    public Admins qureryByPhoneNum(String adPhoneNum) {
+        return adminsService.lambdaQuery().eq(Admins::getAdPhone, adPhoneNum).one();
     }
     @Override
     public void registerAdmin(AdminsRegisterReq req) {
-        if(adminsService.qureryByUsername(req.getAdUsername()) != null) {
-            throw new BusiException("用户名已存在");
+        if(adminsService.qureryByPhoneNum(req.getAdPhone()) != null) {
+            throw new BusiException("手机号已存在");
         }
         Admins admins = new Admins(req);
         admins.setAdPasswordHash(PasswordUtils.encrypt(req.getAdPasswordHash()));
@@ -45,13 +49,31 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
     }
     @Override
     public AdminsLoginResp login(AdminsLoginReq req) {
-        Admins admins = adminsService.qureryByUsername(req.getAdUsername());
+        Admins admins = adminsService.qureryByPhoneNum(req.getAdPhone());
+        if (admins == null){
+            throw new BusiException("手机号不存在");
+        }
         if (PasswordUtils.verify(req.getAdPasswordHash(), admins.getAdPasswordHash())){
             AdminsLoginResp loginResp = AdminsConverter.INSTANCE.toLoginResp(admins);
-            loginResp.setToken(JwtUtil.generateToken(admins.getAdminId(), admins.getAdUsername()));
+            log.info(admins.getAdminId());
+            log.info(admins.getAdPhone());
+            loginResp.setToken(JwtUtil.generateToken(admins.getAdminId(), admins.getAdPhone()));;
             return loginResp;
         }
         throw new BusiException("密码错误");
+    }
+    @Override
+    public void changeUserInfo(AdminsInfoReq req, String userId) {
+        Admins admins = adminsService.getById(userId);
+        if (adminsService.qureryByPhoneNum(req.getAdPhone()) != null){
+            throw new BusiException("手机号存在");
+        }
+        if(adminsService.qureryByUsername(req.getAdUsername()) != null){
+            throw new BusiException("用户名存在");
+        }
+        admins.setAdEmail(req.getAdEmail());
+        admins.setAdPhone(req.getAdPhone());
+        adminsService.updateById(admins);
     }
 
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.zjut.mapper.ContractsMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.Contracts.Contracts">
+            <id property="contractId" column="contract_id" jdbcType="VARCHAR"/>
+            <result property="cHouseId" column="c_house_id" jdbcType="VARCHAR"/>
+            <result property="cLandlordId" column="c_landlord_id" jdbcType="VARCHAR"/>
+            <result property="cTenantId" column="c_tenant_id" jdbcType="VARCHAR"/>
+            <result property="cStartDate" column="c_start_date" jdbcType="TIMESTAMP"/>
+            <result property="cEndDate" column="c_end_date" jdbcType="TIMESTAMP"/>
+            <result property="cRentAmount" column="c_rent_amount" jdbcType="DECIMAL"/>
+            <result property="cDepositAmount" column="c_deposit_amount" jdbcType="DECIMAL"/>
+            <result property="cStatus" column="c_status" jdbcType="VARCHAR"/>
+            <result property="cAdditions" column="c_additions" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        contract_id,c_house_id,c_landlord_id,
+        c_tenant_id,c_start_date,c_end_date,
+        c_rent_amount,c_deposit_amount,c_status,
+        c_additions
+    </sql>
+</mapper>
