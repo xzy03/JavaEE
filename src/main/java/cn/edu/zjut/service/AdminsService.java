@@ -4,6 +4,7 @@ import cn.edu.zjut.entity.admins.Admins;
 import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
 import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
 import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -18,4 +19,5 @@ public interface AdminsService extends IService<Admins> {
     void registerAdmin(AdminsRegisterReq req);
     AdminsLoginResp login(AdminsLoginReq req);
     void changeUserInfo(AdminsInfoReq req, String userId);
+    void findPwd(PwdChangeReq req);
 }

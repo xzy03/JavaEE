@@ -4,6 +4,7 @@ import cn.edu.zjut.entity.admins.AdminsConverter;
 import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
 import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
 import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.exception.apiException.BusiException;
@@ -73,6 +74,18 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         }
         admins.setAdEmail(req.getAdEmail());
         admins.setAdPhone(req.getAdPhone());
+        adminsService.updateById(admins);
+    }
+    @Override
+    public void findPwd(PwdChangeReq req) {
+        Admins admins = adminsService.qureryByPhoneNum(req.getPhoneNum());
+        if (admins == null){
+            throw new BusiException("手机号不存在");
+        }
+        if (!req.getNewPassword().equals(req.getConfirmPassword())){
+            throw new BusiException("两次输入密码不相同");
+        }
+        admins.setAdPasswordHash(PasswordUtils.encrypt(req.getNewPassword()));
         adminsService.updateById(admins);
     }
 

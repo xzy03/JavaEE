@@ -1,10 +1,10 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
-import cn.edu.zjut.entity.admins.Admins;
 import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
 import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
 import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
@@ -53,13 +53,23 @@ public class AdminsController {
         }
         return CommonResult.success(adminsLoginResp);
     }
-    //写个修改
+
     @Operation(summary="管理员用户修改信息")
     @PostMapping("/changeUserInfo")
     public CommonResult<Void> changeUserInfo(@Validated @RequestBody AdminsInfoReq req) {
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
             adminsService.changeUserInfo(req, userTokenInfoDto.getUserId());
+        } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="管理员用户找回密码")
+    @PostMapping("/findPwd")
+    public CommonResult<Void> findPwd(@Validated @RequestBody PwdChangeReq req) {
+        try {
+            adminsService.findPwd(req);
         } catch (BusiException e) {
             return CommonResult.error(e.getMessage());
         }
