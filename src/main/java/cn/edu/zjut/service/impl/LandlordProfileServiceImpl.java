@@ -1,16 +1,20 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfileConverter;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
+import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
 import cn.edu.zjut.exception.apiException.BusiException;
-import cn.edu.zjut.service.AdminsService;
+import cn.edu.zjut.utils.JwtUtil;
 import cn.edu.zjut.utils.PasswordUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.service.LandlordProfileService;
 import cn.edu.zjut.mapper.LandlordProfileMapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordRegisterReq;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 
 /**
 * @author 86173
@@ -18,13 +22,14 @@ import cn.edu.zjut.entity.LandlordProfile.req.LandlordRegisterReq;
 * @createDate 2024-12-12 23:50:53
 */
 @Service
+@Slf4j
 public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMapper, LandlordProfile>
     implements LandlordProfileService{
     @Lazy
     @Resource
     LandlordProfileService landlordProfileService;
     @Override
-    public void registerLandlord(LandlordRegisterReq req) {
+    public void registerLandlord(LandlordProfileRegisterReq req) {
         if(landlordProfileService.qureryByPhoneNum(req.getLPhoneNumber()) != null) {
             throw new BusiException("手机号已存在");
         }
@@ -39,6 +44,21 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
     @Override
     public LandlordProfile qureryByPhoneNum(String lPhoneNumber) {
         return landlordProfileService.lambdaQuery().eq(LandlordProfile::getLPhoneNumber,lPhoneNumber).one();
+    }
+    @Override
+    public LandlordProfileLoginResp loginLandlord(LandlordProfileLoginReq req) {
+        LandlordProfile landlordProfile = landlordProfileService.qureryByPhoneNum(req.getLPhoneNumber());
+        if(landlordProfile == null) {
+            throw new BusiException("用户不存在");
+        }
+        if (PasswordUtils.verify(req.getLPassword(), landlordProfile.getLPassword())){
+            LandlordProfileLoginResp landlordProfileLoginResp = LandlordProfileConverter.INSTANCE.toLandlordLoginResp(landlordProfile);
+            log.info(landlordProfile.getLandlordId());
+            log.info(landlordProfile.getLPhoneNumber());
+            landlordProfileLoginResp.setToken(JwtUtil.generateToken(landlordProfile.getLandlordId(), landlordProfile.getLPhoneNumber()));
+            return landlordProfileLoginResp;
+        }
+        throw new BusiException("密码错误");
     }
 }
 

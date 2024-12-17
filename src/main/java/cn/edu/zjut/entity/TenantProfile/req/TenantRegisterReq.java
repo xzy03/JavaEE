@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+
 public class TenantRegisterReq {
     @Schema(description = "用户名",example = "admin")
     @NotBlank

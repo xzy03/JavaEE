@@ -1,7 +1,12 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.TenantProfile.TenantConverter;
+import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.utils.JwtUtil;
+import cn.edu.zjut.utils.PasswordUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.service.TenantProfileService;
@@ -30,7 +35,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         }
         TenantProfile tenantProfile = TenantProfile.builder()
             .tAccount(req.getTAccount())
-            .tPassword(req.getTPassword())
+            .tPassword(PasswordUtils.encrypt(req.getTPassword()))
             .tPhoneNumber(req.getTPhoneNumber())
             .tEmail(req.getTEmail())
             .tBalance(BigDecimal.valueOf(0))
@@ -40,6 +45,20 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
     @Override
     public TenantProfile qureryByPhoneNum(String tPhoneNumber) {
         return tenantProfileService.lambdaQuery().eq(TenantProfile::getTPhoneNumber,tPhoneNumber).one();
+    }
+
+    @Override
+    public TenantLoginResp loginTenant(TenantLoginReq req) {
+        TenantProfile tenantProfile = tenantProfileService.qureryByPhoneNum(req.getPhoneNum());
+        if (tenantProfile == null){
+            throw new BusiException("手机号不存在");
+        }
+        if (PasswordUtils.verify(req.getPassword(), tenantProfile.getTPassword())){
+            TenantLoginResp tenantLoginResp = TenantConverter.INSTANCE.toLoginResp(tenantProfile);
+            tenantLoginResp.setToken(JwtUtil.generateToken(tenantProfile.getTenantId(), tenantProfile.getTPhoneNumber()));
+            return tenantLoginResp;
+        }
+        throw new BusiException("密码错误");
     }
 }
 

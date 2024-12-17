@@ -1,6 +1,9 @@
 package cn.edu.zjut.controller;
 
+import cn.edu.zjut.annotation.PassAuthentication;
+import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.TenantProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,4 +31,17 @@ public class TenantController {
          }
          return CommonResult.success(null);
      }
+    @PassAuthentication
+    @Operation(summary="大学生租户登录")
+    @PostMapping("/login")
+    public CommonResult<TenantLoginResp> login(@Validated @RequestBody TenantLoginReq req) {
+        TenantLoginResp tenantLoginResp;
+        try {
+            tenantLoginResp = landlordsService.loginTenant(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(tenantLoginResp);
+    }
+
 }

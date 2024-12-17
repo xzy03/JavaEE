@@ -1,7 +1,9 @@
 package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
+import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -12,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface TenantProfileService extends IService<TenantProfile> {
     void registerTenant(TenantRegisterReq req);
     TenantProfile qureryByPhoneNum(String tPhoneNumber);
+    TenantLoginResp loginTenant(TenantLoginReq req);
+
 }

@@ -1,7 +1,9 @@
 package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordRegisterReq;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
+import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,5 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface LandlordProfileService extends IService<LandlordProfile> {
     LandlordProfile qureryByPhoneNum(String lAccount);
-    void registerLandlord(LandlordRegisterReq req);
+    void registerLandlord(LandlordProfileRegisterReq req);
+    LandlordProfileLoginResp loginLandlord(LandlordProfileLoginReq req);
 }

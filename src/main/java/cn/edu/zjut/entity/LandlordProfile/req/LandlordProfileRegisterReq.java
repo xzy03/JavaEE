@@ -11,8 +11,7 @@ import org.hibernate.validator.constraints.Length;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class LandlordRegisterReq {
+public class LandlordProfileRegisterReq {
     @Schema(description = "用户名",example = "admin")
     @NotBlank
     @Length(min = 6, max = 24)
