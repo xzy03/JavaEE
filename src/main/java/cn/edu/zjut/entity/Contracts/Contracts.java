@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class Contracts implements Serializable {
     /**
      * 合同ID，唯一标识
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_UUID)
     private String contractId;
 
     /**

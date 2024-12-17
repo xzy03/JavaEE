@@ -34,7 +34,7 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
             .lPhoneNumber(req.getLPhoneNumber())
             .lEmail(req.getLEmail())
             .build();
-        save(landlordProfile);
+        this.save(landlordProfile);
     }
     @Override
     public LandlordProfile qureryByPhoneNum(String lPhoneNumber) {
