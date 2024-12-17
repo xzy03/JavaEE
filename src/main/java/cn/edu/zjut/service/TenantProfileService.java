@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
 * @author 86173
 * @description 针对表【tenant_profile(大学生租客表)】的数据库操作Service
-* @createDate 2024-12-11 14:28:24
+* @createDate 2024-12-17 18:50:44
 */
 public interface TenantProfileService extends IService<TenantProfile> {
 

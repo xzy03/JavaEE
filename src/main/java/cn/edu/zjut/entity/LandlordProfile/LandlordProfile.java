@@ -25,7 +25,7 @@ public class LandlordProfile implements Serializable {
     /**
      * 房东ID，唯一标识
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_UUID)
     private String landlordId;
 
     /**

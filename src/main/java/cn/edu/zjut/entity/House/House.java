@@ -26,8 +26,13 @@ public class House implements Serializable {
     /**
      * 房屋ID，唯一标识
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_UUID)
     private String houseId;
+
+    /**
+     * 房东ID
+     */
+    private String landlordId;
 
     /**
      * 小区ID
@@ -55,14 +60,9 @@ public class House implements Serializable {
     private BigDecimal hArea;
 
     /**
-     * 房间数量
+     * 房间布局
      */
-    private Integer hRooms;
-
-    /**
-     * 房屋状态
-     */
-    private String hStatus;
+    private String hRooms;
 
     /**
      * 可用日期

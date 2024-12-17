@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author 86173
 * @description 针对表【tenant_profile(大学生租客表)】的数据库操作Service实现
-* @createDate 2024-12-11 14:28:24
+* @createDate 2024-12-17 18:50:44
 */
 @Service
 public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, TenantProfile>

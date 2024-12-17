@@ -75,4 +75,5 @@ public class AdminsController {
         }
         return CommonResult.success(null);
     }
+
 }
