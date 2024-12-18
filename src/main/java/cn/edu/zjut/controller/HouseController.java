@@ -24,8 +24,8 @@ public class HouseController {
      @PostMapping("/publish")
      public CommonResult<Void> publish(@Validated @RequestBody HousePublishReq req) {
          try {
-//             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-             houseService.publish(req, "L00000001");
+             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+             houseService.publish(req, userTokenInfoDto.getUserId());
          } catch (Exception e) {
              return CommonResult.error(e.getMessage());
          }

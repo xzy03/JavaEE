@@ -30,9 +30,8 @@ public class ContractsController {
     @PostMapping("/publish")
     public CommonResult<Void> publish(@Validated @RequestBody ContractsPublishReq req) {
         try {
-//            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-//            contractsService.publish(req, userTokenInfoDto.getUserId());
-            contractsService.publish(req,"L00000001");
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsService.publish(req, userTokenInfoDto.getUserId());
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
