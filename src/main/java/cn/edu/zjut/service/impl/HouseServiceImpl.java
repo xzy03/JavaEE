@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author 86173
 * @description 针对表【house(房源信息表)】的数据库操作Service实现
-* @createDate 2024-12-17 20:28:07
+* @createDate 2024-12-19 08:31:33
 */
 @Service
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
@@ -33,6 +33,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
                 .hTenantrequired(req.getHTenantrequired())
                 .hTotalTenants(req.getHTotalTenants())
                 .hRemainingVacancies(req.getHRemainingVacancies())
+                .lHouseLicensePhoto(req.getLHouseLicensePhoto())
+                .lHousePhoto(req.getLHousePhoto())
                 .build();
         this.save(house);
     }

@@ -8,10 +8,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * 房源信息表
@@ -19,20 +17,13 @@ import lombok.NoArgsConstructor;
  */
 @TableName(value ="house")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class House implements Serializable {
     /**
-     * 房屋ID，唯一标识
+     * 房源ID
      */
     @TableId(type = IdType.ASSIGN_UUID)
     private String houseId;
-
-    /**
-     * 房东ID
-     */
-    private String landlordId;
 
     /**
      * 小区ID
@@ -40,12 +31,17 @@ public class House implements Serializable {
     private String communityId;
 
     /**
-     * 房屋标题
+     * 房东ID
+     */
+    private String landlordId;
+
+    /**
+     * 房源标题
      */
     private String hTitle;
 
     /**
-     * 房屋位置
+     * 房源位置
      */
     private String hLocation;
 
@@ -55,7 +51,7 @@ public class House implements Serializable {
     private BigDecimal hRent;
 
     /**
-     * 房屋面积
+     * 面积（平方米）
      */
     private BigDecimal hArea;
 
@@ -65,12 +61,12 @@ public class House implements Serializable {
     private String hRooms;
 
     /**
-     * 可用日期
+     * 可入住时间
      */
     private Date hAvailableFrom;
 
     /**
-     * 房屋朝向
+     * 朝向
      */
     private String hDirection;
 
@@ -85,7 +81,7 @@ public class House implements Serializable {
     private Integer hTotalFloors;
 
     /**
-     * 房屋设施
+     * 配套设施
      */
     private String hFacilities;
 
@@ -95,19 +91,34 @@ public class House implements Serializable {
     private Integer hPetFriendly;
 
     /**
-     * 要求租户
+     * 租客要求
      */
     private String hTenantrequired;
 
     /**
-     * 总租户数
+     * 总租户数量
      */
     private Integer hTotalTenants;
 
     /**
-     * 剩余空缺
+     * 剩余空闲数量
      */
     private Integer hRemainingVacancies;
+
+    /**
+     * 房产证图片
+     */
+    private String lHouseLicensePhoto;
+
+    /**
+     * 房产证验证状态
+     */
+    private String lHouseLicenseState;
+
+    /**
+     * 房屋图片
+     */
+    private String lHousePhoto;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

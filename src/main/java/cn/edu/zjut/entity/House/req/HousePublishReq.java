@@ -73,4 +73,10 @@ public class HousePublishReq {
     @Schema(description = "剩余空缺")
     @NotNull
     private Integer hRemainingVacancies;
+
+    @Schema(description = "房屋证件照")
+    private String lHouseLicensePhoto;
+
+    @Schema(description = "房屋图片")
+    private String lHousePhoto;
 }

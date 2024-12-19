@@ -23,18 +23,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LandlordProfile implements Serializable {
     /**
-     * 房东ID，唯一标识
+     * 房东ID
      */
     @TableId(type = IdType.ASSIGN_UUID)
     private String landlordId;
 
     /**
-     * 房东房产ID
-     */
-    private String lPropertyId;
-
-    /**
-     * 房东账户
+     * 房东账号
      */
     private String lAccount;
 
@@ -44,62 +39,52 @@ public class LandlordProfile implements Serializable {
     private String lPassword;
 
     /**
-     * 房东电话号码
+     * 手机号
      */
     private String lPhoneNumber;
 
     /**
-     * 房东电子邮件
+     * 邮箱
      */
     private String lEmail;
 
     /**
-     * 房东房屋状态
+     * 房东身份验证状态
      */
     private String lHouseStatus;
 
     /**
-     * 房东房屋许可证照片
-     */
-    private String lHouseLicensePhoto;
-
-    /**
-     * 房东房屋许可证状态
-     */
-    private String lHouseLicenseState;
-
-    /**
-     * 房东头像
+     * 房东头像图片的URL
      */
     private String lProfilePicture;
 
     /**
-     * 房东身份证号
+     * 身份证号码
      */
     private String lCardNumber;
 
     /**
-     * 房东姓名
+     * 姓名
      */
     private String lName;
 
     /**
-     * 房东身份证正面照
+     * 身份证正面图片
      */
     private String lCardImageFront;
 
     /**
-     * 房东身份证背面照
+     * 身份证背面图片
      */
     private String lCardImageBack;
 
     /**
-     * 房东状态
+     * 审核状态
      */
     private String lStatus;
 
     /**
-     * 房东余额
+     * 钱包余额
      */
     private BigDecimal lBalance;
 

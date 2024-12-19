@@ -6,8 +6,8 @@
 
     <resultMap id="BaseResultMap" type="cn.edu.zjut.entity.House.House">
             <id property="houseId" column="house_id" jdbcType="VARCHAR"/>
-            <result property="landlordId" column="landlord_id" jdbcType="VARCHAR"/>
             <result property="communityId" column="community_id" jdbcType="VARCHAR"/>
+            <result property="landlordId" column="landlord_id" jdbcType="VARCHAR"/>
             <result property="hTitle" column="h_title" jdbcType="VARCHAR"/>
             <result property="hLocation" column="h_location" jdbcType="VARCHAR"/>
             <result property="hRent" column="h_rent" jdbcType="DECIMAL"/>
@@ -22,14 +22,18 @@
             <result property="hTenantrequired" column="h_tenantrequired" jdbcType="VARCHAR"/>
             <result property="hTotalTenants" column="h_total_tenants" jdbcType="INTEGER"/>
             <result property="hRemainingVacancies" column="h_remaining_vacancies" jdbcType="INTEGER"/>
+            <result property="lHouseLicensePhoto" column="l_house_license_photo" jdbcType="VARCHAR"/>
+            <result property="lHouseLicenseState" column="l_house_license_state" jdbcType="VARCHAR"/>
+            <result property="lHousePhoto" column="l_house_photo" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        house_id,landlord_id,community_id,
+        house_id,community_id,landlord_id,
         h_title,h_location,h_rent,
         h_area,h_rooms,h_available_from,
         h_direction,h_floor,h_total_floors,
         h_facilities,h_pet_friendly,h_tenantrequired,
-        h_total_tenants,h_remaining_vacancies
+        h_total_tenants,h_remaining_vacancies,l_house_license_photo,
+        l_house_license_state,l_house_photo
     </sql>
 </mapper>

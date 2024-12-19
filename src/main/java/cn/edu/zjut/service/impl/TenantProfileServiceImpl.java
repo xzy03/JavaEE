@@ -38,6 +38,8 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             .tPassword(PasswordUtils.encrypt(req.getTPassword()))
             .tPhoneNumber(req.getTPhoneNumber())
             .tEmail(req.getTEmail())
+            .tIdentityStatus("未认证")
+            .tStatus("未审核")
             .tBalance(BigDecimal.valueOf(0))
             .build();
         this.save(tenantProfile);
