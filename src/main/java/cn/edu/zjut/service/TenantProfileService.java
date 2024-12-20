@@ -5,6 +5,7 @@ import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -17,4 +18,5 @@ public interface TenantProfileService extends IService<TenantProfile> {
     TenantProfile qureryByPhoneNum(String tPhoneNumber);
     TenantLoginResp loginTenant(TenantLoginReq req);
     TenantProfile updateTenateProfile(TenantUpdateReq req, String tenantId);
+    void findPwd(PwdChangeReq req);
 }

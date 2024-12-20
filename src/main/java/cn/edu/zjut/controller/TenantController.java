@@ -7,6 +7,7 @@ import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.TenantProfileService;
@@ -71,5 +72,15 @@ public class TenantController {
             return CommonResult.error(e.getMessage());
         }
         return CommonResult.success(tenantProfile);
+    }
+    @Operation(summary="大学生租户找回密码")
+    @PostMapping("/findPwd")
+    public CommonResult<Void> findPwd(@Validated @RequestBody PwdChangeReq req) {
+        try {
+            landlordsService.findPwd(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
     }
 }

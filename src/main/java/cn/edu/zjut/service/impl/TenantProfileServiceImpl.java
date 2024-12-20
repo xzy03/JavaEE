@@ -1,10 +1,12 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantConverter;
 import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
 import cn.edu.zjut.utils.PasswordUtils;
@@ -73,6 +75,18 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         tenantProfile.setTProfilePicture(req.getTProfilePicture());
         this.updateById(tenantProfile);
         return tenantProfile;
+    }
+    @Override
+    public void findPwd(PwdChangeReq req) {
+        TenantProfile tenantProfile = tenantProfileService.qureryByPhoneNum(req.getPhoneNum());
+        if(tenantProfile == null) {
+            throw new BusiException("用户不存在");
+        }
+        if (!req.getNewPassword().equals(req.getConfirmPassword())){
+            throw new BusiException("两次输入密码不相同");
+        }
+        tenantProfile.setTPassword(PasswordUtils.encrypt(req.getNewPassword()));
+        tenantProfileService.updateById(tenantProfile);
     }
 }
 
