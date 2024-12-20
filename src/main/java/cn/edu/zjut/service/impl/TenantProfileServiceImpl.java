@@ -3,6 +3,7 @@ package cn.edu.zjut.service.impl;
 import cn.edu.zjut.entity.TenantProfile.TenantConverter;
 import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
+import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
@@ -61,6 +62,17 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             return tenantLoginResp;
         }
         throw new BusiException("密码错误");
+    }
+
+    @Override
+    public TenantProfile updateTenateProfile(TenantUpdateReq req, String tenantId) {
+        TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
+        tenantProfile.setTAccount(req.getTAccount());
+        tenantProfile.setTPhoneNumber(req.getTPhoneNumber());
+        tenantProfile.setTEmail(req.getTEmail());
+        tenantProfile.setTProfilePicture(req.getTProfilePicture());
+        this.updateById(tenantProfile);
+        return tenantProfile;
     }
 }
 

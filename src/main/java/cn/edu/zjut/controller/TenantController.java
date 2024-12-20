@@ -1,11 +1,16 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
+import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
+import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.TenantProfileService;
+import cn.edu.zjut.utils.UserInfoUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +48,28 @@ public class TenantController {
         }
         return CommonResult.success(tenantLoginResp);
     }
-
+    @Operation(summary="查看大学生租户信息")
+    @GetMapping("/tenantInfo")
+    public CommonResult<TenantProfile> getTenantProfile() {
+        TenantProfile tenantProfile;
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            tenantProfile = landlordsService.getById(userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(tenantProfile);
+    }
+    @Operation(summary="修改大学生租户信息")
+    @PostMapping("/updateTenantInfo")
+    public CommonResult<TenantProfile> updateTenantProfile(@Validated @RequestBody TenantUpdateReq req) {
+        TenantProfile tenantProfile;
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            tenantProfile = landlordsService.updateTenateProfile(req, userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(tenantProfile);
+    }
 }
