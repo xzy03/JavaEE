@@ -3,7 +3,9 @@ package cn.edu.zjut.service.impl;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfileConverter;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
+import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
 import cn.edu.zjut.utils.PasswordUtils;
@@ -64,6 +66,28 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
             return landlordProfileLoginResp;
         }
         throw new BusiException("密码错误");
+    }
+    @Override
+    public LandlordProfile updateLandlordProfile(LandlordProfileUpdateReq req, String landlordId) {
+        LandlordProfile landlordProfile = landlordProfileService.getById(landlordId);
+        landlordProfile.setLAccount(req.getLAccount());
+        landlordProfile.setLPhoneNumber(req.getLPhoneNumber());
+        landlordProfile.setLEmail(req.getLEmail());
+        landlordProfile.setLProfilePicture(req.getLProfilePicture());
+        landlordProfileService.updateById(landlordProfile);
+        return landlordProfile;
+    }
+    @Override
+    public void findPwd(PwdChangeReq req) {
+        LandlordProfile landlordProfile = landlordProfileService.qureryByPhoneNum(req.getPhoneNum());
+        if(landlordProfile == null) {
+            throw new BusiException("用户不存在");
+        }
+        if (!req.getNewPassword().equals(req.getConfirmPassword())){
+            throw new BusiException("两次输入密码不相同");
+        }
+        landlordProfile.setLPassword(PasswordUtils.encrypt(req.getNewPassword()));
+        landlordProfileService.updateById(landlordProfile);
     }
 }
 
