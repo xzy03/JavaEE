@@ -36,4 +36,57 @@
         h_total_tenants,h_remaining_vacancies,l_house_license_photo,
         l_house_license_state,l_house_photo
     </sql>
+
+    <!-- resultMap -->
+    <resultMap id="houseDetailResultMap" type="cn.edu.zjut.entity.House.resp.HouseDetail">
+        <!-- 房源信息 -->
+        <result property="hTitle" column="h_title"/>
+        <result property="hLocation" column="h_location"/>
+        <result property="hRent" column="h_rent"/>
+        <result property="hArea" column="h_area"/>
+        <result property="hRooms" column="h_rooms"/>
+        <result property="hAvailableFrom" column="h_available_from"/>
+        <result property="hDirection" column="h_direction"/>
+        <result property="hFloor" column="h_floor"/>
+        <result property="hTotalFloors" column="h_total_floors"/>
+        <result property="hFacilities" column="h_facilities"/>
+        <result property="hPetFriendly" column="h_pet_friendly"/>
+        <result property="hTenantrequired" column="h_tenantrequired"/>
+        <result property="hTotalTenants" column="h_total_tenants"/>
+        <result property="hRemainingVacancies" column="h_remaining_vacancies"/>
+        <result property="lHouseLicensePhoto" column="l_house_license_photo"/>
+        <result property="lHousePhoto" column="l_house_photo"/>
+
+        <!-- 房东信息 -->
+        <result property="lPhoneNumber" column="l_phone_number"/>
+        <result property="lEmail" column="l_email"/>
+        <result property="lName" column="l_name"/>
+    </resultMap>
+    <!-- 查询房源信息及其房东信息 -->
+    <select id="getHouseDetailWithLandlord" resultMap="houseDetailResultMap">
+        SELECT
+            h.h_title AS hTitle,
+            h.h_location AS hLocation,
+            h.h_rent AS hRent,
+            h.h_area AS hArea,
+            h.h_rooms AS hRooms,
+            h.h_available_from AS hAvailableFrom,
+            h.h_direction AS hDirection,
+            h.h_floor AS hFloor,
+            h.h_total_floors AS hTotalFloors,
+            h.h_facilities AS hFacilities,
+            h.h_pet_friendly AS hPetFriendly,
+            h.h_tenantrequired AS hTenantrequired,
+            h.h_total_tenants AS hTotalTenants,
+            h.h_remaining_vacancies AS hRemainingVacancies,
+            h.l_house_license_photo AS lHouseLicensePhoto,
+            h.l_house_photo AS lHousePhoto,
+            l.l_phone_number AS lPhoneNumber,
+            l.l_email AS lEmail,
+            l.l_name AS lName
+        FROM house h
+                 INNER JOIN landlord_profile l ON h.landlord_id = l.landlord_id
+        WHERE h.house_id = #{houseId}
+    </select>
+
 </mapper>

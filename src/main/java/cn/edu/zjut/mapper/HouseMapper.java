@@ -1,7 +1,9 @@
 package cn.edu.zjut.mapper;
 
 import cn.edu.zjut.entity.House.House;
+import cn.edu.zjut.entity.House.resp.HouseDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author 86173
@@ -10,7 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.edu.zjut.entity.House.House
 */
 public interface HouseMapper extends BaseMapper<House> {
-
+     HouseDetail getHouseDetailWithLandlord(@Param("houseId") String houseId);
 }
 
 
