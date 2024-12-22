@@ -1,7 +1,10 @@
 package cn.edu.zjut.controller;
 
+import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.entity.House.req.HouseIdReq;
+import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
+import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.HouseService;
@@ -35,16 +38,17 @@ public class HouseController {
          }
          return CommonResult.success(null);
      }
-//     @Operation(summary="获取房源列表")
-//     @PostMapping("/getHouseList")
-//     public CommonResult<HouseListInfo> getHouseList(@Validated @RequestBody PageReq req) {
-//         try {
-//             List<HouseInfo> houseInfoList = houseService.getHouseList(req);
-//         } catch (Exception e) {
-//             return CommonResult.error(e.getMessage());
-//         }
-//         return CommonResult.success(HouseListInfo);
-//     }
+     @Operation(summary="获取房源列表")
+     @PostMapping("/getHouseList")
+     public CommonResult<HouseListInfo> getHouseList(@Validated @RequestBody QueryHouseReq req) {
+         HouseListInfo houseInfoList;
+         try {
+             houseInfoList = houseService.getHouseList(req);
+         } catch (Exception e) {
+             return CommonResult.error(e.getMessage());
+         }
+         return CommonResult.success(houseInfoList);
+     }
      @Operation(summary="获取房源详情")
      @PostMapping("/getHouseDetail")
      public CommonResult<HouseDetail> getHouseDetail(@Validated @RequestBody HouseIdReq req) {

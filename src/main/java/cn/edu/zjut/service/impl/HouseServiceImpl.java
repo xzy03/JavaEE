@@ -1,7 +1,9 @@
 package cn.edu.zjut.service.impl;
 
 import cn.edu.zjut.entity.House.req.HousePublishReq;
+import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
+import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.service.HouseService;
@@ -11,6 +13,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author 86173
@@ -47,7 +51,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     }
     @Override
     public HouseDetail getHouseDetail(String houseId) {
-        log.info("Fetching house detail for houseId: {}", houseId);
         HouseDetail houseDetail = baseMapper.getHouseDetailWithLandlord(houseId);
         if (houseDetail == null) {
             log.warn("No house detail found for houseId: {}", houseId);
@@ -55,6 +58,14 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
             log.info("Fetched house detail: {}", houseDetail);
         }
         return houseDetail;
+    }
+    @Override
+    public HouseListInfo getHouseList(QueryHouseReq req) {
+        List<House> houseList = baseMapper.getHouseList(req);
+        HouseListInfo houseListInfo = HouseListInfo.builder()
+                .houseList(houseList)
+                .build();
+        return houseListInfo;
     }
 }
 

@@ -89,4 +89,53 @@
         WHERE h.house_id = #{houseId}
     </select>
 
+    <!-- 获取房源列表 -->
+    <select id="getHouseList" resultType="cn.edu.zjut.entity.House.House">
+        SELECT
+        h.*
+        FROM
+        house h
+        WHERE
+        1=1
+        <if test="req.communityId != null and req.communityId != ''">
+            AND h.community_id = #{req.communityId}
+        </if>
+        <if test="req.landlordId != null and req.landlordId != ''">
+            AND h.landlord_id = #{req.landlordId}
+        </if>
+        <if test="req.hLocation != null and req.hLocation != ''">
+            AND h.h_location LIKE CONCAT('%', #{req.hLocation}, '%')
+        </if>
+        <if test="req.minRent != null">
+            AND h.h_rent &gt;= #{req.minRent}
+        </if>
+        <if test="req.maxRent != null">
+            AND h.h_rent &lt;= #{req.maxRent}
+        </if>
+        <if test="req.minArea != null">
+            AND h.h_area &gt;= #{req.minArea}
+        </if>
+        <if test="req.maxArea != null">
+            AND h.h_area &lt;= #{req.maxArea}
+        </if>
+        <if test="req.hDirection != null and req.hDirection != ''">
+            AND h.h_direction = #{req.hDirection}
+        </if>
+        <if test="req.hFloor != null">
+            AND h.h_floor = #{req.hFloor}
+        </if>
+        <if test="req.hTotalFloors != null">
+            AND h.h_total_floors = #{req.hTotalFloors}
+        </if>
+        <if test="req.hPetFriendly != null">
+            AND h.h_pet_friendly = #{req.hPetFriendly}
+        </if>
+        <if test="req.hTotalTenants != null">
+            AND h.h_total_tenants = #{req.hTotalTenants}
+        </if>
+        <if test="req.hRemainingVacancies != null">
+            AND h.h_remaining_vacancies = #{req.hRemainingVacancies}
+        </if>
+        ORDER BY h.house_id DESC
+    </select>
 </mapper>
