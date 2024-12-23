@@ -3,6 +3,10 @@ spring:
     name: JavaEE
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 
 server:
   port: 8080

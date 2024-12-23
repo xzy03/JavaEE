@@ -1,8 +1,8 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
-import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
+import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
 import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @CrossOrigin
@@ -26,12 +27,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/tenant")
 @Tag(name = "大学生租户管理", description = "大学生租户相关的 API")
 public class TenantController {
-     private final TenantProfileService landlordsService;
+     private final TenantProfileService tenantProfileService;
      @Operation(summary="大学生租户注册")
      @PostMapping("/register")
      public CommonResult<Void> register(@Validated @RequestBody TenantRegisterReq req) {
          try {
-             landlordsService.registerTenant(req);
+             tenantProfileService.registerTenant(req);
          } catch (Exception e) {
              return CommonResult.error(e.getMessage());
          }
@@ -43,7 +44,7 @@ public class TenantController {
     public CommonResult<TenantLoginResp> login(@Validated @RequestBody TenantLoginReq req) {
         TenantLoginResp tenantLoginResp;
         try {
-            tenantLoginResp = landlordsService.loginTenant(req);
+            tenantLoginResp = tenantProfileService.loginTenant(req);
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
@@ -55,7 +56,7 @@ public class TenantController {
         TenantProfile tenantProfile;
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-            tenantProfile = landlordsService.getById(userTokenInfoDto.getUserId());
+            tenantProfile = tenantProfileService.getById(userTokenInfoDto.getUserId());
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
@@ -67,7 +68,7 @@ public class TenantController {
         TenantProfile tenantProfile;
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-            tenantProfile = landlordsService.updateTenateProfile(req, userTokenInfoDto.getUserId());
+            tenantProfile = tenantProfileService.updateTenateProfile(req, userTokenInfoDto.getUserId());
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
@@ -77,10 +78,41 @@ public class TenantController {
     @PostMapping("/findPwd")
     public CommonResult<Void> findPwd(@Validated @RequestBody PwdChangeReq req) {
         try {
-            landlordsService.findPwd(req);
+            tenantProfileService.findPwd(req);
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
         return CommonResult.success(null);
     }
+    @Operation(summary="大学生租户身份证验证")
+    @PostMapping("/idCardCheck")
+    public CommonResult<Void> idCardCheck(
+            @RequestParam("tCardNumber") String tCardNumber,
+            @RequestParam("tName") String tName,
+            @RequestParam("tCardImageFront") MultipartFile tCardImageFront,
+            @RequestParam("tCardImageBack") MultipartFile tCardImageBack) {
+        TenantIdcardReq req = new TenantIdcardReq(tCardNumber, tName, tCardImageFront, tCardImageBack);
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            tenantProfileService.idCardCheck(req, userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="大学生租户学生认证信息")
+    @PostMapping("/studentInfo")
+    public CommonResult<Void> studentInfo(
+            @RequestParam("tUniversity") String tUniversity,
+            @RequestParam("tMajor") String tMajor,
+            @RequestParam("tProfilePicture") MultipartFile tProfilePicture) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            tenantProfileService.studentInfo(tUniversity, tMajor, tProfilePicture,userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+
 }

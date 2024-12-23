@@ -20,4 +20,5 @@ public interface AdminsService extends IService<Admins> {
     AdminsLoginResp login(AdminsLoginReq req);
     void changeUserInfo(AdminsInfoReq req, String userId);
     void findPwd(PwdChangeReq req);
+    void idCardCheck(String tenantId);
 }

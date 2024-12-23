@@ -1,5 +1,6 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.admins.AdminsConverter;
 import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
 import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
@@ -8,6 +9,7 @@ import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.service.TenantProfileService;
 import cn.edu.zjut.utils.PasswordUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.admins.Admins;
@@ -31,6 +33,9 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
     @Lazy
     @Resource
     AdminsService adminsService;
+    @Lazy
+    @Resource
+    TenantProfileService tenantProfileService;
     @Override
     public Admins qureryByUsername(String adUsername) {
         return adminsService.lambdaQuery().eq(Admins::getAdUsername, adUsername).one();
@@ -88,7 +93,15 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         admins.setAdPasswordHash(PasswordUtils.encrypt(req.getNewPassword()));
         adminsService.updateById(admins);
     }
-
+    @Override
+    public void idCardCheck(String tenantId) {
+        TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
+        if (tenantProfile == null){
+            throw new BusiException("租客不存在");
+        }
+        tenantProfile.setTIdentityStatus("已认证");
+        tenantProfileService.updateById(tenantProfile);
+    }
 }
 
 

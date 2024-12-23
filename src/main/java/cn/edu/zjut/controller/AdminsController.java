@@ -75,5 +75,15 @@ public class AdminsController {
         }
         return CommonResult.success(null);
     }
-
+    @Operation(summary="管理员审核大学生租户身份证")
+    @PostMapping("/idCardCheck")
+    public CommonResult<Void> idCardCheck(String tenantId) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            adminsService.idCardCheck(tenantId);
+        } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
 }
