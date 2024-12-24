@@ -1,10 +1,7 @@
 package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.admins.Admins;
-import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
-import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
-import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
-import cn.edu.zjut.entity.admins.req.PwdChangeReq;
+import cn.edu.zjut.entity.admins.req.*;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,5 +17,8 @@ public interface AdminsService extends IService<Admins> {
     AdminsLoginResp login(AdminsLoginReq req);
     void changeUserInfo(AdminsInfoReq req, String userId);
     void findPwd(PwdChangeReq req);
-    void idCardCheck(String tenantId);
+    void idCardCheck(CheckReq req);
+    void studentCardCheck(CheckReq req);
+    void landlordIdCardCheck(CheckReq req);
+    void landlordHouseCardCheck(CheckReq req);
 }

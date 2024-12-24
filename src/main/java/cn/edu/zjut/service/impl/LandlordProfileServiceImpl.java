@@ -5,10 +5,16 @@ import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
+import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
 import cn.edu.zjut.utils.PasswordUtils;
+import cn.edu.zjut.utils.UploadGiteeImgBed;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.service.LandlordProfileService;
@@ -17,8 +23,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
 * @author 86173
@@ -88,6 +97,52 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         }
         landlordProfile.setLPassword(PasswordUtils.encrypt(req.getNewPassword()));
         landlordProfileService.updateById(landlordProfile);
+    }
+    @Override
+    public void landlordIdCardCheck(TenantIdcardReq req, String landlordId) {
+        LandlordProfile landlordProfile = landlordProfileService.getById(landlordId);
+        if (landlordProfile == null) {
+            throw new BusiException("用户不存在");
+        }
+        landlordProfile.setLCardNumber(req.getTCardNumber());
+        landlordProfile.setLName(req.getTName());
+
+        MultipartFile multipartFile = req.getTCardImageFront();
+        MultipartFile multipartFile1 = req.getTCardImageBack();
+        String originalFilename = multipartFile.getOriginalFilename();
+        String originalFilename1 = multipartFile1.getOriginalFilename();
+        if (originalFilename == null || originalFilename1 == null) {
+            throw new BusiException("文件名为空");
+        }
+        String targetURL = UploadGiteeImgBed.createUploadFileUrl(originalFilename);
+        String targetURL1 = UploadGiteeImgBed.createUploadFileUrl(originalFilename1);
+        log.info("目标url：" + targetURL);
+        log.info("目标url：" + targetURL1);
+        try {
+            Map<String, Object> uploadBodyMap = UploadGiteeImgBed.getUploadBodyMap(multipartFile.getBytes());
+            String JSONResult = HttpUtil.post(targetURL, uploadBodyMap);
+            JSONObject jsonObj = JSONUtil.parseObj(JSONResult);
+            if (jsonObj == null || jsonObj.getObj("commit") == null) {
+                throw new BusiException("上传失败");
+            }
+            JSONObject content = JSONUtil.parseObj(jsonObj.getObj("content"));
+            log.info("响应data为：" + content.getObj("download_url"));
+            landlordProfile.setLCardImageFront(content.getStr("download_url")); // 设置正面图片下载地址
+            uploadBodyMap = UploadGiteeImgBed.getUploadBodyMap(multipartFile1.getBytes());
+            JSONResult = HttpUtil.post(targetURL1, uploadBodyMap);
+            jsonObj = JSONUtil.parseObj(JSONResult);
+            if (jsonObj == null || jsonObj.getObj("commit") == null) {
+                throw new BusiException("上传失败");
+            }
+            content = JSONUtil.parseObj(jsonObj.getObj("content"));
+            log.info("响应data为：" + content.getObj("download_url"));
+            landlordProfile.setLCardImageBack(content.getStr("download_url")); // 设置背面图片下载地址
+            landlordProfile.setLStatus("等待审核");
+            landlordProfileService.updateById(landlordProfile);
+        } catch (IOException e) {
+            log.error("文件读取失败", e);
+            throw new BusiException("文件读取失败，请稍后再试");
+        }
     }
 }
 

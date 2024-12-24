@@ -6,6 +6,7 @@ import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
+import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @CrossOrigin
@@ -80,6 +82,22 @@ public class landlordController {
         try {
             landlordsService.findPwd(req);
         } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="房东身份证验证")
+    @PostMapping("/landlordIdCardCheck")
+    public CommonResult<Void> landlordIdCardCheck(
+            @RequestParam("tCardNumber") String tCardNumber,
+            @RequestParam("tName") String tName,
+            @RequestParam("tCardImageFront") MultipartFile tCardImageFront,
+            @RequestParam("tCardImageBack") MultipartFile tCardImageBack) {
+        TenantIdcardReq req = new TenantIdcardReq(tCardNumber, tName, tCardImageFront, tCardImageBack);
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            landlordsService.landlordIdCardCheck(req, userTokenInfoDto.getUserId());
+        } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
         return CommonResult.success(null);

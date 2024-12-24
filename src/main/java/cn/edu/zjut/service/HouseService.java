@@ -6,6 +6,7 @@ import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author 86173
@@ -16,4 +17,5 @@ public interface HouseService extends IService<House> {
     void publish(HousePublishReq req, String landlordId);
     HouseDetail getHouseDetail(String houseId);
     HouseListInfo getHouseList(QueryHouseReq req);
+    void addHouseCard(String house_id,MultipartFile l_house_photo, MultipartFile l_house_license_photo);
 }

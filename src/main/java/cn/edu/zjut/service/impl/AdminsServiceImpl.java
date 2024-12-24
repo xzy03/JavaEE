@@ -1,14 +1,14 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.House.House;
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.admins.AdminsConverter;
-import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
-import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
-import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
-import cn.edu.zjut.entity.admins.req.PwdChangeReq;
+import cn.edu.zjut.entity.admins.req.*;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
-import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.service.HouseService;
+import cn.edu.zjut.service.LandlordProfileService;
 import cn.edu.zjut.service.TenantProfileService;
 import cn.edu.zjut.utils.PasswordUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,6 +36,12 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
     @Lazy
     @Resource
     TenantProfileService tenantProfileService;
+    @Lazy
+    @Resource
+    LandlordProfileService landlordProfileService;
+    @Lazy
+    @Resource
+    HouseService houseService;
     @Override
     public Admins qureryByUsername(String adUsername) {
         return adminsService.lambdaQuery().eq(Admins::getAdUsername, adUsername).one();
@@ -94,13 +100,40 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         adminsService.updateById(admins);
     }
     @Override
-    public void idCardCheck(String tenantId) {
-        TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
+    public void idCardCheck(CheckReq req) {
+        TenantProfile tenantProfile = tenantProfileService.getById(req.getId());
         if (tenantProfile == null){
             throw new BusiException("租客不存在");
         }
-        tenantProfile.setTIdentityStatus("已认证");
+        tenantProfile.setTIdentityStatus(req.getContent());
         tenantProfileService.updateById(tenantProfile);
+    }
+    @Override
+    public void studentCardCheck(CheckReq req) {
+        TenantProfile tenantProfile = tenantProfileService.getById(req.getId());
+        if (tenantProfile == null){
+            throw new BusiException("租客不存在");
+        }
+        tenantProfile.setTStatus(req.getContent());
+        tenantProfileService.updateById(tenantProfile);
+    }
+    @Override
+    public void landlordIdCardCheck(CheckReq req){
+        LandlordProfile landlordProfile = landlordProfileService.getById(req.getId());
+        if (landlordProfile == null){
+            throw new BusiException("房东不存在");
+        }
+        landlordProfile.setLHouseStatus(req.getContent());
+        landlordProfileService.updateById(landlordProfile);
+    }
+    @Override
+    public void landlordHouseCardCheck(CheckReq req){
+        House house = houseService.getById(req.getId());
+        if (house == null){
+            throw new BusiException("房屋不存在");
+        }
+        house.setLHouseLicenseState(req.getContent());
+        houseService.updateById(house);
     }
 }
 

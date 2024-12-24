@@ -4,17 +4,24 @@ import cn.edu.zjut.entity.House.req.HousePublishReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
+import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.utils.UploadGiteeImgBed;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.service.HouseService;
 import cn.edu.zjut.mapper.HouseMapper;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author 86173
@@ -25,6 +32,9 @@ import java.util.List;
 @Slf4j
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     implements HouseService{
+    @Lazy
+    @Resource
+    HouseService houseService;
     @Override
     public void publish(HousePublishReq req, String landlordId){
         House house = House.builder()
@@ -44,8 +54,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
                 .hTenantrequired(req.getHTenantrequired())
                 .hTotalTenants(req.getHTotalTenants())
                 .hRemainingVacancies(req.getHRemainingVacancies())
-                .lHouseLicensePhoto(req.getLHouseLicensePhoto())
-                .lHousePhoto(req.getLHousePhoto())
                 .build();
         this.save(house);
     }
@@ -66,6 +74,44 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
                 .houseList(houseList)
                 .build();
         return houseListInfo;
+    }
+    @Override
+    public void addHouseCard(String house_id, MultipartFile l_house_photo, MultipartFile l_house_license_photo){
+        House house = houseService.getById(house_id);
+        String originalFilename = l_house_photo.getOriginalFilename();
+        String originalFilename1 = l_house_license_photo.getOriginalFilename();
+        if (originalFilename == null || originalFilename1 == null) {
+            throw new BusiException("文件名为空");
+        }
+        String targetURL = UploadGiteeImgBed.createUploadFileUrl(originalFilename);
+        String targetURL1 = UploadGiteeImgBed.createUploadFileUrl(originalFilename1);
+        log.info("目标url：" + targetURL);
+        log.info("目标url：" + targetURL1);
+        try {
+            Map<String, Object> uploadBodyMap = UploadGiteeImgBed.getUploadBodyMap(l_house_photo.getBytes());
+            String JSONResult = HttpUtil.post(targetURL, uploadBodyMap);
+            JSONObject jsonObj = JSONUtil.parseObj(JSONResult);
+            if (jsonObj == null || jsonObj.getObj("commit") == null) {
+                throw new BusiException("上传失败");
+            }
+            JSONObject content = JSONUtil.parseObj(jsonObj.getObj("content"));
+            log.info("响应data为：" + content.getObj("download_url"));
+            house.setLHousePhoto(content.getStr("download_url"));
+            uploadBodyMap = UploadGiteeImgBed.getUploadBodyMap(l_house_license_photo.getBytes());
+            JSONResult = HttpUtil.post(targetURL1, uploadBodyMap);
+            jsonObj = JSONUtil.parseObj(JSONResult);
+            if (jsonObj == null || jsonObj.getObj("commit") == null) {
+                throw new BusiException("上传失败");
+            }
+            content = JSONUtil.parseObj(jsonObj.getObj("content"));
+            log.info("响应data为：" + content.getObj("download_url"));
+            house.setLHouseLicensePhoto(content.getStr("download_url"));
+            house.setLHouseLicenseState("等待审核");
+            houseService.updateById(house);
+        } catch (IOException e) {
+            log.error("文件读取失败", e);
+            throw new BusiException("文件读取失败，请稍后再试");
+        }
     }
 }
 

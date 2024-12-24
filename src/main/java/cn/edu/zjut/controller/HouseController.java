@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import cn.edu.zjut.utils.UserInfoUtils;
 import cn.edu.zjut.entity.House.req.HousePublishReq;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,6 +60,19 @@ public class HouseController {
          } catch (Exception e) {
              return CommonResult.error(e.getMessage());
          }
+     }
+     @Operation(summary="增加房产证信息")
+     @PostMapping("/addHouseCard")
+     public CommonResult<Void> addHouseCard(
+             @RequestParam("house_id") String house_id,
+             @RequestParam("l_house_photo") MultipartFile l_house_photo,
+             @RequestParam("l_house_license_photo") MultipartFile l_house_license_photo) {
+         try {
+             houseService.addHouseCard(house_id,l_house_photo,l_house_license_photo);
+         } catch (Exception e) {
+             return CommonResult.error(e.getMessage());
+         }
+         return CommonResult.success(null);
      }
     // @Operation(summary="修改房源信息")
     // @PostMapping("/changeHouseInfo")

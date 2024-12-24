@@ -1,10 +1,7 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
-import cn.edu.zjut.entity.admins.req.AdminsInfoReq;
-import cn.edu.zjut.entity.admins.req.AdminsLoginReq;
-import cn.edu.zjut.entity.admins.req.AdminsRegisterReq;
-import cn.edu.zjut.entity.admins.req.PwdChangeReq;
+import cn.edu.zjut.entity.admins.req.*;
 import cn.edu.zjut.entity.admins.resp.AdminsLoginResp;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
@@ -77,10 +74,43 @@ public class AdminsController {
     }
     @Operation(summary="管理员审核大学生租户身份证")
     @PostMapping("/idCardCheck")
-    public CommonResult<Void> idCardCheck(String tenantId) {
+    public CommonResult<Void> idCardCheck(@Validated @RequestBody CheckReq req) {
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-            adminsService.idCardCheck(tenantId);
+            adminsService.idCardCheck(req);
+        } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="管理员审核大学生租户学生证")
+    @PostMapping("/studentCardCheck")
+    public CommonResult<Void> studentCardCheck(@Validated @RequestBody CheckReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            adminsService.studentCardCheck(req);
+        } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="管理员审核房东身份证")
+    @PostMapping("/landlordIdCardCheck")
+    public CommonResult<Void> landlordIdCardCheck(@Validated @RequestBody CheckReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            adminsService.landlordIdCardCheck(req);
+        } catch (BusiException e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="管理员审核房东房产证")
+    @PostMapping("/landlordHouseCardCheck")
+    public CommonResult<Void> landlordHouseCardCheck(@Validated @RequestBody CheckReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            adminsService.landlordHouseCardCheck(req);
         } catch (BusiException e) {
             return CommonResult.error(e.getMessage());
         }
