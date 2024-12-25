@@ -27,4 +27,20 @@
         l_card_image_front,l_card_image_back,l_status,
         l_balance
     </sql>
+    <!-- 获取房东列表 -->
+    <select id="getLandlordList" resultType="cn.edu.zjut.entity.LandlordProfile.LandlordProfile">
+        SELECT
+        l.*
+        FROM
+        landlord_profile l
+        WHERE
+        1=1
+        <if test="req.lHouseStatus != null and req.lHouseStatus != ''">
+            AND l.l_house_status = #{req.lHouseStatus}
+        </if>
+        <if test="req.lStatus != null and req.lStatus != ''">
+            AND l.l_status = #{req.lStatus}
+        </if>
+        ORDER BY l.landlord_id DESC
+    </select>
 </mapper>

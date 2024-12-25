@@ -123,16 +123,21 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         if (landlordProfile == null){
             throw new BusiException("房东不存在");
         }
-        landlordProfile.setLHouseStatus(req.getContent());
+        landlordProfile.setLStatus(req.getContent());
         landlordProfileService.updateById(landlordProfile);
     }
     @Override
     public void landlordHouseCardCheck(CheckReq req){
         House house = houseService.getById(req.getId());
+        LandlordProfile landlordProfile = landlordProfileService.getById(house.getLandlordId());
         if (house == null){
             throw new BusiException("房屋不存在");
         }
         house.setLHouseLicenseState(req.getContent());
+        if(landlordProfile.getLHouseStatus()==null || !landlordProfile.getLHouseStatus().equals("已认证")){
+            landlordProfile.setLHouseStatus(req.getContent());
+            landlordProfileService.updateById(landlordProfile);
+        }
         houseService.updateById(house);
     }
 }

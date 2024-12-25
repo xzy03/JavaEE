@@ -2,12 +2,9 @@ package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordIdcardReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
+import cn.edu.zjut.entity.LandlordProfile.req.*;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
-import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
+import cn.edu.zjut.entity.TenantProfile.req.QueryTenantReq;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
@@ -54,7 +51,7 @@ public class landlordController {
     }
 
     @Operation(summary="查看房东信息")
-    @GetMapping("/landlordInfo")
+    @PostMapping("/landlordInfo")
     public CommonResult<LandlordProfile> getLandlordProfile() {
         LandlordProfile landlordProfile;
         try {
@@ -102,5 +99,16 @@ public class landlordController {
             return CommonResult.error(e.getMessage());
         }
         return CommonResult.success(null);
+    }
+    @Operation(summary="查看房东列表")
+    @PostMapping("/getLandlordList")
+    public CommonResult<LandlordListInfo> getTenantList(@Validated @RequestBody QueryLandlordReq req) {
+        LandlordListInfo landlordListInfo;
+        try {
+            landlordListInfo = landlordsService.getLandlordList(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(landlordListInfo);
     }
 }

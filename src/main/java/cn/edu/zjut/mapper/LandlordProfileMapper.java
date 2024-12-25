@@ -1,7 +1,13 @@
 package cn.edu.zjut.mapper;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
+import cn.edu.zjut.entity.LandlordProfile.req.QueryLandlordReq;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
+import cn.edu.zjut.entity.TenantProfile.req.QueryTenantReq;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author 86173
@@ -10,7 +16,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.edu.zjut.entity.LandlordProfile.LandlordProfile
 */
 public interface LandlordProfileMapper extends BaseMapper<LandlordProfile> {
-
+    List<LandlordProfile> getLandlordList(@Param("req") QueryLandlordReq req);
 }
 
 

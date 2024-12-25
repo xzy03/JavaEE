@@ -18,8 +18,6 @@ import lombok.NoArgsConstructor;
  */
 @TableName(value ="landlord_profile")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class LandlordProfile implements Serializable {
     /**

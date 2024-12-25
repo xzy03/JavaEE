@@ -1,11 +1,9 @@
 package cn.edu.zjut.service.impl;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfileConverter;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordIdcardReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
-import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
+import cn.edu.zjut.entity.LandlordProfile.req.*;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantListInfo;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
@@ -26,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,8 +49,6 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
                 .lPassword(PasswordUtils.encrypt(req.getLPassword()))
                 .lPhoneNumber(req.getLPhoneNumber())
                 .lEmail(req.getLEmail())
-                .lStatus("未认证")
-                .lHouseStatus("未认证")
                 .lBalance(BigDecimal.valueOf(0))
                 .build();
         this.save(landlordProfile);
@@ -142,6 +139,14 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
             log.error("文件读取失败", e);
             throw new BusiException("文件读取失败，请稍后再试");
         }
+    }
+    @Override
+    public LandlordListInfo getLandlordList(QueryLandlordReq req) {
+        List<LandlordProfile> landlordList = baseMapper.getLandlordList(req);
+        LandlordListInfo landlordListInfo = LandlordListInfo.builder()
+                .landlordList(landlordList)
+                .build();
+        return landlordListInfo;
     }
 }
 
