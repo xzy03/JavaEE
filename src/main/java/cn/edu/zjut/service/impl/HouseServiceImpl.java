@@ -113,6 +113,16 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
             throw new BusiException("文件读取失败，请稍后再试");
         }
     }
+
+    public String getLandlordIdByHouseId(String houseId) {
+        // 查询 house 表，返回 landlordId
+        House house = baseMapper.selectById(houseId);
+        if (house == null) {
+            throw new BusiException("房源不存在");
+        }
+        return house.getLandlordId();
+    }
+
 }
 
 

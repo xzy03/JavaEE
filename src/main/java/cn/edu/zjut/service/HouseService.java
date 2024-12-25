@@ -18,4 +18,6 @@ public interface HouseService extends IService<House> {
     HouseDetail getHouseDetail(String houseId);
     HouseListInfo getHouseList(QueryHouseReq req);
     void addHouseCard(String house_id,MultipartFile l_house_photo, MultipartFile l_house_license_photo);
+
+    public String getLandlordIdByHouseId(String houseId);
 }
