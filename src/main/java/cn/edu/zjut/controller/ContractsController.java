@@ -1,6 +1,8 @@
 package cn.edu.zjut.controller;
 
+import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
+import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.ContractsService;
@@ -37,5 +39,16 @@ public class ContractsController {
         }
         return CommonResult.success(null);
     }
-
+    @Operation(summary="查看合同详细信息")
+    @PostMapping("/getContractsDetail")
+    public CommonResult<ContractsDetailResp> getContractsDetail(@Validated @RequestBody ContractsIdReq req) {
+        ContractsDetailResp contractsDetailResp;
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsDetailResp = contractsService.getContractsDetail(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(contractsDetailResp);
+    }
 }

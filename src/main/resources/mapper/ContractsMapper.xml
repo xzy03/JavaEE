@@ -23,4 +23,19 @@
         c_rent_amount,c_deposit_amount,c_status,
         c_additions
     </sql>
+    <select id="getContractsDetail" resultType="cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp">
+        SELECT
+            l.l_name AS lName,
+            t.t_name AS tName,
+            c.c_start_date AS cStartDate,
+            c.c_end_date AS cEndDate,
+            c.c_rent_amount AS cRentAmount,
+            c.c_deposit_amount AS cDepositAmount,
+            c.c_additions AS cAdditions
+
+        FROM contracts c
+        INNER JOIN landlord_profile l ON c.c_landlord_id = l.landlord_id
+        INNER JOIN tenant_profile t ON c.c_tenant_id = t.tenant_id
+        WHERE contract_id = #{req.contractsId}
+    </select>
 </mapper>

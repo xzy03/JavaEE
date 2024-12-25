@@ -1,10 +1,14 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
+import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
+import cn.edu.zjut.entity.House.resp.HouseDetail;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.Contracts.Contracts;
 import cn.edu.zjut.service.ContractsService;
 import cn.edu.zjut.mapper.ContractsMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 * @createDate 2024-12-17 18:47:53
 */
 @Service
+@Slf4j
 public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts>
     implements ContractsService{
     @Override
@@ -29,6 +34,16 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
                 .cLandlordId(landlordId)
                 .build();
         this.save(contracts);
+    }
+    @Override
+    public ContractsDetailResp getContractsDetail(ContractsIdReq req) {
+        ContractsDetailResp contractsDetailResp = baseMapper.getContractsDetail(req);
+        if (contractsDetailResp == null) {
+            log.warn("No house detail found for houseId: {}", req);
+        } else {
+            log.info("Fetched house detail: {}", contractsDetailResp);
+        }
+        return contractsDetailResp;
     }
 }
 
