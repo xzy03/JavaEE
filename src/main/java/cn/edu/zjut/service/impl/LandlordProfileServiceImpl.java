@@ -143,6 +143,17 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
             throw new BusiException("文件读取失败，请稍后再试");
         }
     }
+
+    @Override
+    public void modifyBalance(String landlordId, Double amount) {
+        LandlordProfile landlord = this.getById(landlordId);
+        if (landlord == null) {
+            throw new BusiException("房东不存在");
+        }
+        landlord.setLBalance(landlord.getLBalance().add(BigDecimal.valueOf(amount)));
+        this.updateById(landlord);
+    }
+
 }
 
 

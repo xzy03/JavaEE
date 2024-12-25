@@ -22,4 +22,7 @@ public interface TenantProfileService extends IService<TenantProfile> {
     void idCardCheck(TenantIdcardReq req, String tenantId);
     void studentInfo(String tUniversity, String tMajor, MultipartFile tProfilePicture, String tenantId);
     TenantListInfo getTenantList(QueryTenantReq req);
+    // TenantProfileService.java
+    void modifyBalance(String tenantId, Double amount);
+
 }

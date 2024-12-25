@@ -22,4 +22,7 @@ public interface LandlordProfileService extends IService<LandlordProfile> {
     LandlordProfile updateLandlordProfile(LandlordProfileUpdateReq req, String landlordId);
     void findPwd(PwdChangeReq req);
     void landlordIdCardCheck(LandlordIdcardReq req, String landlordId);
+    // LandlordProfileService.java
+    void modifyBalance(String landlordId, Double amount);
+
 }
