@@ -148,6 +148,17 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
                 .build();
         return landlordListInfo;
     }
+
+    @Override
+    public void modifyBalance(String landlordId, Double amount) {
+        LandlordProfile landlord = this.getById(landlordId);
+        if (landlord == null) {
+            throw new BusiException("房东不存在");
+        }
+        landlord.setLBalance(landlord.getLBalance().add(BigDecimal.valueOf(amount)));
+        this.updateById(landlord);
+    }
+
 }
 
 

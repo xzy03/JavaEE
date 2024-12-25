@@ -183,6 +183,17 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
                 .build();
         return tenantListInfo;
     }
+
+    @Override
+    public void modifyBalance(String tenantId, Double amount) {
+        TenantProfile tenant = this.getById(tenantId);
+        if (tenant == null) {
+            throw new BusiException("租户不存在");
+        }
+        tenant.setTBalance(tenant.getTBalance().add(BigDecimal.valueOf(amount)));
+        this.updateById(tenant);
+    }
+
 }
 
 
