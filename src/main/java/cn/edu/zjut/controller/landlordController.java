@@ -2,6 +2,7 @@ package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordIdcardReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
@@ -93,7 +94,7 @@ public class landlordController {
             @RequestParam("tName") String tName,
             @RequestParam("tCardImageFront") MultipartFile tCardImageFront,
             @RequestParam("tCardImageBack") MultipartFile tCardImageBack) {
-        TenantIdcardReq req = new TenantIdcardReq(tCardNumber, tName, tCardImageFront, tCardImageBack);
+        LandlordIdcardReq req = new LandlordIdcardReq(tCardNumber, tName, tCardImageFront, tCardImageBack);
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
             landlordsService.landlordIdCardCheck(req, userTokenInfoDto.getUserId());

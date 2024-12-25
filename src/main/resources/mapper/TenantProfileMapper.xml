@@ -17,9 +17,12 @@
             <result property="tCardNumber" column="t_card_number" jdbcType="VARCHAR"/>
             <result property="tName" column="t_name" jdbcType="VARCHAR"/>
             <result property="tCardImageFront" column="t_card_image_front" jdbcType="VARCHAR"/>
-            <result property="tCatImageBack" column="t_cat_image_back" jdbcType="VARCHAR"/>
+            <result property="tCardImageBack" column="t_card_image_back" jdbcType="VARCHAR"/>
             <result property="tStatus" column="t_status" jdbcType="VARCHAR"/>
             <result property="tBalance" column="t_balance" jdbcType="DECIMAL"/>
+            <result property="tSex" column="t_sex" jdbcType="VARCHAR"/>
+            <result property="tBirth" column="t_birth" jdbcType="TIMESTAMP"/>
+            <result property="tIntroduction" column="t_introduction" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -27,6 +30,39 @@
         t_university,t_major,t_phone_number,
         t_email,t_identity_status,t_profile_picture,
         t_card_number,t_name,t_card_image_front,
-        t_cat_image_back,t_status,t_balance
+        t_card_image_back,t_status,t_balance,
+        t_sex,t_birth,t_introduction
     </sql>
+    <!-- 获取大学生列表 -->
+    <select id="getTenantList" resultType="cn.edu.zjut.entity.TenantProfile.TenantProfile">
+        SELECT
+        t.*
+        FROM
+        tenant_profile t
+        WHERE
+        1=1
+        <if test="req.tUniversity != null and req.tUniversity != ''">
+            AND t.t_university = #{req.tUniversity}
+        </if>
+        <if test="req.tMajor != null and req.tMajor != ''">
+            AND t.t_major = #{req.tMajor}
+        </if>
+        <if test="req.tIdentityStatus != null and req.tIdentityStatus != ''">
+            AND t.t_identity_status = #{req.tIdentityStatus}
+        </if>
+        <if test="req.tStatus != null and req.tStatus != ''">
+            AND t.t_status = #{req.tStatus}
+        </if>
+        <if test="req.tSex != null">
+            AND t.t_sex = #{req.tSex}
+        </if>
+        <!-- 出生年月时间范围 -->
+        <if test="req.tBirthStart != null">
+            AND t.t_birth &gt;= #{req.tBirthStart}
+        </if>
+        <if test="req.tBirthEnd != null">
+            AND t.t_birth &lt;= #{req.tBirthEnd}
+        </if>
+        ORDER BY t.tenant_id DESC
+    </select>
 </mapper>

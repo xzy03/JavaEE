@@ -1,12 +1,11 @@
 package cn.edu.zjut.service.impl;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfileConverter;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordIdcardReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
-import cn.edu.zjut.entity.TenantProfile.TenantProfile;
-import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.utils.JwtUtil;
@@ -99,7 +98,7 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         landlordProfileService.updateById(landlordProfile);
     }
     @Override
-    public void landlordIdCardCheck(TenantIdcardReq req, String landlordId) {
+    public void landlordIdCardCheck(LandlordIdcardReq req, String landlordId) {
         LandlordProfile landlordProfile = landlordProfileService.getById(landlordId);
         if (landlordProfile == null) {
             throw new BusiException("用户不存在");

@@ -1,6 +1,7 @@
 package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
+import cn.edu.zjut.entity.LandlordProfile.req.LandlordIdcardReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileLoginReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileRegisterReq;
 import cn.edu.zjut.entity.LandlordProfile.req.LandlordProfileUpdateReq;
@@ -20,5 +21,5 @@ public interface LandlordProfileService extends IService<LandlordProfile> {
     LandlordProfileLoginResp loginLandlord(LandlordProfileLoginReq req);
     LandlordProfile updateLandlordProfile(LandlordProfileUpdateReq req, String landlordId);
     void findPwd(PwdChangeReq req);
-    void landlordIdCardCheck(TenantIdcardReq req, String landlordId);
+    void landlordIdCardCheck(LandlordIdcardReq req, String landlordId);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,80 +24,95 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TenantProfile implements Serializable {
     /**
-     * 租户ID，唯一标识
+     * 租客ID
      */
     @TableId(type = IdType.ASSIGN_UUID)
     private String tenantId;
 
     /**
-     * 租户账户
+     * 学生账号
      */
     private String tAccount;
 
     /**
-     * 租户密码
+     * 学生密码
      */
     private String tPassword;
 
     /**
-     * 租户所在大学
+     * 就读大学
      */
     private String tUniversity;
 
     /**
-     * 租户专业
+     * 专业
      */
     private String tMajor;
 
     /**
-     * 租户电话
+     * 手机号
      */
     private String tPhoneNumber;
 
     /**
-     * 租户电子邮件
+     * 邮箱
      */
     private String tEmail;
 
     /**
-     * 租户身份状态
+     * 身份认证状态
      */
     private String tIdentityStatus;
 
     /**
-     * 租户头像
+     * 学生证照片
      */
     private String tProfilePicture;
 
     /**
-     * 租户身份证号
+     * 身份证号码
      */
     private String tCardNumber;
 
     /**
-     * 租户姓名
+     * 姓名
      */
     private String tName;
 
     /**
-     * 租户身份证正面照
+     * 身份证正面图片
      */
     private String tCardImageFront;
 
     /**
-     * 租户身份证背面照
+     * 身份证背面图片
      */
-    private String tCatImageBack;
+    private String tCardImageBack;
 
     /**
-     * 租户状态
+     * 学生证审核状态
      */
     private String tStatus;
 
     /**
-     * 租户余额
+     * 钱包余额
      */
     private BigDecimal tBalance;
+
+    /**
+     * 性别
+     */
+    private String tSex;
+
+    /**
+     * 出生年月
+     */
+    private Date tBirth;
+
+    /**
+     * 个人介绍
+     */
+    private String tIntroduction;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

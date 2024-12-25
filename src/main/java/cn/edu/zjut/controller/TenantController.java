@@ -1,11 +1,11 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
+import cn.edu.zjut.entity.House.req.QueryHouseReq;
+import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
-import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
+import cn.edu.zjut.entity.TenantProfile.req.*;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantListInfo;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Slf4j
 @CrossOrigin
@@ -51,7 +54,7 @@ public class TenantController {
         return CommonResult.success(tenantLoginResp);
     }
     @Operation(summary="查看大学生租户信息")
-    @GetMapping("/tenantInfo")
+    @PostMapping("/tenantInfo")
     public CommonResult<TenantProfile> getTenantProfile() {
         TenantProfile tenantProfile;
         try {
@@ -89,10 +92,14 @@ public class TenantController {
     public CommonResult<Void> idCardCheck(
             @RequestParam("tCardNumber") String tCardNumber,
             @RequestParam("tName") String tName,
+            @RequestParam("tSex") String tSex,
+            @RequestParam("tBirth") String tBirth,
             @RequestParam("tCardImageFront") MultipartFile tCardImageFront,
             @RequestParam("tCardImageBack") MultipartFile tCardImageBack) {
-        TenantIdcardReq req = new TenantIdcardReq(tCardNumber, tName, tCardImageFront, tCardImageBack);
         try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = dateFormat.parse(tBirth);
+            TenantIdcardReq req = new TenantIdcardReq(tCardNumber, tName, tSex, date,tCardImageFront, tCardImageBack);
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
             tenantProfileService.idCardCheck(req, userTokenInfoDto.getUserId());
         } catch (Exception e) {
@@ -114,5 +121,15 @@ public class TenantController {
         }
         return CommonResult.success(null);
     }
-
+    @Operation(summary="查看大学生列表")
+    @PostMapping("/getTenantList")
+    public CommonResult<TenantListInfo> getTenantList(@Validated @RequestBody QueryTenantReq req) {
+        TenantListInfo tenantListInfo;
+        try {
+            tenantListInfo = tenantProfileService.getTenantList(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(tenantListInfo);
+    }
 }

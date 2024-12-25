@@ -1,11 +1,8 @@
 package cn.edu.zjut.service.impl;
 
-import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantConverter;
-import cn.edu.zjut.entity.TenantProfile.req.TenantIdcardReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantLoginReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantRegisterReq;
-import cn.edu.zjut.entity.TenantProfile.req.TenantUpdateReq;
+import cn.edu.zjut.entity.TenantProfile.req.*;
+import cn.edu.zjut.entity.TenantProfile.resq.TenantListInfo;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantLoginResp;
 import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import cn.edu.zjut.exception.apiException.BusiException;
@@ -27,12 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
 * @author 86173
 * @description 针对表【tenant_profile(大学生租客表)】的数据库操作Service实现
-* @createDate 2024-12-17 18:50:44
+* @createDate 2024-12-25 13:41:08
 */
 @Service
 @Slf4j
@@ -47,14 +45,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             throw new BusiException("手机号已存在");
         }
         TenantProfile tenantProfile = TenantProfile.builder()
-            .tAccount(req.getTAccount())
-            .tPassword(PasswordUtils.encrypt(req.getTPassword()))
-            .tPhoneNumber(req.getTPhoneNumber())
-            .tEmail(req.getTEmail())
-            .tIdentityStatus("未认证")
-            .tStatus("未审核")
-            .tBalance(BigDecimal.valueOf(0))
-            .build();
+                .tAccount(req.getTAccount())
+                .tPassword(PasswordUtils.encrypt(req.getTPassword()))
+                .tPhoneNumber(req.getTPhoneNumber())
+                .tEmail(req.getTEmail())
+                .tIdentityStatus("未认证")
+                .tStatus("未审核")
+                .tBalance(BigDecimal.valueOf(0))
+                .build();
         this.save(tenantProfile);
     }
     @Override
@@ -83,6 +81,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         tenantProfile.setTPhoneNumber(req.getTPhoneNumber());
         tenantProfile.setTEmail(req.getTEmail());
         tenantProfile.setTProfilePicture(req.getTProfilePicture());
+        tenantProfile.setTIntroduction(req.getTIntroduction());
         this.updateById(tenantProfile);
         return tenantProfile;
     }
@@ -106,6 +105,8 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         }
         tenantProfile.setTCardNumber(req.getTCardNumber());
         tenantProfile.setTName(req.getTName());
+        tenantProfile.setTSex(req.getTSex());
+        tenantProfile.setTBirth(req.getTBirth());
 
         MultipartFile multipartFile = req.getTCardImageFront();
         MultipartFile multipartFile1 = req.getTCardImageBack();
@@ -136,7 +137,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             }
             content = JSONUtil.parseObj(jsonObj.getObj("content"));
             log.info("响应data为：" + content.getObj("download_url"));
-            tenantProfile.setTCatImageBack(content.getStr("download_url")); // 设置背面图片下载地址
+            tenantProfile.setTCardImageBack(content.getStr("download_url")); // 设置背面图片下载地址
             tenantProfile.setTIdentityStatus("等待审核");
             tenantProfileService.updateById(tenantProfile);
         } catch (IOException e) {
@@ -174,7 +175,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             throw new BusiException("文件读取失败，请稍后再试");
         }
     }
-
+    @Override
+    public TenantListInfo getTenantList(QueryTenantReq req) {
+        List<TenantProfile> tenantList = baseMapper.getTenantList(req);
+        TenantListInfo tenantListInfo = TenantListInfo.builder()
+                .tenantList(tenantList)
+                .build();
+        return tenantListInfo;
+    }
 }
 
 

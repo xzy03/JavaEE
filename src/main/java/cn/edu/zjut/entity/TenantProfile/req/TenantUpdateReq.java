@@ -17,4 +17,6 @@ public class TenantUpdateReq {
     private String tEmail;
     @Schema(description = "头像")
     private String tProfilePicture;
+    @Schema(description = "个人介绍")
+    private String tIntroduction;
 }
