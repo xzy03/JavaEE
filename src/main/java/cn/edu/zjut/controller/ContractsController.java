@@ -3,6 +3,9 @@ package cn.edu.zjut.controller;
 import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
+import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
+import cn.edu.zjut.entity.House.req.QueryHouseReq;
+import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.ContractsService;
@@ -51,4 +54,29 @@ public class ContractsController {
         }
         return CommonResult.success(contractsDetailResp);
     }
+    @Operation(summary="大学生租户查看合同列表")
+    @PostMapping("/viewTenantContracts")
+    public CommonResult<ContractsListInfo> viewTenantContracts() {
+        ContractsListInfo contractsListInfo;
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsListInfo = contractsService.viewTenantContracts(userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(contractsListInfo);
+    }
+    @Operation(summary="房东查看合同列表")
+    @PostMapping("/viewLandlordContracts")
+    public CommonResult<ContractsListInfo> viewLandlordContracts() {
+        ContractsListInfo contractsListInfo;
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsListInfo = contractsService.viewLandlordContracts(userTokenInfoDto.getUserId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(contractsListInfo);
+    }
+
 }

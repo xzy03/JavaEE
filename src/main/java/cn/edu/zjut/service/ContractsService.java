@@ -4,6 +4,7 @@ import cn.edu.zjut.entity.Contracts.Contracts;
 import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
+import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -14,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ContractsService extends IService<Contracts> {
     void publish(ContractsPublishReq req, String landlordId);
     ContractsDetailResp getContractsDetail(ContractsIdReq req);
+    ContractsListInfo viewTenantContracts(String tenantId);
+    ContractsListInfo viewLandlordContracts(String landlordId);
 }

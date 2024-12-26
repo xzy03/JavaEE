@@ -3,6 +3,7 @@ package cn.edu.zjut.service.impl;
 import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
+import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.Contracts.Contracts;
@@ -10,6 +11,8 @@ import cn.edu.zjut.service.ContractsService;
 import cn.edu.zjut.mapper.ContractsMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author 86173
@@ -44,6 +47,20 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             log.info("Fetched house detail: {}", contractsDetailResp);
         }
         return contractsDetailResp;
+    }
+    @Override
+    public ContractsListInfo viewTenantContracts(String tenantId) {
+        List<Contracts> contractsList = this.lambdaQuery().eq(Contracts::getCTenantId, tenantId).list();
+        return ContractsListInfo.builder()
+                .contractsList(contractsList)
+                .build();
+    }
+    @Override
+    public ContractsListInfo viewLandlordContracts(String landlordId) {
+        List<Contracts> contractsList = this.lambdaQuery().eq(Contracts::getCLandlordId, landlordId).list();
+        return ContractsListInfo.builder()
+                .contractsList(contractsList)
+                .build();
     }
 }
 
