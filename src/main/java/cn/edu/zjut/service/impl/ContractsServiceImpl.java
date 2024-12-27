@@ -4,12 +4,15 @@ import cn.edu.zjut.entity.Contracts.req.ContractsIdReq;
 import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
+import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
+import cn.edu.zjut.entity.HouseTenants.HouseTenants;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.Transactions.Transactions;
-import cn.edu.zjut.service.TransactionsService;
+import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.Contracts.Contracts;
-import cn.edu.zjut.service.ContractsService;
 import cn.edu.zjut.mapper.ContractsMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +38,25 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
     @Lazy
     @Resource
     TransactionsService transactionsService;
+    @Lazy
+    @Resource
+    HouseTenantsService houseTenantsService;
+    @Lazy
+    @Resource
+    HouseService houseService;
+    @Lazy
+    @Resource
+    TenantProfileService tenantProfileService;
     @Override
     public void publish(ContractsPublishReq req, String landlordId) {
+        House house = houseService.getById(req.getCHouseId());
+        if(!house.getLandlordId().equals(landlordId)){
+            throw new BusiException("您不是该房屋的房东，无法发布合同");
+        }
+        TenantProfile tenantProfile = tenantProfileService.getById(req.getCTenantId());
+        if(tenantProfile == null){
+            throw new BusiException("租客不存在");
+        }
         Contracts contracts = Contracts.builder()
                 .cHouseId(req.getCHouseId())
                 .cTenantId(req.getCTenantId())
@@ -78,7 +98,17 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
     @Transactional
     public void confirmContract(ContractsIdReq req) {
         Contracts contracts = this.getById(req.getContractsId());
-        contracts.setCStatus("已确认");
+        if(contracts == null){
+            throw new BusiException("合同不存在");
+        }
+        contracts.setCStatus("已生效");
+        HouseTenants houseTenants = HouseTenants.builder()
+                .houseId(contracts.getCHouseId())
+                .tenantId(contracts.getCTenantId())
+                .htRentAmount(contracts.getCRentAmount())
+                .htDepositAmount(contracts.getCDepositAmount())
+                .build();
+        houseTenantsService.save(houseTenants);
         this.updateById(contracts);
         generateTransactionRecords(contracts);
     }
@@ -109,6 +139,7 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             depositTransaction.setTStatus("待支付");             // 交易状态
             depositTransaction.setTName("押金支付 - " + currentMonth.getMonthValue() + "/" + currentMonth.getYear());  // 交易项目
             depositTransaction.setTFees(BigDecimal.ZERO);         // 手续费（假设没有手续费）
+            depositTransaction.setTPaytime(Date.from(currentMonth.atStartOfDay(ZoneId.systemDefault()).toInstant()));            // 交易时间
             // 插入押金交易记录
             transactionsService.save(depositTransaction);
         }
@@ -124,6 +155,7 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             rentTransaction.setTStatus("待支付");              // 交易状态
             rentTransaction.setTName("租金支付 - " + currentMonth.getMonthValue() + "/" + currentMonth.getYear());  // 交易项目
             rentTransaction.setTFees(BigDecimal.ZERO);         // 手续费（假设没有手续费）
+            rentTransaction.setTPaytime(Date.from(currentMonth.atStartOfDay(ZoneId.systemDefault()).toInstant()));  // 交易时间
             // 插入租金交易记录
             transactionsService.save(rentTransaction);
             // 将当前月份推向下一个月

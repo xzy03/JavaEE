@@ -25,7 +25,7 @@ public class HouseTenants implements Serializable {
     /**
      * 租户ID，唯一标识
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_UUID)
     private String htId;
 
     /**
