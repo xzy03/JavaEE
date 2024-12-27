@@ -26,7 +26,7 @@ public class Transactions implements Serializable {
     /**
      * 交易ID，唯一标识
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_UUID)
     private String transactionId;
 
     /**

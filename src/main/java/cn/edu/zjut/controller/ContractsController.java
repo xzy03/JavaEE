@@ -78,5 +78,16 @@ public class ContractsController {
         }
         return CommonResult.success(contractsListInfo);
     }
+    @Operation(summary="大学生租客确认合同")
+    @PostMapping("/confirmContract")
+    public CommonResult<Void> confirmContract(@Validated @RequestBody ContractsIdReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsService.confirmContract(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
 
 }

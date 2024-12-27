@@ -5,13 +5,22 @@ import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
+import cn.edu.zjut.entity.Transactions.Transactions;
+import cn.edu.zjut.service.TransactionsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.edu.zjut.entity.Contracts.Contracts;
 import cn.edu.zjut.service.ContractsService;
 import cn.edu.zjut.mapper.ContractsMapper;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,6 +32,9 @@ import java.util.List;
 @Slf4j
 public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts>
     implements ContractsService{
+    @Lazy
+    @Resource
+    TransactionsService transactionsService;
     @Override
     public void publish(ContractsPublishReq req, String landlordId) {
         Contracts contracts = Contracts.builder()
@@ -62,6 +74,63 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
                 .contractsList(contractsList)
                 .build();
     }
+    @Override
+    @Transactional
+    public void confirmContract(ContractsIdReq req) {
+        Contracts contracts = this.getById(req.getContractsId());
+        contracts.setCStatus("已确认");
+        this.updateById(contracts);
+        generateTransactionRecords(contracts);
+    }
+    private void generateTransactionRecords(Contracts contracts) {
+        // 获取合同的开始日期和结束日期
+        Date startDate = contracts.getCStartDate();  // 假设 getCStartDate() 返回 java.util.Date 类型
+        Date endDate = contracts.getCEndDate();      // 假设 getCEndDate() 返回 java.util.Date 类型
+
+        // 将 java.util.Date 转换为 java.time.LocalDate
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        BigDecimal rentAmount = contracts.getCRentAmount();  // 获取租金金额
+        BigDecimal depositAmount = contracts.getCDepositAmount();  // 获取押金金额
+        String tenantId = contracts.getCTenantId();  // 租客 ID
+        String landlordId = contracts.getCLandlordId();  // 房东 ID
+
+        LocalDate currentMonth = startLocalDate;
+
+        // 判断第一个月是否需要生成押金交易记录
+        if (depositAmount.compareTo(BigDecimal.ZERO) > 0) {
+            // 生成押金交易记录
+            Transactions depositTransaction = new Transactions();
+            depositTransaction.setTenantId(tenantId);
+            depositTransaction.setLandlordId(landlordId);
+            depositTransaction.setTTransactionType("押金支付");  // 交易类型
+            depositTransaction.setTAmount(depositAmount);        // 押金金额
+            depositTransaction.setTStatus("待支付");             // 交易状态
+            depositTransaction.setTName("押金支付 - " + currentMonth.getMonthValue() + "/" + currentMonth.getYear());  // 交易项目
+            depositTransaction.setTFees(BigDecimal.ZERO);         // 手续费（假设没有手续费）
+            // 插入押金交易记录
+            transactionsService.save(depositTransaction);
+        }
+
+        // 生成每个月的租金交易记录
+        while (currentMonth.isBefore(endLocalDate) || currentMonth.isEqual(endLocalDate)) {
+            // 生成租金交易记录
+            Transactions rentTransaction = new Transactions();
+            rentTransaction.setTenantId(tenantId);
+            rentTransaction.setLandlordId(landlordId);
+            rentTransaction.setTTransactionType("租金支付");  // 交易类型
+            rentTransaction.setTAmount(rentAmount);            // 租金金额
+            rentTransaction.setTStatus("待支付");              // 交易状态
+            rentTransaction.setTName("租金支付 - " + currentMonth.getMonthValue() + "/" + currentMonth.getYear());  // 交易项目
+            rentTransaction.setTFees(BigDecimal.ZERO);         // 手续费（假设没有手续费）
+            // 插入租金交易记录
+            transactionsService.save(rentTransaction);
+            // 将当前月份推向下一个月
+            currentMonth = currentMonth.plusMonths(1);
+        }
+    }
+
 }
 
 
