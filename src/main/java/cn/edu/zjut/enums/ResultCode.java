@@ -10,6 +10,7 @@ public enum ResultCode {
     UNAUTHORIZED(401, "暂未登录或token已经过期"),
     UNKNOWN_EXCEPTION(402,"未知异常"),
     FORBIDDEN(403, "没有相关权限"),
+    INVALID_PARAM(405, "无效参数"),
 
     BUSINESS_EXCEPTION(4000,"业务异常");
     private int code;

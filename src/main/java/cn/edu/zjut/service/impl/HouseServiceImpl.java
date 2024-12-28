@@ -1,5 +1,6 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.House.req.HouseInfoReq;
 import cn.edu.zjut.entity.House.req.HousePublishReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
@@ -122,7 +123,32 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
         }
         return house.getLandlordId();
     }
-
+    @Override
+    public House changeHouseInfo(HouseInfoReq req, String landlordId) {
+        House house = houseService.getById(req.getHouseId());
+        if (house == null) {
+            throw new BusiException("房源不存在");
+        }
+        if (!house.getLandlordId().equals(landlordId)) {
+            throw new BusiException("您不是该房屋的房东，无法修改房源信息");
+        }
+        house.setHTitle(req.getHTitle());
+        house.setHLocation(req.getHLocation());
+        house.setHRent(req.getHRent());
+        house.setHArea(req.getHArea());
+        house.setHRooms(req.getHRooms());
+        house.setHAvailableFrom(req.getHAvailableFrom());
+        house.setHDirection(req.getHDirection());
+        house.setHFloor(req.getHFloor());
+        house.setHTotalFloors(req.getHTotalFloors());
+        house.setHFacilities(req.getHFacilities());
+        house.setHPetFriendly(req.getHPetFriendly());
+        house.setHTenantrequired(req.getHTenantrequired());
+        house.setHTotalTenants(req.getHTotalTenants());
+        house.setHRemainingVacancies(req.getHRemainingVacancies());
+        this.updateById(house);
+        return house;
+    }
 }
 
 

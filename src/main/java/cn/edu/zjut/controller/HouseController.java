@@ -2,6 +2,7 @@ package cn.edu.zjut.controller;
 
 import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.entity.House.req.HouseIdReq;
+import cn.edu.zjut.entity.House.req.HouseInfoReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
@@ -74,16 +75,18 @@ public class HouseController {
          }
          return CommonResult.success(null);
      }
-    // @Operation(summary="修改房源信息")
-    // @PostMapping("/changeHouseInfo")
-    // public CommonResult<Void> changeHouseInfo(@Validated @RequestBody HouseInfoReq req) {
-    //     try {
-    //         houseService.changeHouseInfo(req);
-    //     } catch (Exception e) {
-    //         return CommonResult.error(e.getMessage());
-    //     }
-    //     return CommonResult.success(null);
-    // }
+     @Operation(summary="修改房源信息")
+     @PostMapping("/changeHouseInfo")
+     public CommonResult<House> changeHouseInfo(@Validated @RequestBody HouseInfoReq req) {
+         House house;
+         try {
+             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+             house = houseService.changeHouseInfo(req, userTokenInfoDto.getUserId());
+         } catch (Exception e) {
+             return CommonResult.error(e.getMessage());
+         }
+         return CommonResult.success(house);
+     }
     // @Operation(summary="删除房源")
     // @PostMapping("/deleteHouse")
     // public CommonResult<Void> deleteHouse(@Validated @RequestBody HouseDeleteReq req) {
