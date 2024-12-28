@@ -4,6 +4,7 @@ import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.enums.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,5 +50,12 @@ public class GlobalExceptionHandler {
 
         // 返回验证错误信息
         return CommonResult.any(ResultCode.INVALID_PARAM, "验证失败", errorMessages);
+    }
+    // 捕获 JSON 解析错误
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public CommonResult<String> handleJsonParseException(HttpMessageNotReadableException ex) {
+        log.error("JSON解析错误: ", ex);
+        return CommonResult.any(ResultCode.INVALID_PARAM, "请输入有效的数字", null);
     }
 }
