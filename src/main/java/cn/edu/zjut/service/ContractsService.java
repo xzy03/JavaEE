@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-12-17 18:47:54
 */
 public interface ContractsService extends IService<Contracts> {
-    void publish(ContractsPublishReq req, String landlordId);
+    void publish(ContractsPublishReq req);
     ContractsDetailResp getContractsDetail(ContractsIdReq req);
     ContractsListInfo viewTenantContracts(String tenantId);
     ContractsListInfo viewLandlordContracts(String landlordId);

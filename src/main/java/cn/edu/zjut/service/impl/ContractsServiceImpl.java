@@ -5,7 +5,6 @@ import cn.edu.zjut.entity.Contracts.req.ContractsPublishReq;
 import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import cn.edu.zjut.entity.House.House;
-import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.HouseTenants.HouseTenants;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.Transactions.Transactions;
@@ -47,28 +46,35 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
     @Lazy
     @Resource
     TenantProfileService tenantProfileService;
+    @Lazy
+    @Resource
+    ContractsService contractsService;
     @Override
-    public void publish(ContractsPublishReq req, String landlordId) {
-        House house = houseService.getById(req.getCHouseId());
-        if(!house.getLandlordId().equals(landlordId)){
-            throw new BusiException("您不是该房屋的房东，无法发布合同");
+    @Transactional
+    public void publish(ContractsPublishReq req) {
+        Contracts contracts = contractsService.getById(req.getContractId());
+        if(contracts == null){
+            throw new BusiException("合同不存在");
         }
-        TenantProfile tenantProfile = tenantProfileService.getById(req.getCTenantId());
-        if(tenantProfile == null){
-            throw new BusiException("租客不存在");
+        House house = houseService.getById(contracts.getCHouseId());
+//        if(!house.getLandlordId().equals(landlordId)){
+//            throw new BusiException("您不是该房屋的房东，无法发布合同");
+//        }
+//        TenantProfile tenantProfile = tenantProfileService.getById(req.getCTenantId());
+//        if(tenantProfile == null){
+//            throw new BusiException("租客不存在");
+//        }
+        if(house.getHRemainingVacancies()<=0){
+            throw new BusiException("该房屋已无空余房间");
         }
-        Contracts contracts = Contracts.builder()
-                .cHouseId(req.getCHouseId())
-                .cTenantId(req.getCTenantId())
-                .cStartDate(req.getCStartDate())
-                .cEndDate(req.getCEndDate())
-                .cRentAmount(req.getCRentAmount())
-                .cDepositAmount(req.getCDepositAmount())
-                .cAdditions(req.getCAdditions())
-                .cStatus("未生效")
-                .cLandlordId(landlordId)
-                .build();
-        this.save(contracts);
+        contracts.setCStartDate(req.getCStartDate());
+        contracts.setCEndDate(req.getCEndDate());
+        contracts.setCRentAmount(req.getCRentAmount());
+        contracts.setCDepositAmount(req.getCDepositAmount());
+        contracts.setCAdditions(req.getCAdditions());
+        this.updateById(contracts);
+        house.setHRemainingVacancies(house.getHRemainingVacancies()-1);
+        houseService.updateById(house);
     }
     @Override
     public ContractsDetailResp getContractsDetail(ContractsIdReq req) {

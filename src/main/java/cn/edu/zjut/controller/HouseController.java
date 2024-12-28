@@ -87,6 +87,18 @@ public class HouseController {
          }
          return CommonResult.success(house);
      }
+     @Operation(summary="大学生租客想要租房")
+     @PostMapping("/rentHouse")
+     public CommonResult<Void> rentHouse(@Validated @RequestBody HouseIdReq req) {
+         try {
+             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+             houseService.rentHouse(req.getHouseId(), userTokenInfoDto.getUserId());
+         } catch (Exception e) {
+             return CommonResult.error(e.getMessage());
+         }
+         return CommonResult.success(null);
+     }
+
     // @Operation(summary="删除房源")
     // @PostMapping("/deleteHouse")
     // public CommonResult<Void> deleteHouse(@Validated @RequestBody HouseDeleteReq req) {

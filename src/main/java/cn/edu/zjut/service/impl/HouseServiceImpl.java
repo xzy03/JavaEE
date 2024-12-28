@@ -1,11 +1,13 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.Contracts.Contracts;
 import cn.edu.zjut.entity.House.req.HouseInfoReq;
 import cn.edu.zjut.entity.House.req.HousePublishReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import cn.edu.zjut.exception.apiException.BusiException;
+import cn.edu.zjut.service.ContractsService;
 import cn.edu.zjut.utils.UploadGiteeImgBed;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
@@ -36,6 +38,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     @Lazy
     @Resource
     HouseService houseService;
+    @Lazy
+    @Resource
+    ContractsService contractsService;
     @Override
     public void publish(HousePublishReq req, String landlordId){
         House house = House.builder()
@@ -148,6 +153,23 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
         house.setHRemainingVacancies(req.getHRemainingVacancies());
         this.updateById(house);
         return house;
+    }
+    @Override
+    public void rentHouse(String houseId, String tenantId) {
+        House house = houseService.getById(houseId);
+        if (house == null) {
+            throw new BusiException("房源不存在");
+        }
+        if (house.getHRemainingVacancies() <= 0) {
+            throw new BusiException("该房屋已无空余房间");
+        }
+        Contracts contracts = Contracts.builder()
+                .cHouseId(houseId)
+                .cTenantId(tenantId)
+                .cLandlordId(house.getLandlordId())
+                .cStatus("未生效")
+                .build();
+        contractsService.save(contracts);
     }
 }
 

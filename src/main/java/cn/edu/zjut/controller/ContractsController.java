@@ -36,7 +36,7 @@ public class ContractsController {
     public CommonResult<Void> publish(@Validated @RequestBody ContractsPublishReq req) {
         try {
             UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-            contractsService.publish(req, userTokenInfoDto.getUserId());
+            contractsService.publish(req);
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
         }
