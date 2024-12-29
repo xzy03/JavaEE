@@ -7,6 +7,8 @@ import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
 * @author 86173
 * @description 针对表【contracts(租房合同表)】的数据库操作Service
@@ -18,4 +20,6 @@ public interface ContractsService extends IService<Contracts> {
     ContractsListInfo viewTenantContracts(String tenantId);
     ContractsListInfo viewLandlordContracts(String landlordId);
     void confirmContract(ContractsIdReq req);
+
+    public List<Contracts> getContractsByLandlord(String landlordId);
 }

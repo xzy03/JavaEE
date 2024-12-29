@@ -79,7 +79,7 @@ public interface DamageAssessmentsMapper extends BaseMapper<DamageAssessments> {
             "da_created_at AS daCreatedAt " +
             "FROM damage_assessments " +
             "WHERE tenant_id = #{tenantId}")
-    List<DamageAssessments> findBytenantId1(@Param("tenantId") String tenantId);
+    public List<DamageAssessments> findBytenantId1(@Param("tenantId") String tenantId);
 
     //房东通过damageid来删除定损信息
 

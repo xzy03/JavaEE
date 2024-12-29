@@ -15,6 +15,7 @@ import cn.edu.zjut.entity.Contracts.Contracts;
 import cn.edu.zjut.mapper.ContractsMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,9 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
     @Lazy
     @Resource
     ContractsService contractsService;
+
+    @Autowired
+    private ContractsMapper contractsMapper;
     @Override
     @Transactional
     public void publish(ContractsPublishReq req) {
@@ -167,6 +171,20 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             // 将当前月份推向下一个月
             currentMonth = currentMonth.plusMonths(1);
         }
+    }
+
+
+    public List<Contracts> getContractsByLandlord(String landlordId) {
+        // 调用Mapper层的方法，根据房东ID查询合同信息
+        return contractsMapper.getContractsByLandlordId(landlordId);
+    }
+
+    public List<Contracts> getValidContractByTenant(String tenantId) {
+        // 获取当前时间
+        Date currentDate = new Date();
+
+        // 调用 Mapper 方法，查询有效合同
+        return contractsMapper.getValidContractsByTenant(tenantId, currentDate);
     }
 
 }

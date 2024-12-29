@@ -37,10 +37,22 @@ public interface TenantProfileMapper extends BaseMapper<TenantProfile> {
 
 
     @Select(
-            "SELECT tName " +
+            "SELECT t_name " +
                     "FROM tenant_profile " +
                     "WHERE tenant_id = #{tenantId}")
-    String selectTenantNameByTenantId(String tenantId);
+    public String selectTenantNameByTenantId(String tenantId);
+
+
+    @Select(
+            "SELECT t_balance " +
+                    "FROM tenant_profile " +
+                    "WHERE tenant_id = #{tenantId}")
+    public BigDecimal getTenantBalance(String tenantId);
+
+
+
+
+
 }
 
 
