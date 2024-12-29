@@ -8,6 +8,8 @@ import cn.edu.zjut.entity.admins.req.PwdChangeReq;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 /**
 * @author 86173
 * @description 针对表【tenant_profile(大学生租客表)】的数据库操作Service
@@ -25,4 +27,9 @@ public interface TenantProfileService extends IService<TenantProfile> {
     // TenantProfileService.java
     void modifyBalance(String tenantId, Double amount);
 
+    //根据租户ID获取租户信息
+    TenantProfile getTenantProfileById(String tenantId);
+
+    //更新租户的账户余额
+    public boolean updateTenantProfileBalance(String tenantId, BigDecimal tBalance);
 }

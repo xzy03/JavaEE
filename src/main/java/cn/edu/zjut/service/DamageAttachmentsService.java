@@ -9,5 +9,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-12-12 23:49:44
 */
 public interface DamageAttachmentsService extends IService<DamageAttachments> {
-
+    //public void createDamageAttachments(CreateDamageAssessmentDTO createDamageAssessmentDTO);
 }

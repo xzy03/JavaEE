@@ -23,4 +23,11 @@
         da_amount,da_description,da_status,
         da_created_at
     </sql>
+
+    <select id="find_damageId" resultType="cn.edu.zjut.entity.DamageAssessments.DamageAssessments">
+        SELECT
+            damage_id AS damageId,
+        FROM damage_assessments
+        WHERE landlord_id = #{landlordid}
+    </select>
 </mapper>

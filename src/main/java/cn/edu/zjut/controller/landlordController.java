@@ -24,9 +24,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/landlords")
+
 @Tag(name = "房东管理", description = "房东相关的 API")
 public class landlordController {
     private final LandlordProfileService landlordsService;
+
+    @PassAuthentication
     @Operation(summary="房东注册")
     @PostMapping("/register")
     public CommonResult<Void> register(@Validated @RequestBody LandlordProfileRegisterReq req) {

@@ -23,4 +23,9 @@ public interface LandlordProfileService extends IService<LandlordProfile> {
     // LandlordProfileService.java
     void modifyBalance(String landlordId, Double amount);
 
+    //用房东的id来查看房东的信息
+    public LandlordProfile getLandlordProfileById(String landlordId);
+
+    public boolean updateLandlordProfile(LandlordProfile landlordProfile);
+
 }

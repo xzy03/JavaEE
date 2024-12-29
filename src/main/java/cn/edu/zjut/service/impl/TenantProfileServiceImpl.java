@@ -18,8 +18,10 @@ import cn.edu.zjut.service.TenantProfileService;
 import cn.edu.zjut.mapper.TenantProfileMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -39,6 +41,10 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
     @Lazy
     @Resource
     TenantProfileService tenantProfileService;
+
+    @Autowired
+    private TenantProfileMapper tenantProfileMapper;
+
     @Override
     public void registerTenant(TenantRegisterReq req) {
         if(tenantProfileService.qureryByPhoneNum(req.getTPhoneNumber()) != null) {
@@ -192,6 +198,22 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         }
         tenant.setTBalance(tenant.getTBalance().add(BigDecimal.valueOf(amount)));
         this.updateById(tenant);
+    }
+
+
+    //根据租户ID获取租户信息
+    @Override
+    public TenantProfile getTenantProfileById(String tenantId) {
+        // 查询租户信息
+        return tenantProfileMapper.selectByTenantId(tenantId);
+    }
+
+    //更新租户的账户余额
+    @Override
+    @Transactional  // 确保余额更新是原子操作
+    public boolean updateTenantProfileBalance(String tenantId, BigDecimal tBalance) {
+        int rowsAffected = tenantProfileMapper.updateTenantBalance(tenantId, tBalance);
+        return rowsAffected > 0;
     }
 
 }

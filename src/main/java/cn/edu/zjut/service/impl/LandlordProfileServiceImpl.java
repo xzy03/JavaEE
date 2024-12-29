@@ -39,6 +39,10 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
     @Lazy
     @Resource
     LandlordProfileService landlordProfileService;
+
+    @Lazy
+    @Resource
+    LandlordProfileMapper landlordProfileMapper;
     @Override
     public void registerLandlord(LandlordProfileRegisterReq req) {
         if(landlordProfileService.qureryByPhoneNum(req.getLPhoneNumber()) != null) {
@@ -157,6 +161,18 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         }
         landlord.setLBalance(landlord.getLBalance().add(BigDecimal.valueOf(amount)));
         this.updateById(landlord);
+    }
+
+
+
+    //用房东的id来查看房东的信息
+    public LandlordProfile getLandlordProfileById(String landlordId) {
+        return landlordProfileMapper.selectById(landlordId); // 根据 ID 查询房东信息
+    }
+
+    //更新房东的余额
+    public boolean updateLandlordProfile(LandlordProfile landlordProfile) {
+        return landlordProfileMapper.updateById(landlordProfile.getLandlordId(), landlordProfile.getLBalance()) > 0; // 更新房东信息
     }
 
 }
