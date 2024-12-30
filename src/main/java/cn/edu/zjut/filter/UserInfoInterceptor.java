@@ -39,6 +39,14 @@ public class UserInfoInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        else{
+            HandlerMethod method = (HandlerMethod) handler;
+
+            // 如果方法或类上标记了 @PassAuthentication 注解，则放行
+            if (method.hasMethodAnnotation(PassAuthentication.class)) {
+                return true;
+            }
+        }
 
         // 放行knife4j相关URL
         String requestUrl = request.getRequestURI();

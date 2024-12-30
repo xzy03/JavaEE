@@ -7,6 +7,10 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
 
 server:
   port: 8080
@@ -28,5 +32,7 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+
+
 
 
