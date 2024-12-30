@@ -18,4 +18,7 @@ public interface ContractsService extends IService<Contracts> {
     ContractsListInfo viewTenantContracts(String tenantId);
     ContractsListInfo viewLandlordContracts(String landlordId);
     void confirmContract(ContractsIdReq req);
+    void rejectContract(ContractsIdReq req);
+    void terminateContract(ContractsIdReq req);
+    void endContract(ContractsIdReq req);
 }

@@ -6,6 +6,7 @@ import cn.edu.zjut.entity.Contracts.resp.ContractsDetailResp;
 import cn.edu.zjut.entity.Contracts.resp.ContractsListInfo;
 import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.entity.HouseTenants.HouseTenants;
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.Transactions.Transactions;
 import cn.edu.zjut.exception.apiException.BusiException;
@@ -49,6 +50,9 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
     @Lazy
     @Resource
     ContractsService contractsService;
+    @Lazy
+    @Resource
+    LandlordProfileService landlordProfileService;
     @Override
     @Transactional
     public void publish(ContractsPublishReq req) {
@@ -167,6 +171,58 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             // 将当前月份推向下一个月
             currentMonth = currentMonth.plusMonths(1);
         }
+    }
+    @Override
+    @Transactional
+    public void rejectContract(ContractsIdReq req) {
+        Contracts contracts = this.getById(req.getContractsId());
+        if(contracts == null){
+            throw new BusiException("合同不存在");
+        }
+        House house = houseService.getById(contracts.getCHouseId());
+        house.setHRemainingVacancies(house.getHRemainingVacancies()+1);
+        contracts.setCStatus("已拒绝");
+        houseService.updateById(house);
+        this.updateById(contracts);
+    }
+    @Override
+    @Transactional
+    public void terminateContract(ContractsIdReq req) {
+        Contracts contracts = this.getById(req.getContractsId());
+        if(contracts == null){
+            throw new BusiException("合同不存在");
+        }
+        House house = houseService.getById(contracts.getCHouseId());
+        house.setHRemainingVacancies(house.getHRemainingVacancies()+1);
+        contracts.setCStatus("已终止");
+        houseService.updateById(house);
+        this.updateById(contracts);
+    }
+    @Override
+    @Transactional
+    public void endContract(ContractsIdReq req) {
+        Contracts contracts = this.getById(req.getContractsId());
+        if(contracts == null){
+            throw new BusiException("合同不存在");
+        }
+        House house = houseService.getById(contracts.getCHouseId());
+        TenantProfile tenantProfile = tenantProfileService.getById(contracts.getCTenantId());
+        LandlordProfile landlordProfile = landlordProfileService.getById(contracts.getCLandlordId());
+        house.setHRemainingVacancies(house.getHRemainingVacancies()+1);
+        contracts.setCStatus("已到期");
+        if(landlordProfile.getLBalance().compareTo(contracts.getCDepositAmount())<0){
+            throw new BusiException("房东余额不足，无法退还押金");
+        }
+        tenantProfile.setTBalance(tenantProfile.getTBalance().add(contracts.getCDepositAmount()));
+        landlordProfile.setLBalance(landlordProfile.getLBalance().subtract(contracts.getCDepositAmount()));
+        landlordProfileService.modifyBalance(contracts.getCLandlordId(),contracts.getCDepositAmount().doubleValue());
+        log.info("房东余额：{}",landlordProfile.getLBalance());
+        tenantProfileService.updateById(tenantProfile);
+        log.info("租客余额：{}",tenantProfile.getTBalance());
+        houseService.updateById(house);
+        log.info("房屋剩余空置数：{}",house.getHRemainingVacancies());
+        this.updateById(contracts);
+        log.info("合同状态：{}",contracts.getCStatus());
     }
 
 }

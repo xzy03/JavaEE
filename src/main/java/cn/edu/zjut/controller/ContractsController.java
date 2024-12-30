@@ -89,5 +89,37 @@ public class ContractsController {
         }
         return CommonResult.success(null);
     }
-
+    @Operation(summary="大学生租客拒绝合同")
+    @PostMapping("/rejectContract")
+    public CommonResult<Void> rejectContract(@Validated @RequestBody ContractsIdReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsService.rejectContract(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="违约终止租客的合同")
+    @PostMapping("/terminateContract")
+    public CommonResult<Void> terminateContract(@Validated @RequestBody ContractsIdReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsService.terminateContract(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
+    @Operation(summary="正常到期结束合同")
+    @PostMapping("/endContract")
+    public CommonResult<Void> endContract(@Validated @RequestBody ContractsIdReq req) {
+        try {
+            UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+            contractsService.endContract(req);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(null);
+    }
 }
