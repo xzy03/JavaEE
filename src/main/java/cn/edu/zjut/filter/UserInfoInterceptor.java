@@ -65,7 +65,16 @@ public class UserInfoInterceptor implements HandlerInterceptor {
         if (!method.isAnnotationPresent(PassAuthentication.class)) {
             log.info("当前方法未添加PassAuthentication注解，进入拦截器");
             // 没有PassAuthentication注解时，进行token解析
-            String token = request.getHeader("Authorization");
+            String token;
+            if (request.getRequestURI().contains("/userDashboard")) {
+                // 从请求体（body）中获取 token
+                token = request.getParameter("Authorization");
+                log.info("从 body 中获取 token: {}", token);
+            }
+            else{
+                token = request.getHeader("Authorization");
+                log.info("从 Header 中获取 token: {}", token);
+            }
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }

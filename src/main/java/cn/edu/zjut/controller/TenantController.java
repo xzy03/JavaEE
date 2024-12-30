@@ -31,6 +31,7 @@ import java.util.Date;
 @Tag(name = "大学生租户管理", description = "大学生租户相关的 API")
 public class TenantController {
      private final TenantProfileService tenantProfileService;
+    @PassAuthentication
      @Operation(summary="大学生租户注册")
      @PostMapping("/register")
      public CommonResult<Void> register(@Validated @RequestBody TenantRegisterReq req) {

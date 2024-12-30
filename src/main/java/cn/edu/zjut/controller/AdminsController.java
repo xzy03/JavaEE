@@ -28,10 +28,12 @@ import cn.edu.zjut.utils.UserInfoUtils;
 @Tag(name = "管理员管理", description = "管理员相关的 API")
 public class AdminsController {
     private final AdminsService adminsService;
+    @PassAuthentication
     @Operation(summary="管理员用户注册")
     @PostMapping("/register")
     public CommonResult<Void> register(@Validated @RequestBody AdminsRegisterReq req) {
         try {
+            System.out.println("进入管理员注册");
             adminsService.registerAdmin(req);
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
