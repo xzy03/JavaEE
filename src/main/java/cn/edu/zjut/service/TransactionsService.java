@@ -2,6 +2,7 @@ package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.Transactions.Transactions;
 import cn.edu.zjut.entity.Transactions.resp.DepositListInfo;
+import cn.edu.zjut.entity.Transactions.resp.RentListInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,4 +14,7 @@ public interface TransactionsService extends IService<Transactions> {
     DepositListInfo viewTenantDeposit(String tenantId);
     DepositListInfo viewLandlordDeposit(String landlordId);
     void payDeposit(String transactionId);
+    RentListInfo viewRentTenant(String tenantId);
+    RentListInfo viewRentLandlord(String landlordId);
+    void payRent(String transactionId);
 }

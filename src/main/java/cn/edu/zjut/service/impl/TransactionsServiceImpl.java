@@ -3,6 +3,7 @@ package cn.edu.zjut.service.impl;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.Transactions.resp.DepositListInfo;
+import cn.edu.zjut.entity.Transactions.resp.RentListInfo;
 import cn.edu.zjut.service.LandlordProfileService;
 import cn.edu.zjut.service.TenantProfileService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -71,7 +72,44 @@ public class TransactionsServiceImpl extends ServiceImpl<TransactionsMapper, Tra
         landlordProfileService.updateById(landlordProfile);
         this.updateById(transaction);
     }
-
+    @Override
+    public RentListInfo viewRentTenant(String tenantId) {
+        List<Transactions> rentList = this.lambdaQuery()
+                .eq(Transactions::getTenantId, tenantId)
+                .eq(Transactions::getTTransactionType, "租金支付")
+                .list();
+        return RentListInfo.builder().rentList(rentList).build();
+    }
+    @Override
+    public RentListInfo viewRentLandlord(String landlordId) {
+        List<Transactions> rentList = this.lambdaQuery()
+                .eq(Transactions::getLandlordId, landlordId)
+                .eq(Transactions::getTTransactionType, "租金支付")
+                .list();
+        return RentListInfo.builder().rentList(rentList).build();
+    }
+    @Override
+    @Transactional
+    public void payRent(String transactionId) {
+        Transactions transaction = transactionsService.getById(transactionId);
+        if (transaction == null) {
+            throw new RuntimeException("交易记录不存在");
+        }
+        TenantProfile tenantProfile = tenantProfileService.getById(transaction.getTenantId());
+        LandlordProfile landlordProfile = landlordProfileService.getById(transaction.getLandlordId());
+        if (!transaction.getTStatus().equals("待支付")) {
+            throw new RuntimeException("交易状态不正确");
+        }
+        if (tenantProfile.getTBalance().compareTo(transaction.getTAmount()) < 0) {
+            throw new RuntimeException("余额不足");
+        }
+        transaction.setTStatus("已支付");
+        tenantProfile.setTBalance(tenantProfile.getTBalance().subtract(transaction.getTAmount()));
+        landlordProfile.setLBalance(landlordProfile.getLBalance().add(transaction.getTAmount()));
+        tenantProfileService.updateById(tenantProfile);
+        landlordProfileService.updateById(landlordProfile);
+        this.updateById(transaction);
+    }
 }
 
 

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DepositListInfo {
-    @Schema(description = "押金支付记录列表")
-    private List<Transactions> depositList;
+public class RentListInfo {
+    @Schema(description = "房租支付记录列表")
+    private List<Transactions> rentList;
 }
