@@ -97,8 +97,8 @@
             } else if (userType === '房东') {
                 loginUrl = '/landlords/login';
                 requestBody = {
-                    lPhoneNumber: loginName,
-                    lPassword: password
+                    lphoneNumber: loginName,
+                    lpassword: password
                 };
             }
 

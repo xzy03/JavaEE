@@ -434,10 +434,14 @@
 
             </c:when>
             <c:when test="${user == '房东'}">
-                <li><a href="#teacherInfo" onclick="showTeacherInfo()">教师个人信息</a></li>
-                <li><a href="#searchCourse" onclick="showSearchCourse()"> 课程信息查询</a></li>
-                <li><a href="#searchTeachAtTeacher" onclick="showSearchTeachAtTeacher()"> 个人授课查询</a></li>
-                <li><a href="#showTeacherStudentScore" onclick="showTeacherStudentScoreInfo()"> 学生成绩总览</a></li>
+                <li><a href="#landlordProfileManagement" onclick="showLandlordManagement()">个人信息管理</a></li>
+                <div id="landlordProfileManagement"></div>
+                <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">房源信息管理</a></li>
+                <div id="landlordHouseManagement"></div>
+<%--                <li><a href="#teacherInfo" onclick="showTeacherInfo()">教师个人信息</a></li>--%>
+<%--                <li><a href="#searchCourse" onclick="showSearchCourse()"> 课程信息查询</a></li>--%>
+<%--                <li><a href="#searchTeachAtTeacher" onclick="showSearchTeachAtTeacher()"> 个人授课查询</a></li>--%>
+<%--                <li><a href="#showTeacherStudentScore" onclick="showTeacherStudentScoreInfo()"> 学生成绩总览</a></li>--%>
             </c:when>
             <c:otherwise>
 
@@ -817,7 +821,6 @@
         });
     }
 
-
     function showTenantStudentCertification(){
 
     }
@@ -837,8 +840,323 @@
     }
 
 
+    function LandlordClean(){
+        let content = document.getElementById('landlordProfileManagement');
+        content.innerHTML='';
+    }
+    function LandlordHouseClean(){
+        let content = document.getElementById('landlordHouseManagement');
+        content.innerHTML='';
+    }
+    function showLandlordManagement() {
+        LandlordClean();
+        let content = document.getElementById('landlordProfileManagement');
+        content.innerHTML = '<li><a onclick="showLandlordSearchInfo()" class="small-text">查看个人信息</a></li>' +
+            '<li><a onclick="showLandlordEditInfo()" class="small-text">修改个人信息</a></li>' +
+            '<li><a onclick="showLandlordIDCertification()" class="small-text">身份证认证</a></li>' ;
+    }
 
+    function showLandlordHouseManagement() {
+        LandlordHouseClean();
+        let content = document.getElementById('landlordHouseManagement');
+        content.innerHTML='<li><a onclick="showLandlordHouseSearch()" class="small-text">房源信息查询</a></li>'+
+            '<li><a onclick="showLandlordHouseAdd()" class="small-text">添加房源</a></li>'+
+            '<li><a onclick="showLandlordHouseEdit()" class="small-text">修改房源信息</a></li>'+
+            '<li><a onclick="showLandlordHouseCertification()" class="small-text">房产证认证</a></li>';
+    }
 
+    function showLandlordSearchInfo() {
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+        <h2>个人信息查询</h2>
+        <div id="searchLandlordResult"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+        console.log(token);
+
+        // 发送 POST 请求
+        fetch('/landlords/landlordInfo', {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+            },
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const resultDiv = document.getElementById('searchLandlordResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('main');
+                mainTable.setAttribute('class', 'table');
+                const headerSection = document.createElement('section');
+                headerSection.setAttribute('class', 'header');
+                const headTitle = document.createElement('h1');
+                headTitle.textContent = '查询结果';
+                headerSection.appendChild(headTitle);
+                mainTable.appendChild(headerSection);
+                const shellSection = document.createElement('section');
+                shellSection.setAttribute('class', 'shell');
+                const shellTable = document.createElement('table');
+                const shellThead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['属性', '值', '操作'].forEach(headerText => {
+                    const shellCell = document.createElement('th');
+                    shellCell.textContent = headerText;
+                    headRow.appendChild(shellCell);
+                    shellThead.appendChild(headRow);
+                });
+                shellTable.appendChild(shellThead);
+                const shellTbody = document.createElement('tbody');
+
+                // 渲染数据
+                const landlord = data.data;
+                const properties = {
+                    '房东账号': landlord.laccount || '无',
+                    '姓名': landlord.lname || '无',
+                    '电话': landlord.lphoneNumber || '无',
+                    '邮箱': landlord.lemail || '无',
+                    '余额': landlord.lbalance || '无'
+                };
+
+                Object.keys(properties).forEach(key => {
+                    const row = document.createElement('tr');
+
+                    // 属性列
+                    const attrCell = document.createElement('td');
+                    attrCell.textContent = key;
+                    row.appendChild(attrCell);
+
+                    // 值列
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = properties[key];
+                    row.appendChild(valueCell);
+
+                    // 操作列
+                    const actionCell = document.createElement('td');
+                    if (key === '余额') {
+                        const walletButton = document.createElement('button');
+                        walletButton.setAttribute('class', 'button');
+                        walletButton.textContent = '查看详情';
+                        walletButton.addEventListener('click', () => showLandlordWalletDetails(landlord.lbalance));
+                        actionCell.appendChild(walletButton);
+                    } else {
+                        actionCell.textContent = '-'; // 其他属性无操作
+                    }
+                    row.appendChild(actionCell);
+
+                    shellTbody.appendChild(row);
+                });
+
+                shellTable.appendChild(shellTbody);
+                shellSection.appendChild(shellTable);
+                mainTable.appendChild(shellSection);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('searchLandlordResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+            });
+    }
+
+    function showLandlordWalletDetails(balance) {
+        // 创建弹窗容器
+        const modal = document.createElement('div');
+        modal.setAttribute('class', 'modal');
+
+        // 设置弹窗内容
+        modal.innerHTML = `
+        <div class="modal-content">
+            <h2>钱包详情</h2>
+            <p>当前余额：<span id="currentBalance">`+balance+`</span> 元</p>
+            <div class="wallet-actions">
+                <button id="rechargeButton">充值</button>
+                <button id="withdrawButton">提现</button>
+            </div>
+            <button id="closeModal" class="close-button">关闭</button>
+        </div>
+    `;
+
+        // 将弹窗添加到页面
+        document.body.appendChild(modal);
+
+        // 获取弹窗元素
+        const currentBalanceElement = document.getElementById('currentBalance');
+        const closeModalButton = document.getElementById('closeModal');
+        const rechargeButton = document.getElementById('rechargeButton');
+        const withdrawButton = document.getElementById('withdrawButton');
+
+        // 关闭弹窗
+        closeModalButton.addEventListener('click', () => {
+            document.body.removeChild(modal);
+            showLandlordSearchInfo();
+        });
+
+        // 充值功能
+        rechargeButton.addEventListener('click', () => {
+            const amountString = prompt('请输入充值金额：'); // 获取输入的字符串
+            const amount = parseFloat(amountString); // 将字符串转换为浮点数
+            if (amount && !isNaN(amount) && Number(amount) > 0) {
+                fetch('/payment/landlord', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': "<%= token %>" // 添加 token
+                    },
+                    body: JSON.stringify({ amount: Number(amount) })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert('充值成功！');
+                            currentBalanceElement.textContent = (parseFloat(balance) + amount).toFixed(2);
+                            balance = parseFloat(currentBalanceElement.textContent);
+                        } else {
+                            alert('充值失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('充值失败，请稍后重试。');
+                    });
+            } else {
+                alert('请输入有效的充值金额！');
+            }
+        });
+
+        // 提现功能
+        withdrawButton.addEventListener('click', () => {
+            const amountString = prompt('请输入提现金额(提现手续费1%)：'); // 获取输入的字符串
+            let amount = parseFloat(amountString); // 将字符串转换为浮点数
+            amount=amount*1.01;
+            if (amount && !isNaN(amount) && Number(amount) > 0 && Number(amount) <= balance) {
+                fetch('/payment/landlord', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': "<%= token %>" // 添加 token
+                    },
+                    body: JSON.stringify({ amount: Number(-amount) })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert('提现成功！');
+                            currentBalanceElement.textContent = (parseFloat(balance) - amount).toFixed(2);
+                            balance = parseFloat(currentBalanceElement.textContent);
+                        } else {
+                            alert('提现失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('提现失败，请稍后重试。');
+                    });
+            } else if (Number(amount) > balance) {
+                alert('提现金额不能大于余额！');
+            } else {
+                alert('请输入有效的提现金额！');
+            }
+        });
+    }
+
+    function showLandlordEditInfo() {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>修改个人信息</h2>
+        <form id="editTenantForm">
+            <input type="text" id="laccount" name="laccount" placeholder="用户名" class="two">
+            <input type="text" id="lphoneNumber" name="lphoneNumber" placeholder="手机号" class="two">
+            <input type="email" id="lemail" name="lemail" placeholder="邮箱" class="two">
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="editTenantResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const editTenantForm = document.getElementById('editTenantForm');
+        editTenantForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            const landlordUpdateReq = {
+                laccount: formData.get('laccount'),
+                lphoneNumber: formData.get('lphoneNumber'),
+                lemail: formData.get('lemail'),
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/landlords/updateLandlordInfo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(landlordUpdateReq)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showLandlordSearchInfo');
+                    } else {
+                        // 调用失败回调函数，传递失败原因
+                        handleFail('showLandlordEditInfo', data.message || '修改失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数，传递错误信息
+                    handleFail('showLandlordEditInfo', '网络错误，请稍后重试');
+                });
+        });
+    }
+
+    function showLandlordHouseSearch(){
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+        <h2>房源信息查询</h2>
+        <div id="searchLandlordHouseResult"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+        console.log(token);
+    }
 </script>
 </body>
 </html>
