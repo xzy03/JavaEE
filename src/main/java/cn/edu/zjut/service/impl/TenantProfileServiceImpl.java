@@ -136,7 +136,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             content = JSONUtil.parseObj(jsonObj.getObj("content"));
             log.info("响应data为：" + content.getObj("download_url"));
             tenantProfile.setTCardImageBack(content.getStr("download_url")); // 设置背面图片下载地址
-            tenantProfile.setTIdentityStatus("等待审核");
+            tenantProfile.setTIdentityStatus("等待审核");//身份证审核状态
             tenantProfileService.updateById(tenantProfile);
         } catch (IOException e) {
             log.error("文件读取失败", e);
@@ -167,7 +167,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             JSONObject content = JSONUtil.parseObj(jsonObj.getObj("content"));
             log.info("响应data为：" + content.getObj("download_url"));
             tenantProfile.setTProfilePicture(content.getStr("download_url")); // 设置图片下载地址
-            tenantProfile.setTStatus("等待审核");
+            tenantProfile.setTStatus("等待审核");//学生证的审核状态
             tenantProfileService.updateById(tenantProfile);
         } catch (IOException e) {
             log.error("文件读取失败", e);

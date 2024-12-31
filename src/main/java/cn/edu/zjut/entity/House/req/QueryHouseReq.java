@@ -51,4 +51,7 @@ public class QueryHouseReq {
 
     @Schema(description = "剩余空闲数量")
     private Integer hRemainingVacancies;
+
+    @Schema(description = "房源状态")
+    private String lHouseLicenseState;
 }

@@ -134,10 +134,10 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
             throw new BusiException("房屋不存在");
         }
         house.setLHouseLicenseState(req.getContent());
-        if(landlordProfile.getLHouseStatus()==null || !landlordProfile.getLHouseStatus().equals("已认证")){
-            landlordProfile.setLHouseStatus(req.getContent());
-            landlordProfileService.updateById(landlordProfile);
-        }
+//        if(landlordProfile.getLHouseStatus()==null || !landlordProfile.getLHouseStatus().equals("已认证")){
+//            landlordProfile.setLHouseStatus(req.getContent());
+//            landlordProfileService.updateById(landlordProfile);
+//        }
         houseService.updateById(house);
     }
 }

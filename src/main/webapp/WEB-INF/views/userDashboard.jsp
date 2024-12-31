@@ -1804,6 +1804,10 @@
             })
 
     }
+
+    function showLandlordHouseAdd(){
+
+    }
 </script>
 </body>
 </html>

@@ -136,6 +136,9 @@
         <if test="req.hRemainingVacancies != null">
             AND h.h_remaining_vacancies = #{req.hRemainingVacancies}
         </if>
+        <if test="req.lHouseLicenseState != null and req.lHouseLicenseState != ''">
+            AND h.l_house_license_state = #{req.lHouseLicenseState}
+        </if>
         ORDER BY h.house_id DESC
     </select>
 </mapper>
