@@ -526,6 +526,91 @@
             '<li><a onclick="auditLandlordIDCard()" class="small-text">审核房东身份证</a></li>' +
             '<li><a onclick="auditLandlordPropertyCertificate()" class="small-text">审核房东房产证</a></li>';
     }
+    // 确认操作
+    function handleApprove(Id, url) {
+        console.log('确认操作，租户ID：', Id);
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造请求参数
+        const requestBody = {
+            content: "已审核",
+            id: Id
+        }
+
+        // console.log(requestBody);
+        // console.log(url);
+
+        // 发送 POST 请求
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('审核成功！');
+                    // 刷新页面
+                    location.reload();
+                } else {
+                    alert('审核失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请稍后重试。');
+            });
+    }
+    // 拒绝操作
+    function handleReject(Id, url) {
+        console.log('拒绝操作，租户ID：', Id);
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造请求参数
+        const requestBody = {
+            content: "已拒绝",
+            id: Id
+        };
+
+        // 发送 POST 请求
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('拒绝成功！');
+                    // 刷新页面
+                    location.reload();
+                } else {
+                    alert('拒绝失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请稍后重试。');
+            });
+    }
 
     function auditTenantStudentCard() {
         const content = document.getElementById('content');
@@ -583,7 +668,7 @@
                 // 创建表头
                 const thead = document.createElement('thead');
                 const headRow = document.createElement('tr');
-                ['学生账号', '大学', '专业', '学生证照片', '审核状态', '操作'].forEach(headerText => {
+                ['学生账号', '姓名', '性别', '出生年月', '大学', '专业', '学生证照片', '审核状态', '操作'].forEach(headerText => {
                     const th = document.createElement('th');
                     th.textContent = headerText;
                     headRow.appendChild(th);
@@ -603,6 +688,21 @@
                     const accountCell = document.createElement('td');
                     accountCell.textContent = tenant.taccount || '无';
                     row.appendChild(accountCell);
+
+                    // 姓名
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = tenant.tname || '无';
+                    row.appendChild(nameCell);
+
+                    // 性别
+                    const sexCell = document.createElement('td');
+                    sexCell.textContent = tenant.tsex || '无';
+                    row.appendChild(sexCell);
+
+                    // 出生年月
+                    const birthCell = document.createElement('td');
+                    birthCell.textContent = tenant.tbirth ? new Date(tenant.tbirth).toLocaleDateString() : '无';
+                    row.appendChild(birthCell);
 
                     // 大学
                     const universityCell = document.createElement('td');
@@ -646,12 +746,12 @@
                     const approveButton = document.createElement('button');
                     approveButton.textContent = '确认';
                     approveButton.setAttribute('class', 'button approve-button');
-                    approveButton.addEventListener('click', () => handleApproveTenant(tenant.tenantId));
+                    approveButton.addEventListener('click', () => handleApprove(tenant.tenantId, '/admins/studentCardCheck'));
 
                     const rejectButton = document.createElement('button');
                     rejectButton.textContent = '拒绝';
                     rejectButton.setAttribute('class', 'button reject-button');
-                    rejectButton.addEventListener('click', () => handleRejectTenant(tenant.tenantId));
+                    rejectButton.addEventListener('click', () => handleReject(tenant.tenantId, '/admins/studentCardCheck'));
 
                     actionCell.appendChild(approveButton);
                     actionCell.appendChild(rejectButton);
@@ -670,24 +770,339 @@
             });
     }
 
-    // 示例确认和拒绝操作的处理函数
-    function handleApproveTenant(tenantId) {
-        console.log('确认操作，租户ID：', tenantId);
+    function auditTenantIDCard() {
+        const content = document.getElementById('content');
 
-        // 这里后续可以补充请求逻辑
+        // 清空内容并设置标题
+        content.innerHTML = `
+        <h2>大学生租户身份证审核</h2>
+        <div id="tenantIDCardList"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造查询条件
+        const queryParams = {
+            tidentityStatus: "未审核", // 只查询未审核的身份证
+            tstatus: null,
+            tsex: null,
+            tmajor: null,
+            tuniversity: null,
+            tbirthStart: null,
+            tbirthEnd: null
+        };
+
+        // 发送 POST 请求获取租户列表
+        fetch('/tenant/getTenantList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(queryParams)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                const resultDiv = document.getElementById('tenantIDCardList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['学生账号', '姓名', '身份证号码', '性别', '出生年月', '身份证正面', '身份证背面', '身份认证状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.tenantList.forEach(tenant => {
+                    console.log(tenant);
+                    const row = document.createElement('tr');
+
+                    // 学生账号
+                    const accountCell = document.createElement('td');
+                    accountCell.textContent = tenant.taccount || '无';
+                    row.appendChild(accountCell);
+
+                    // 姓名
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = tenant.tname || '无';
+                    row.appendChild(nameCell);
+
+                    // 身份证号码
+                    const cardNumberCell = document.createElement('td');
+                    cardNumberCell.textContent = tenant.tcardNumber || '无';
+                    row.appendChild(cardNumberCell);
+
+                    // 性别
+                    const sexCell = document.createElement('td');
+                    sexCell.textContent = tenant.tsex || '无';
+                    row.appendChild(sexCell);
+
+                    // 出生年月
+                    const birthCell = document.createElement('td');
+                    birthCell.textContent = tenant.tbirth ? new Date(tenant.tbirth).toLocaleDateString() : '无';
+                    row.appendChild(birthCell);
+
+                    // 身份证正面
+                    const frontImageCell = document.createElement('td');
+                    if (tenant.tcardImageFront) {
+                        const img = document.createElement('img');
+                        img.src = tenant.tcardImageFront;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '身份证正面预览';
+                        img.addEventListener('click', function () {
+                            window.open(tenant.tcardImageFront);
+                        });
+                        frontImageCell.appendChild(img);
+                    } else {
+                        frontImageCell.textContent = '无';
+                    }
+                    row.appendChild(frontImageCell);
+
+                    // 身份证背面
+                    const backImageCell = document.createElement('td');
+                    if (tenant.tcardImageBack) {
+                        const img = document.createElement('img');
+                        img.src = tenant.tcardImageBack;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '身份证背面预览';
+                        img.addEventListener('click', function () {
+                            window.open(tenant.tcardImageBack);
+                        });
+                        backImageCell.appendChild(img);
+                    } else {
+                        backImageCell.textContent = '无';
+                    }
+                    row.appendChild(backImageCell);
+
+                    // 身份认证状态
+                    const identityStatusCell = document.createElement('td');
+                    identityStatusCell.textContent = tenant.tidentityStatus || '无';
+                    row.appendChild(identityStatusCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = '确认';
+                    approveButton.setAttribute('class', 'button approve-button');
+                    approveButton.addEventListener('click', () => handleApprove(tenant.tenantId, '/admins/idCardCheck'));
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = '拒绝';
+                    rejectButton.setAttribute('class', 'button reject-button');
+                    rejectButton.addEventListener('click', () => handleReject(tenant.tenantId, '/admins/idCardCheck'));
+
+                    actionCell.appendChild(approveButton);
+                    actionCell.appendChild(rejectButton);
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('tenantIDCardList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
     }
 
-    function handleRejectTenant(tenantId) {
-        console.log('拒绝操作，租户ID：', tenantId);
-        // 这里后续可以补充请求逻辑
-    }
+    function auditLandlordIDCard() {
+        const content = document.getElementById('content');
 
-    function auditTenantIDCard(){
+        // 清空内容并设置标题
+        content.innerHTML = `
+    <h2>房东身份证审核</h2>
+    <div id="landlordIDCardList"></div>
+    `;
 
-    }
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
 
-    function auditLandlordIDCard(){
+        // 构造查询条件
+        const queryParams = {
+            lhouseStatus: null,
+            lstatus: "未审核" // 只查询未审核的房东身份证
+        };
 
+        // 发送 POST 请求获取房东列表
+        fetch('/landlords/getLandlordList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(queryParams)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                const resultDiv = document.getElementById('landlordIDCardList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房东账号', '姓名', '身份证号码', '身份证正面', '身份证背面', '身份认证状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.landlordList.forEach(landlord => {
+                    console.log(landlord);
+                    const row = document.createElement('tr');
+
+                    // 房东账号
+                    const accountCell = document.createElement('td');
+                    accountCell.textContent = landlord.laccount || '无';
+                    row.appendChild(accountCell);
+
+                    // 姓名
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = landlord.lname || '无';
+                    row.appendChild(nameCell);
+
+                    // 身份证号码
+                    const cardNumberCell = document.createElement('td');
+                    cardNumberCell.textContent = landlord.lcardNumber || '无';
+                    row.appendChild(cardNumberCell);
+
+                    // 身份证正面
+                    const frontImageCell = document.createElement('td');
+                    if (landlord.lcardImageFront) {
+                        const img = document.createElement('img');
+                        img.src = landlord.lcardImageFront;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '身份证正面预览';
+                        img.addEventListener('click', function () {
+                            window.open(landlord.lcardImageFront);
+                        });
+                        frontImageCell.appendChild(img);
+                    } else {
+                        frontImageCell.textContent = '无';
+                    }
+                    row.appendChild(frontImageCell);
+
+                    // 身份证背面
+                    const backImageCell = document.createElement('td');
+                    if (landlord.lcardImageBack) {
+                        const img = document.createElement('img');
+                        img.src = landlord.lcardImageBack;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '身份证背面预览';
+                        img.addEventListener('click', function () {
+                            window.open(landlord.lcardImageBack);
+                        });
+                        backImageCell.appendChild(img);
+                    } else {
+                        backImageCell.textContent = '无';
+                    }
+                    row.appendChild(backImageCell);
+
+                    // 身份认证状态
+                    const identityStatusCell = document.createElement('td');
+                    identityStatusCell.textContent = landlord.lstatus || '无';
+                    row.appendChild(identityStatusCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = '确认';
+                    approveButton.setAttribute('class', 'button approve-button');
+                    approveButton.addEventListener('click', () => handleApprove(landlord.landlordId, '/admins/landlordIdCardCheck'));
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = '拒绝';
+                    rejectButton.setAttribute('class', 'button reject-button');
+                    rejectButton.addEventListener('click', () => handleReject(landlord.landlordId, '/admins/landlordIdCardCheck'));
+
+                    actionCell.appendChild(approveButton);
+                    actionCell.appendChild(rejectButton);
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('landlordIDCardList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
     }
 
     function auditLandlordPropertyCertificate(){
