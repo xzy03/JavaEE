@@ -24,6 +24,7 @@ public class HousePublishReq {
 
     @Schema(description = "房屋位置")
     @NotBlank(message = "房屋位置不能为空")
+    @Size(min = 1, max = 50, message = "房屋位置必须在1到50个字符之间")
     private String hLocation;
 
     @Schema(description = "租金")
@@ -40,6 +41,7 @@ public class HousePublishReq {
 
     @Schema(description = "房间布局")
     @NotBlank(message = "房间布局不能为空")
+    @Size(min = 1, max = 50, message = "房间布局必须在1到50个字符之间")
     private String hRooms;
 
     @Schema(description = "可用日期")
@@ -71,6 +73,7 @@ public class HousePublishReq {
     private Integer hPetFriendly;
 
     @Schema(description = "要求租户")
+    @Size(min = 1, max = 50, message = "房间布局必须在1到50个字符之间")
     private String hTenantrequired;
 
     @Schema(description = "总租户数")

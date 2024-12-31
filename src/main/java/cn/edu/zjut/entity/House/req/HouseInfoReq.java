@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 public class HouseInfoReq {
     @Schema(description = "房源ID")
-    @NotBlank
+    @NotBlank(message = "房源ID不能为空")
     private String houseId;
 
     @Schema(description = "房源标题")
@@ -25,6 +25,7 @@ public class HouseInfoReq {
     private String hTitle;
 
     @Schema(description = "房源位置")
+    @Size(min = 1, max = 50, message = "房源位置必须在1到50个字符之间")
     private String hLocation;
 
     @Schema(description = "租金")
@@ -38,6 +39,7 @@ public class HouseInfoReq {
     private BigDecimal hArea;
 
     @Schema(description = "房间布局")
+    @Size(min = 1, max = 50, message = "房间布局必须在1到50个字符之间")
     private String hRooms;
 
     @Schema(description = "可入住时间")
@@ -58,12 +60,14 @@ public class HouseInfoReq {
     private Integer hTotalFloors;
 
     @Schema(description = "配套设施")
+    @Size(min = 1, max = 50, message = "配套设施必须在1到50个字符之间")
     private String hFacilities;
 
     @Schema(description = "是否允许宠物")
     private Integer hPetFriendly;
 
     @Schema(description = "租客要求")
+    @Size(min = 1, max = 50, message = "租客要求必须在1到50个字符之间")
     private String hTenantrequired;
 
     @Schema(description = "总租户数量")
