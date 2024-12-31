@@ -8,7 +8,8 @@
     String token = request.getParameter("Authorization");
     System.out.println("进入userDashboard,当前用户token为：" + token);
     String user=request.getParameter("userType");
-
+    UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
+    request.setAttribute("userTokenInfoDto", userTokenInfoDto);
     // 将 userTokenInfoDto 放入 request 范围中
     request.setAttribute("user", user);
 %>
@@ -16,6 +17,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
     <title>用户操作界面</title>
     <style>
         body {
@@ -1235,26 +1237,26 @@
         // 渲染表单 HTML
         content.innerHTML = `
         <h2>修改个人信息</h2>
-        <form id="editTenantForm">
+        <form id="editLandlordForm">
             <input type="text" id="laccount" name="laccount" placeholder="用户名" class="two">
             <input type="text" id="lphoneNumber" name="lphoneNumber" placeholder="手机号" class="two">
             <input type="email" id="lemail" name="lemail" placeholder="邮箱" class="two">
             <button type="submit" class="submit-button">提交</button>
         </form>
-        <div id="editTenantResult"></div>
+        <div id="editLandlordResult"></div>
     `;
 
         // 绑定表单提交事件
-        const editTenantForm = document.getElementById('editTenantForm');
-        editTenantForm.addEventListener('submit', function (event) {
+        const editLandlordForm = document.getElementById('editLandlordForm');
+        editLandlordForm.addEventListener('submit', function (event) {
             event.preventDefault(); // 阻止默认提交行为
 
             // 获取表单数据
             const formData = new FormData(this);
             const landlordUpdateReq = {
-                laccount: formData.get('laccount'),
-                lphoneNumber: formData.get('lphoneNumber'),
-                lemail: formData.get('lemail'),
+                laccount: formData.get('laccount') === "" ? null : formData.get('laccount'),
+                lphoneNumber: formData.get('lphoneNumber') === "" ? null : formData.get('lphoneNumber'),
+                lemail: formData.get('lemail') === "" ? null : formData.get('lemail'),
             };
 
             // 获取 token
@@ -1291,6 +1293,104 @@
         });
     }
 
+    function showLandlordIDCertification(){
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>身份证认证</h2>
+        <form id="idCertificationForm" class="simple-form" enctype="multipart/form-data">
+            <input type="text" id="tName" name="tName" placeholder="姓名" class="one" required>
+            <input type="text" id="tCardNumber" name="tCardNumber" placeholder="身份证号码" class="one" required>
+            <label for="tCardImageFront">身份证正面照片：</label>
+            <input type="file" id="tCardImageFront" name="tCardImageFront" accept="image/*" class="one" required>
+            <label for="tCardImageBack">身份证背面照片：</label>
+            <input type="file" id="tCardImageBack" name="tCardImageBack" accept="image/*" class="one" required>
+            <div id="idImagePreview" class="image-preview"></div> <!-- 图片预览区域 -->
+            <button type="submit" class="submit-button">提交认证</button>
+        </form>
+        <div id="idCertificationResult"></div>
+    `;
+
+        // 实时显示上传的图片
+        const tCardImageFrontInput = document.getElementById('tCardImageFront');
+        const tCardImageBackInput = document.getElementById('tCardImageBack');
+        const idImagePreview = document.getElementById('idImagePreview');
+
+        // 实时显示身份证正面照片
+        tCardImageFrontInput.addEventListener('change', function () {
+            idImagePreview.innerHTML = ''; // 清空之前的图片预览
+
+            const file = tCardImageFrontInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '身份证正面照片预览';
+                idImagePreview.appendChild(img);
+            }
+        });
+
+        // 实时显示身份证背面照片
+        tCardImageBackInput.addEventListener('change', function () {
+            const file = tCardImageBackInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '身份证背面照片预览';
+                idImagePreview.appendChild(img);
+            }
+        });
+
+        // 绑定表单提交事件
+        const idCertificationForm = document.getElementById('idCertificationForm');
+        idCertificationForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/landlords/landlordIdCardCheck', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token // 设置 Authorization 头部
+                },
+                body: formData // 直接发送 FormData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('idCertificationResult');
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showLandlordIDCertification');
+                    } else {
+                        // 显示错误信息
+                        handleFail('showLandlordIDCertification', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showLandlordIDCertification', '网络错误，请稍后重试');
+                });
+        });
+    }
+
     function showLandlordHouseSearch(){
         let content = document.getElementById('content');
 
@@ -1307,6 +1407,214 @@
             return;
         }
         console.log(token);
+
+        const QueryHouseReq = {
+            landlordId: "<%= userTokenInfoDto.getUserId() %>",
+        };
+        // 发送 POST 请求
+        fetch('/house/getHouseList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(QueryHouseReq)
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const resultDiv = document.getElementById('searchLandlordHouseResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+                if (data.data.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无房源信息</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('main');
+                mainTable.setAttribute('class', 'table');
+                const headerSection = document.createElement('section');
+                headerSection.setAttribute('class', 'header');
+                const headTitle = document.createElement('h1');
+                headTitle.textContent = '查询结果';
+                headerSection.appendChild(headTitle);
+                mainTable.appendChild(headerSection);
+                const shellSection = document.createElement('section');
+                shellSection.setAttribute('class', 'shell');
+                const shellTable = document.createElement('table');
+                const shellThead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房源ID', '房产证验证状态', '总租户数量','剩余空闲数量','操作'].forEach(headerText => {
+                    const shellCell = document.createElement('th');
+                    shellCell.textContent = headerText;
+                    headRow.appendChild(shellCell);
+                    shellThead.appendChild(headRow);
+                });
+                shellTable.appendChild(shellThead);
+                const shellTbody = document.createElement('tbody');
+
+                // 渲染数据
+                const houseList = data.data.houseList;
+                houseList.forEach(item => {
+                    const row = document.createElement('tr');
+                    ['houseId', 'lhouseLicenseState', 'htotalTenants', 'hremainingVacancies'].forEach(key => {
+                        const cell = document.createElement('td');
+                        cell.textContent = item[key];
+                        row.appendChild(cell);
+                    });
+                    const actionCell = document.createElement('td');
+                    const houseButton = document.createElement('button');
+                    houseButton.setAttribute('class','button');
+                    houseButton.textContent = '查看详情';
+                    houseButton.addEventListener('click', () => showHouseDetails(item['houseId']));
+                    actionCell.appendChild(houseButton);
+                    row.appendChild(actionCell);
+                    shellTbody.appendChild(row);
+
+                    shellTable.appendChild(shellTbody);
+                    shellSection.appendChild(shellTable);
+                    mainTable.appendChild(shellSection);
+                    resultDiv.appendChild(mainTable);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('searchLandlordHouseResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+            });
+
+    }
+
+    function showHouseDetails(houseId){
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+        <h2>房源详细信息</h2>
+        <div id="searchHouseDetailResult"></div>
+    `;
+        // 获取 token
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+        console.log(token);
+
+        const HouseIdReq = {
+            houseId: houseId,
+        };
+        // 发送 POST 请求
+        fetch('/house/getHouseDetail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify(HouseIdReq)
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const resultDiv = document.getElementById('searchHouseDetailResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('main');
+                mainTable.setAttribute('class', 'table');
+                const headerSection = document.createElement('section');
+                headerSection.setAttribute('class', 'header');
+                const headTitle = document.createElement('h1');
+                headTitle.textContent = '查询结果';
+                headerSection.appendChild(headTitle);
+                mainTable.appendChild(headerSection);
+                const shellSection = document.createElement('section');
+                shellSection.setAttribute('class', 'shell');
+                const shellTable = document.createElement('table');
+                const shellThead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['属性', '值'].forEach(headerText => {
+                    const shellCell = document.createElement('th');
+                    shellCell.textContent = headerText;
+                    headRow.appendChild(shellCell);
+                    shellThead.appendChild(headRow);
+                });
+                shellTable.appendChild(shellThead);
+                const shellTbody = document.createElement('tbody');
+
+                // 渲染数据
+                const house = data.data;
+                const properties = {
+                    '房源标题': house.htitle || '无',
+                    '房源位置': house.hlocation || '无',
+                    '租金': house.hrent || '无',
+                    '面积（平方米）': house.harea || '无',
+                    '房间布局': house.hrooms || '无',
+                    '可入住时间': house.havailableFrom || '无',
+                    '朝向': house.hdirection || '无',
+                    '总楼层数': house.htotalFloors || '无',
+                    '楼层': house.hfloor || '无',
+                    '配套设施': house.hfacilities || '无',
+                    '是否允许宠物': house.hpetFriendly || '无',
+                    '租客要求': house.htenantrequired || '无',
+                    '总租户数量': house.htotalTenants || '无',
+                    '剩余空闲数量': house.hremainingVacancies || '无',
+                    '房产证图片': house.lhouseLicensePhoto || '无',
+                    '房屋图片': house.lhousePhoto || '无',
+                };
+
+                Object.keys(properties).forEach(key => {
+                    const row = document.createElement('tr');
+
+                    // 属性列
+                    const attrCell = document.createElement('td');
+                    attrCell.textContent = key;
+                    row.appendChild(attrCell);
+
+                    // 值列
+                    const valueCell = document.createElement('td');
+                    if(key==='房产证图片'||key==='房屋图片'){
+                        const img = document.createElement('img');
+                        img.src = properties[key];
+                        img.style.width = 'auto'; // 按图片原比例宽度
+                        img.style.height = 'auto'; // 按图片原比例高度
+                        img.style.maxWidth = '300px'; // 最大宽度限制
+                        img.style.maxHeight = '200px'; // 最大高度限制
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0'; // 去除圆角，防止椭圆形
+                        img.alt = '图片预览';
+                        img.addEventListener('click', function() {
+                            window.open(properties[key]);
+                        });
+                        valueCell.appendChild(img);
+                        console.log(img);
+                    }
+                    else valueCell.textContent = properties[key];
+                    row.appendChild(valueCell);
+
+                    shellTbody.appendChild(row);
+                });
+
+                shellTable.appendChild(shellTbody);
+                shellSection.appendChild(shellTable);
+                mainTable.appendChild(shellSection);
+                resultDiv.appendChild(mainTable);
+            })
+
     }
 </script>
 </body>
