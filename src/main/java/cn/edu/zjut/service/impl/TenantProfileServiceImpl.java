@@ -192,6 +192,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         tenant.setTBalance(tenant.getTBalance().add(BigDecimal.valueOf(amount)));
         this.updateById(tenant);
     }
+    @Override
+    public TenantListInfo getTenantListByHouseId(String houseId) {
+        List<TenantProfile> tenantList = baseMapper.getTenantListByHouseId(houseId);
+        TenantListInfo tenantListInfo = TenantListInfo.builder()
+                .tenantList(tenantList)
+                .build();
+        return tenantListInfo;
+    }
 
 }
 

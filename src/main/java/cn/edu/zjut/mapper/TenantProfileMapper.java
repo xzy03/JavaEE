@@ -17,6 +17,7 @@ import java.util.List;
 */
 public interface TenantProfileMapper extends BaseMapper<TenantProfile> {
     List<TenantProfile> getTenantList(@Param("req") QueryTenantReq req);
+    List<TenantProfile> getTenantListByHouseId(@Param("houseId") String houseId);
 }
 
 

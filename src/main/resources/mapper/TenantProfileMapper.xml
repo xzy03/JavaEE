@@ -65,4 +65,10 @@
         </if>
         ORDER BY t.tenant_id DESC
     </select>
+    <select id="getTenantListByHouseId" resultType="cn.edu.zjut.entity.TenantProfile.TenantProfile">
+        SELECT t.*
+        FROM tenant_profile t
+        INNER JOIN contracts c ON c.c_tenant_id = t.tenant_id
+        WHERE c.c_house_id = #{houseId} AND c.c_status = '已生效'
+    </select>
 </mapper>
