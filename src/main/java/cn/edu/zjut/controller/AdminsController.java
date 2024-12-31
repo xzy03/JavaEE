@@ -33,6 +33,7 @@ public class AdminsController {
     @PostMapping("/register")
     public CommonResult<Void> register(@Validated @RequestBody AdminsRegisterReq req) {
         try {
+            System.out.println("进入管理员注册");
             adminsService.registerAdmin(req);
         } catch (Exception e) {
             return CommonResult.error(e.getMessage());
