@@ -776,11 +776,11 @@
             // 获取表单数据
             const formData = new FormData(this);
             const tenantUpdateReq = {
-                tAccount: formData.get('tAccount'),
-                tPhoneNumber: formData.get('tPhoneNumber'),
-                tEmail: formData.get('tEmail'),
-                tProfilePicture: formData.get('tProfilePicture'),
-                tIntroduction: formData.get('tIntroduction'),
+                taccount: formData.get('tAccount'),
+                tphoneNumber: formData.get('tPhoneNumber'),
+                temail: formData.get('tEmail'),
+                tprofilePicture: formData.get('tProfilePicture'),
+                tintroduction: formData.get('tIntroduction'),
             };
 
             // 获取 token
