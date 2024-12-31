@@ -271,6 +271,10 @@
             flex: 0 1 calc(50% - 10px);  /*每行两列，间距为10px */
         }
 
+        form input.one{
+            flex: 0 1 calc(100% - 10px);  /*每行一列，间距为10px */
+        }
+
         form input.five{
             flex: 0 1 calc(20% - 10px);  /*每行五列，间距为10px */
         }
@@ -413,20 +417,7 @@
     <ul>
         <c:choose>
             <c:when test="${user == '管理员'}">
-                <li><a href="#studentManagement" onclick="showStudentManagement()">学生信息管理</a></li>
-                <div id="studentManagement"></div>
-                <li><a href="#teacherManagement" onclick="showTeacherManagement()">教师信息管理</a></li>
-                <div id="teacherManagement"></div>
-                <li><a href="#deptManagement" onclick="showDeptManagement()">专业信息管理</a></li>
-                <div id="deptManagement"></div>
-                <li><a href="#classManagement" onclick="showClassManagement()">班级信息管理</a></li>
-                <div id="classManagement"></div>
-                <li><a href="#courseManagement" onclick="showCourseManagement()">课程信息管理</a></li>
-                <div id="courseManagement"></div>
-                <li><a href="#teachManagement" onclick="showTeachManagement()">授课信息管理</a></li>
-                <div id="teachManagement"></div>
-                <li><a href="#scoreManagement" onclick="showScoreManagement()">选课信息管理</a></li>
-                <div id="scoreManagement"></div>
+
             </c:when>
             <c:when test="${user == '大学生租户'}">
                 <li><a href="#TenantProfileManagement" onclick="showTenantManagement()">个人信息管理</a></li>
@@ -449,14 +440,6 @@
         </c:choose>
 
     </ul>
-    <div class="logout-btn">
-        <button type="button" class="password" onclick="changePassword()">修改密码</button>
-    </div>
-    <div class="logout-btn">
-        <form action="userLogout" method="post">
-            <button type="submit">退出登录</button>
-        </form>
-    </div>
 </div>
 <div class="content" id="content" >
     <div class="user-info">
@@ -766,7 +749,7 @@
             <input type="text" id="tPhoneNumber" name="tPhoneNumber" placeholder="手机号" class="two">
             <input type="email" id="tEmail" name="tEmail" placeholder="邮箱" class="two">
             <input type="text" id="tProfilePicture" name="tProfilePicture" placeholder="头像 URL" class="two">
-            <textarea id="tIntroduction" name="tIntroduction" placeholder="个人介绍" class="wide-textarea" class="" rows="4"></textarea>
+            <textarea id="tIntroduction" name="tIntroduction" placeholder="个人介绍" class="wide-textarea" rows="4"></textarea>
             <button type="submit" class="submit-button">提交</button>
         </form>
         <div id="editTenantResult"></div>
@@ -780,11 +763,11 @@
             // 获取表单数据
             const formData = new FormData(this);
             const tenantUpdateReq = {
-                taccount: formData.get('tAccount'),
-                tphoneNumber: formData.get('tPhoneNumber'),
-                temail: formData.get('tEmail'),
-                tprofilePicture: formData.get('tProfilePicture'),
-                tintroduction: formData.get('tIntroduction'),
+                taccount: formData.get('tAccount') === "" ? null : formData.get('tAccount'),
+                tphoneNumber: formData.get('tPhoneNumber') === "" ? null : formData.get('tPhoneNumber'),
+                temail: formData.get('tEmail') === "" ? null : formData.get('tEmail'),
+                tprofilePicture: formData.get('tProfilePicture') === "" ? null : formData.get('tProfilePicture'),
+                tintroduction: formData.get('tIntroduction') === "" ? null : formData.get('tIntroduction'),
             };
 
             // 获取 token
@@ -821,22 +804,190 @@
         });
     }
 
-    function showTenantStudentCertification(){
+    function showTenantStudentCertification() {
+        // 获取内容容器
+        const content = document.getElementById('content');
 
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>学生证认证</h2>
+        <form id="studentCertificationForm" class="simple-form" enctype="multipart/form-data">
+            <input type="text" id="tUniversity" name="tUniversity" placeholder="就读大学" class="one" required>
+            <input type="text" id="tMajor" name="tMajor" placeholder="专业" class="one" required>
+            <input type="file" id="tProfilePicture" name="tProfilePicture" accept="image/*" class="one" required>
+            <div id="imagePreview" class="image-preview"></div> <!-- 图片预览区域 -->
+            <button type="submit" class="submit-button">提交认证</button>
+        </form>
+        <div id="studentCertificationResult"></div>
+    `;
+
+        // 实时显示上传的图片
+        const tProfilePictureInput = document.getElementById('tProfilePicture');
+        const imagePreview = document.getElementById('imagePreview');
+
+        tProfilePictureInput.addEventListener('change', function () {
+            // 清空之前的图片预览
+            imagePreview.innerHTML = '';
+
+            // 获取用户上传的文件
+            const file = tProfilePictureInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file); // 创建临时图片 URL
+                img.style.width = '100%'; // 自动调整宽度
+                img.style.maxWidth = '300px'; // 设置最大宽度为 300px
+                img.style.marginTop = '10px';
+                img.alt = '学生证照片预览';
+                imagePreview.appendChild(img);
+            }
+        });
+
+        // 绑定表单提交事件
+        const studentCertificationForm = document.getElementById('studentCertificationForm');
+        studentCertificationForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/tenant/studentInfo', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token // 设置 Authorization 头部
+                },
+                body: formData // 直接发送 FormData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('studentCertificationResult');
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showTenantStudentCertification');
+                    } else {
+                        // 显示错误信息
+                        handleFail('showTenantStudentCertification', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showTenantStudentCertification', '网络错误，请稍后重试');
+                });
+        });
     }
 
-    function showTenantIDCertification(){
+    function showTenantIDCertification() {
+        // 获取内容容器
+        const content = document.getElementById('content');
 
-    }
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>身份证认证</h2>
+        <form id="idCertificationForm" class="simple-form" enctype="multipart/form-data">
+            <select id="tSex" name="tSex" class="one" required>
+                <option value="">选择性别</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+            <input type="text" id="tName" name="tName" placeholder="姓名" class="one" required>
+            <input type="text" id="tCardNumber" name="tCardNumber" placeholder="身份证号码" class="one" required>
+            <label for="tBirth">出生日期：</label>
+            <input type="date" id="tBirth" name="tBirth" class="one" required>
+            <label for="tCardImageFront">身份证正面照片：</label>
+            <input type="file" id="tCardImageFront" name="tCardImageFront" accept="image/*" class="one" required>
+            <label for="tCardImageBack">身份证背面照片：</label>
+            <input type="file" id="tCardImageBack" name="tCardImageBack" accept="image/*" class="one" required>
+            <div id="idImagePreview" class="image-preview"></div> <!-- 图片预览区域 -->
+            <button type="submit" class="submit-button">提交认证</button>
+        </form>
+        <div id="idCertificationResult"></div>
+    `;
 
-    function showStudentManagement(){
-        boardClean();
-        let content = document.getElementById('studentManagement');
-        content.innerHTML='<li><a onclick="showSearchStudent()" class="small-text">学生信息查询</a></li>';
-    }
+        // 实时显示上传的图片
+        const tCardImageFrontInput = document.getElementById('tCardImageFront');
+        const tCardImageBackInput = document.getElementById('tCardImageBack');
+        const idImagePreview = document.getElementById('idImagePreview');
 
-    function showSearchStudent(){
+        // 实时显示身份证正面照片
+        tCardImageFrontInput.addEventListener('change', function () {
+            idImagePreview.innerHTML = ''; // 清空之前的图片预览
 
+            const file = tCardImageFrontInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '身份证正面照片预览';
+                idImagePreview.appendChild(img);
+            }
+        });
+
+        // 实时显示身份证背面照片
+        tCardImageBackInput.addEventListener('change', function () {
+            const file = tCardImageBackInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '身份证背面照片预览';
+                idImagePreview.appendChild(img);
+            }
+        });
+
+        // 绑定表单提交事件
+        const idCertificationForm = document.getElementById('idCertificationForm');
+        idCertificationForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/tenant/idCardCheck', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token // 设置 Authorization 头部
+                },
+                body: formData // 直接发送 FormData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('idCertificationResult');
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showTenantIDCertification');
+                    } else {
+                        // 显示错误信息
+                        handleFail('showTenantIDCertification', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showTenantIDCertification', '网络错误，请稍后重试');
+                });
+        });
     }
 
 

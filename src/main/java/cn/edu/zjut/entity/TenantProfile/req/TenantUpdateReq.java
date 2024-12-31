@@ -2,12 +2,14 @@ package cn.edu.zjut.entity.TenantProfile.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TenantUpdateReq {
     @Schema(description = "用户名",example = "admin")
     private String tAccount;
