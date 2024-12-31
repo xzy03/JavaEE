@@ -2221,7 +2221,34 @@
     }
 
     function showLandlordHouseAdd(){
+        // 获取内容容器
+        const content = document.getElementById('content');
 
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>填写房源信息</h2>
+        <form id="editHouseForm">
+            <input type="text" id="htitle" name="htitle" placeholder="房源标题" class="two">
+            <input type="text" id="hrooms" name="hrooms" placeholder="房间布局" class="two">
+            <input type="text" id="hfacilities" name="hfacilities" placeholder="配套设施" class="two">
+            <input type="text" id="htenantrequired" name="htenantrequired" placeholder="租客要求" class="two">
+            <input type="text" id="hlocation" name="hlocation" placeholder="房源位置" class="two">
+            <input type="number" id="hfloor" name="hfloor" placeholder="楼层" class="two">
+            <input type="number" id="htotalFloors" name="htotalFloors" placeholder="总楼层数" class="two">
+            <input type="number" id="hrent" name="hrent" placeholder="租金" class="two">
+            <input type="number" id="harea" name="harea" placeholder="面积（平方米）" class="two">
+            <input type="number" id="htotalTenants" name="htotalTenants" placeholder="总租户数量" class="two">
+            <input type="number" id="hremainingVacancies" name="hremainingVacancies" placeholder="剩余空闲数量" class="two">
+            <input type="datetime-local" id="havailableFrom" name="havailableFrom" placeholder="可入住时间" class="two" required>
+            <label>是否同意养宠物：</label><br>
+            <input type="radio" id="yes" name="hpetFriendly" value="1" required>
+            <label for="yes">是</label><br>
+            <input type="radio" id="no" name="hpetFriendly" value="0" required>
+            <label for="no">否</label><br>
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="editHouseResult"></div>
+    `;
     }
 </script>
 </body>
