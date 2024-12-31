@@ -78,7 +78,7 @@
             flex: 1;
             padding: 20px;
             background-color: #f4f4f4;
-            background-image: url('background2.jpeg'); /* 替换为你的图片路径 */
+            background-image: url('../../static/background2.jpeg'); /* 替换为你的图片路径 */
             background-size: cover; /* 使图片覆盖整个背景 */
             background-position: center; /* 居中显示图片 */
             background-repeat: no-repeat; /* 防止图片重复 */
@@ -419,7 +419,8 @@
     <ul>
         <c:choose>
             <c:when test="${user == '管理员'}">
-
+                <li><a href="#AdminReviewManagement" onclick="showAdminReviewManagement()">审核管理</a></li>
+                <div id="AdminReviewManagement"></div>
             </c:when>
             <c:when test="${user == '大学生租户'}">
                 <li><a href="#TenantProfileManagement" onclick="showTenantManagement()">个人信息管理</a></li>
@@ -512,6 +513,187 @@
         }, 2000);
     }
 
+    function AdminClean(){
+        let content = document.getElementById('AdminReviewManagement');
+        content.innerHTML='';
+    }
+
+    function showAdminReviewManagement() {
+        AdminClean();
+        let content = document.getElementById('AdminReviewManagement');
+        content.innerHTML = '<li><a onclick="auditTenantStudentCard()" class="small-text">审核大学生租户学生证</a></li>' +
+            '<li><a onclick="auditTenantIDCard()" class="small-text">审核大学生租户身份证</a></li>' +
+            '<li><a onclick="auditLandlordIDCard()" class="small-text">审核房东身份证</a></li>' +
+            '<li><a onclick="auditLandlordPropertyCertificate()" class="small-text">审核房东房产证</a></li>';
+    }
+
+    function auditTenantStudentCard() {
+        const content = document.getElementById('content');
+
+        // 清空内容并设置标题
+        content.innerHTML = `
+        <h2>大学生租户学生证审核</h2>
+        <div id="tenantStudentCardList"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造查询条件
+        const queryParams = {
+            tstatus: "未审核", // 只查询未审核的租户
+            tidentityStatus: null,
+            tsex: null,
+            tmajor: null,
+            tuniversity: null,
+            tbirthStart: null,
+            tbirthEnd: null
+        };
+
+        // 发送 POST 请求获取租户列表
+        fetch('/tenant/getTenantList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(queryParams)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                const resultDiv = document.getElementById('tenantStudentCardList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['学生账号', '大学', '专业', '学生证照片', '审核状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.tenantList.forEach(tenant => {
+                    console.log(tenant);
+                    const row = document.createElement('tr');
+
+                    // 学生账号
+                    const accountCell = document.createElement('td');
+                    accountCell.textContent = tenant.taccount || '无';
+                    row.appendChild(accountCell);
+
+                    // 大学
+                    const universityCell = document.createElement('td');
+                    universityCell.textContent = tenant.tuniversity || '无';
+                    row.appendChild(universityCell);
+
+                    // 专业
+                    const majorCell = document.createElement('td');
+                    majorCell.textContent = tenant.tmajor || '无';
+                    row.appendChild(majorCell);
+
+                    // 学生证照片
+                    const photoCell = document.createElement('td');
+                    if (tenant.tprofilePicture) {
+                        const img = document.createElement('img');
+                        img.src = tenant.tprofilePicture;
+                        img.style.width = 'auto'; // 按图片原比例宽度
+                        img.style.height = 'auto'; // 按图片原比例高度
+                        img.style.maxWidth = '300px'; // 最大宽度限制
+                        img.style.maxHeight = '200px'; // 最大高度限制
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0'; // 去除圆角，防止椭圆形
+                        img.style.cursor = 'pointer'; // 鼠标悬停效果
+                        img.alt = '学生证图片预览';
+                        img.addEventListener('click', function () {
+                            window.open(tenant.tprofilePicture); // 点击图片新窗口打开原图
+                        });
+                        photoCell.appendChild(img);
+                    } else {
+                        photoCell.textContent = '无';
+                    }
+                    row.appendChild(photoCell);
+
+                    // 审核状态
+                    const statusCell = document.createElement('td');
+                    statusCell.textContent = tenant.tstatus || '无';
+                    row.appendChild(statusCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = '确认';
+                    approveButton.setAttribute('class', 'button approve-button');
+                    approveButton.addEventListener('click', () => handleApproveTenant(tenant.tenantId));
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = '拒绝';
+                    rejectButton.setAttribute('class', 'button reject-button');
+                    rejectButton.addEventListener('click', () => handleRejectTenant(tenant.tenantId));
+
+                    actionCell.appendChild(approveButton);
+                    actionCell.appendChild(rejectButton);
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('tenantStudentCardList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
+    }
+
+    // 示例确认和拒绝操作的处理函数
+    function handleApproveTenant(tenantId) {
+        console.log('确认操作，租户ID：', tenantId);
+
+        // 这里后续可以补充请求逻辑
+    }
+
+    function handleRejectTenant(tenantId) {
+        console.log('拒绝操作，租户ID：', tenantId);
+        // 这里后续可以补充请求逻辑
+    }
+
+    function auditTenantIDCard(){
+
+    }
+
+    function auditLandlordIDCard(){
+
+    }
+
+    function auditLandlordPropertyCertificate(){
+
+    }
+
     function TenantClean(){
         let content = document.getElementById('TenantProfileManagement');
         content.innerHTML='';
@@ -589,12 +771,18 @@
                 // 渲染数据
                 const tenant = data.data;
                 const properties = {
-                    '学生账号': tenant.taccount || '无',
+                    '账号': tenant.taccount || '无',
                     '姓名': tenant.tname || '无',
                     '性别': tenant.tsex || '无',
+                    '出生年月': tenant.tbirth ? tenant.tbirth.split(' ')[0] : '无',
                     '大学': tenant.tuniversity || '无',
-                    '电话': tenant.tphoneNumber || '无',
-                    '余额': tenant.tbalance || '无'
+                    '专业': tenant.tmajor || '无',
+                    '手机号': tenant.tphoneNumber || '无',
+                    '邮箱': tenant.temail || '无',
+                    '身份认证状态': tenant.tidentityStatus || '无',
+                    '学生认证状态': tenant.tstatus || '无',
+                    '余额': tenant.tbalance || '无',
+                    '个人介绍': tenant.tintroduction || '无'
                 };
 
                 Object.keys(properties).forEach(key => {
