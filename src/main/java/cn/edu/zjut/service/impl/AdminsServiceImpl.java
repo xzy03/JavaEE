@@ -83,6 +83,7 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         if(adminsService.qureryByUsername(req.getAdUsername()) != null){
             throw new BusiException("用户名存在");
         }
+        admins.setAdUsername(req.getAdUsername());
         admins.setAdEmail(req.getAdEmail());
         admins.setAdPhone(req.getAdPhone());
         adminsService.updateById(admins);
@@ -134,10 +135,10 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
             throw new BusiException("房屋不存在");
         }
         house.setLHouseLicenseState(req.getContent());
-        if(landlordProfile.getLHouseStatus()==null || !landlordProfile.getLHouseStatus().equals("已认证")){
-            landlordProfile.setLHouseStatus(req.getContent());
-            landlordProfileService.updateById(landlordProfile);
-        }
+//        if(landlordProfile.getLHouseStatus()==null || !landlordProfile.getLHouseStatus().equals("已认证")){
+//            landlordProfile.setLHouseStatus(req.getContent());
+//            landlordProfileService.updateById(landlordProfile);
+//        }
         houseService.updateById(house);
     }
 }

@@ -1,6 +1,7 @@
 package cn.edu.zjut.controller;
 
 import cn.edu.zjut.annotation.PassAuthentication;
+import cn.edu.zjut.entity.House.req.HouseIdReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
@@ -133,4 +134,16 @@ public class TenantController {
         }
         return CommonResult.success(tenantListInfo);
     }
+    @Operation(summary="查看房源对应租客列表")
+    @PostMapping("/getTenantListByHouseId")
+    public CommonResult<TenantListInfo> getTenantListByHouseId(@Validated @RequestBody HouseIdReq req) {
+        TenantListInfo tenantListInfo;
+        try {
+            tenantListInfo = tenantProfileService.getTenantListByHouseId(req.getHouseId());
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+        return CommonResult.success(tenantListInfo);
+    }
+
 }

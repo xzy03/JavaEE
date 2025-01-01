@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ContractsIdReq {
     @Schema(description = "合同ID")
-    @NotBlank
+    @NotBlank(message = "合同ID不能为空")
     private String contractsId;
 }

@@ -24,5 +24,6 @@ public interface TenantProfileService extends IService<TenantProfile> {
     TenantListInfo getTenantList(QueryTenantReq req);
     // TenantProfileService.java
     void modifyBalance(String tenantId, Double amount);
+    TenantListInfo getTenantListByHouseId(String houseId);
 
 }

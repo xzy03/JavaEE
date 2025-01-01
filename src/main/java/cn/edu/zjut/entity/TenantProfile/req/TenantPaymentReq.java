@@ -19,6 +19,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TenantPaymentReq {
     @Schema(description = "修改金额")
-    @NotNull
+    @NotNull(message = "修改金额不能为空")
     private Double amount;
 }

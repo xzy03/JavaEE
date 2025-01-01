@@ -49,8 +49,6 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
                 .tPassword(PasswordUtils.encrypt(req.getTPassword()))
                 .tPhoneNumber(req.getTPhoneNumber())
                 .tEmail(req.getTEmail())
-                .tIdentityStatus("未认证")
-                .tStatus("未审核")
                 .tBalance(BigDecimal.valueOf(0))
                 .build();
         this.save(tenantProfile);
@@ -138,7 +136,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             content = JSONUtil.parseObj(jsonObj.getObj("content"));
             log.info("响应data为：" + content.getObj("download_url"));
             tenantProfile.setTCardImageBack(content.getStr("download_url")); // 设置背面图片下载地址
-            tenantProfile.setTIdentityStatus("等待审核");
+            tenantProfile.setTIdentityStatus("等待审核");//身份证审核状态
             tenantProfileService.updateById(tenantProfile);
         } catch (IOException e) {
             log.error("文件读取失败", e);
@@ -169,6 +167,7 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
             JSONObject content = JSONUtil.parseObj(jsonObj.getObj("content"));
             log.info("响应data为：" + content.getObj("download_url"));
             tenantProfile.setTProfilePicture(content.getStr("download_url")); // 设置图片下载地址
+            tenantProfile.setTStatus("等待审核");//学生证的审核状态
             tenantProfileService.updateById(tenantProfile);
         } catch (IOException e) {
             log.error("文件读取失败", e);
@@ -192,6 +191,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         }
         tenant.setTBalance(tenant.getTBalance().add(BigDecimal.valueOf(amount)));
         this.updateById(tenant);
+    }
+    @Override
+    public TenantListInfo getTenantListByHouseId(String houseId) {
+        List<TenantProfile> tenantList = baseMapper.getTenantListByHouseId(houseId);
+        TenantListInfo tenantListInfo = TenantListInfo.builder()
+                .tenantList(tenantList)
+                .build();
+        return tenantListInfo;
     }
 
 }
