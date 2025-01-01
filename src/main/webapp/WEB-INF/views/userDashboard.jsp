@@ -727,7 +727,7 @@
 
         // 构造查询条件
         const queryParams = {
-            tstatus: "未审核", // 只查询未审核的租户
+            tstatus: "等待审核", // 只查询等待审核的租户
             tidentityStatus: null,
             tsex: null,
             tmajor: null,
@@ -885,7 +885,7 @@
 
         // 构造查询条件
         const queryParams = {
-            tidentityStatus: "未审核", // 只查询未审核的身份证
+            tidentityStatus: "等待审核", // 只查询等待审核的身份证
             tstatus: null,
             tsex: null,
             tmajor: null,
@@ -1061,7 +1061,7 @@
         // 构造查询条件
         const queryParams = {
             lhouseStatus: null,
-            lstatus: "未审核" // 只查询未审核的房东身份证
+            lstatus: "等待审核" // 只查询等待审核的房东身份证
         };
 
         // 发送 POST 请求获取房东列表
@@ -1220,7 +1220,7 @@
 
         // 构造查询条件
         const queryParams = {
-            lhouseLicenseState: "未审核" // 只查询未审核的房产证
+            lhouseLicenseState: "等待审核" // 只查询等待审核的房产证
         };
 
         // 发送 POST 请求获取房源列表
