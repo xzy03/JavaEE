@@ -3281,7 +3281,7 @@
         // 渲染表单 HTML
         content.innerHTML = `
         <h2>填写房源信息</h2>
-        <form id="editHouseForm">
+        <form id="publishHouseForm">
             <input type="text" id="htitle" name="htitle" class="three" placeholder="房源标题">
             <input type="number" id="hfloor" name="hfloor" class="three" placeholder="楼层">
             <input type="number" id="htotalFloors" name="htotalFloors" class="three" placeholder="总楼层数">
@@ -3295,14 +3295,78 @@
                 <option value="1">是</option>
                 <option value="0">否</option>
             </select>
+            <select id="hdirection" name="hdirection" class="three" required>
+                <option value="">房屋朝向</option>
+                <option value="南">南</option>
+                <option value="北">北</option>
+            </select>
             <textarea id="hrooms" name="hrooms" placeholder="房间布局" class="wide-textarea" rows="2"></textarea>
             <textarea id="hlocation" name="hlocation" placeholder="房源位置" class="wide-textarea" rows="2"></textarea>
             <textarea id="hfacilities" name="hfacilities" placeholder="配套设施" class="wide-textarea" rows="4"></textarea>
             <textarea id="htenantrequired" name="htenantrequired" placeholder="租客要求" class="wide-textarea" rows="4"></textarea>
             <button type="submit" class="submit-button">提交</button>
         </form>
-        <div id="editHouseResult"></div>
+        <div id="publishHouseResult"></div>
     `;
+        // 绑定表单提交事件
+        const publishHouseForm = document.getElementById('publishHouseForm');
+        publishHouseForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            const houseUpdateReq = {
+                htitle: formData.get('htitle') === "" ? null : formData.get('htitle'),
+                hfloor: formData.get('hfloor') === "" ? null : parseInt(formData.get('hfloor')),
+                htotalFloors: formData.get('htotalFloors') === "" ? null : parseInt(formData.get('htotalFloors')),
+                hrent: formData.get('hrent') === "" ? null : parseFloat(formData.get('hrent')),
+                harea: formData.get('harea') === "" ? null : parseFloat(formData.get('harea')),
+                htotalTenants: formData.get('htotalTenants') === "" ? null : parseInt(formData.get('htotalTenants')),
+                hremainingVacancies: formData.get('hremainingVacancies') === "" ? null : parseInt(formData.get('hremainingVacancies')),
+                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom').replace('T', ' ')+':00',
+                hpetFriendly: formData.get('hpetFriendly') === "" ? null : parseInt(formData.get('hpetFriendly')),
+                hrooms: formData.get('hrooms') === "" ? null : formData.get('hrooms'),
+                hfacilities: formData.get('hfacilities') === "" ? null : formData.get('hfacilities'),
+                htenantrequired: formData.get('htenantrequired') === "" ? null : formData.get('htenantrequired'),
+                hlocation: formData.get('hlocation') === "" ? null : formData.get('hlocation'),
+                hdirection: formData.get('hdirection') === "" ? null : formData.get('hdirection'),
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/house/publish', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(houseUpdateReq)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('publishHouseResult');
+                    if (data.code === 200) {
+                        // 成功提示并刷新页面或调用相关函数
+                        resultDiv.innerHTML = `<p>添加成功！</p>`;
+                        alert("房源信息添加成功！");
+                        showLandlordHouseSearch(); // 刷新房源列表
+                    } else {
+                        // 显示错误信息
+                        resultDiv.innerHTML = `<p>添加失败：` + data.message + data.data + `</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const resultDiv = document.getElementById('publishHouseResult');
+                    resultDiv.innerHTML = `<p>网络错误，请稍后再试。</p>`;
+                });
+        });
     }
 
     function showTenantRentInfo(){
