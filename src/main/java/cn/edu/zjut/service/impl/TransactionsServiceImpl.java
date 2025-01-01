@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -106,6 +107,7 @@ public class TransactionsServiceImpl extends ServiceImpl<TransactionsMapper, Tra
             throw new RuntimeException("余额不足");
         }
         transaction.setTStatus("已支付");
+        transaction.setTPaytime(new Date());
         tenantProfile.setTBalance(tenantProfile.getTBalance().subtract(transaction.getTAmount()));
         landlordProfile.setLBalance(landlordProfile.getLBalance().add(transaction.getTAmount()));
         tenantProfileService.updateById(tenantProfile);

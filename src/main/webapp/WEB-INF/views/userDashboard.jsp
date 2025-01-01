@@ -2725,144 +2725,132 @@
 
     }
 
-    function showTenantRentInfo() {
-        let content = document.getElementById('content');
+    function showTenantRentInfo(){
+        // 获取内容容器
+        const content = document.getElementById('content');
 
+        // 渲染表单 HTML
         content.innerHTML = `
-        <h2>房租信息</h2>
-        <div id="rentInfoResult"></div>
+        <h2>房租押金信息</h2>
+        <form id="searchRentForm">
+            <select id="ttransactionType" name="ttransactionType" class="three" required>
+                <option value="">交易类型</option>
+                <option value="押金支付">押金支付</option>
+                <option value="租金支付">租金支付</option>
+            </select>
+            <select id="tStatus" name="tStatus" class="three" required>
+                <option value="">交易状态</option>
+                <option value="待支付">待支付</option>
+                <option value="已支付">已支付</option>
+            </select>
+            <input type="datetime-local" id="startTime" name="startTime" class="three" placeholder="开始时间" required>
+            <input type="datetime-local" id="endTime" name="endTime" class="three" placeholder="结束时间" required>
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="rentInfoSearchResult"></div>
     `;
+        // 绑定表单提交事件
+        const searchRentForm = document.getElementById('searchRentForm');
+        searchRentForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
 
-        const token = "<%= token %>";
-
-        if (!token) {
-            alert("用户未登录，请先登录！");
-            return;
-        }
-
-        fetch('/rent/viewRentTenant', {
-            method: 'POST',
-            headers: {
-                'Authorization': token
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById('rentInfoResult');
-                resultDiv.innerHTML = '';
-
-                if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
-                    return;
-                }
-
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
-                ['交易ID', '租户ID', '房东ID', '交易类型', '交易金额', '交易状态', '交易名称', '是否收费', '交易费用', '交易来源', '支付时间', '操作'].forEach(headerText => {
-                    const th = document.createElement('th');
-                    th.textContent = headerText;
-                    th.style.border = '1px solid #ddd';
-                    th.style.padding = '8px';
-                    th.style.textAlign = 'left';
-                    headerRow.appendChild(th);
-                });
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
-
-                const tbody = document.createElement('tbody');
-                let isModalOpen = false; // 标志变量，防止多次弹窗
-
-                data.data.rentList.forEach(rentInfo => {
-                    const row = document.createElement('tr');
-
-                    const paytime = new Date(rentInfo.tpaytime); // 支付时间
-                    const now = new Date(); // 当前时间
-
-                    // 创建每一列
-                    [
-                        rentInfo.transactionId,
-                        rentInfo.tenantId,
-                        rentInfo.landlordId,
-                        rentInfo.ttransactionType,
-                        rentInfo.tamount.toFixed(2),
-                        rentInfo.tstatus,
-                        rentInfo.tname,
-                        rentInfo.tcharge || '无',
-                        rentInfo.tfees.toFixed(2),
-                        rentInfo.ttransactionSource || '无',
-                        paytime.toLocaleString()
-                    ].forEach(cellData => {
-                        const td = document.createElement('td');
-                        td.textContent = cellData;
-                        td.style.border = '1px solid #ddd';
-                        td.style.padding = '8px';
-                        row.appendChild(td);
-                    });
-
-                    const tdAction = document.createElement('td');
-
-                    // 仅当支付时间小于当前时间时，才展示支付按钮
-                    if (paytime < now) {
-                        const payButton = document.createElement('button');
-                        payButton.textContent = '支付';
-                        payButton.style.padding = '5px 10px';
-                        payButton.style.margin = '5px';
-                        payButton.style.backgroundColor = '#4CAF50';
-                        payButton.style.color = 'white';
-                        payButton.style.border = 'none';
-                        payButton.style.cursor = 'pointer';
-
-                        payButton.addEventListener('click', () => {
-                            if (isModalOpen) {
-                                return; // 如果弹窗已打开，不再执行
-                            }
-                            isModalOpen = true; // 设置弹窗打开标志
-
-                            if (rentInfo.tstatus !== '待支付') {
-                                alert('当前交易不可支付！');
-                                isModalOpen = false; // 关闭标志
-                                return;
-                            }
-
-                            const tenantBalance = parseFloat(rentInfo.tenantBalance); // 假设后端返回了租户余额
-                            const amount = parseFloat(rentInfo.tamount);
-
-                            if (tenantBalance < amount) {
-                                alert('余额不足，请充值！');
-                                isModalOpen = false; // 关闭标志
-                                return;
-                            }
-
-                            console.log('当前交易 ID:', rentInfo.transactionId);
-                            payDeposit(rentInfo.transactionId).then(() => {
-                                isModalOpen = false; // 支付成功后关闭标志
-                            }).catch(() => {
-                                isModalOpen = false; // 支付失败后关闭标志
-                            });
-                        });
-
-                        tdAction.appendChild(payButton);
-                    } else {
-                        tdAction.textContent = '未到支付时间'; // 显示提示信息
-                    }
-
-                    row.appendChild(tdAction);
-                    tbody.appendChild(row);
-                });
-
-                table.appendChild(tbody);
-                resultDiv.appendChild(table);
+            // 获取表单数据
+            const formData = new FormData(this);
+            const QueryTransactionReq = {
+                ttransactionType: formData.get('ttransactionType') === "" ? null : formData.get('ttransactionType'),
+                tstatus: formData.get('tStatus') === "" ? null : formData.get('tStatus'),
+                startTime: formData.get('startTime') === "" ? null : formData.get('startTime').replace('T', ' ')+':00',
+                endTime: formData.get('endTime') === "" ? null : formData.get('endTime').replace('T', ' ')+':00',
+            };
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+            // 发送 POST 请求
+            fetch('/rent/queryRentTenant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(QueryTransactionReq)
             })
-            .catch(error => {
-                console.error('Error:', error);
-                const resultDiv = document.getElementById('rentInfoResult');
-                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
-            });
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    const resultDiv = document.getElementById('rentInfoSearchResult');
+                    resultDiv.innerHTML = '';
+
+                    if (data.code !== 200) {
+                        resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                        return;
+                    }
+                    // 创建主表格
+                    const mainTable = document.createElement('main');
+                    mainTable.setAttribute('class', 'table');
+                    const headerSection = document.createElement('section');
+                    headerSection.setAttribute('class', 'header');
+                    const headTitle = document.createElement('h1');
+                    headTitle.textContent = '查询结果';
+                    headerSection.appendChild(headTitle);
+                    mainTable.appendChild(headerSection);
+                    const shellSection = document.createElement('section');
+                    shellSection.setAttribute('class', 'shell');
+                    const shellTable = document.createElement('table');
+                    const shellThead = document.createElement('thead');
+                    const headRow = document.createElement('tr');
+                    ['房东姓名', '租户姓名', '交易类型', '交易金额','交易状态','支付时间','操作'].forEach(headerText => {
+                        const shellCell = document.createElement('th');
+                        shellCell.textContent = headerText;
+                        headRow.appendChild(shellCell);
+                        shellThead.appendChild(headRow);
+                    });
+                    shellTable.appendChild(shellThead);
+                    const shellTbody = document.createElement('tbody');
+
+                    // 渲染数据
+                    data.data.forEach(item => {
+                        const row = document.createElement('tr');
+                        ['lname', 'tname', 'ttransactionType', 'tamount','tstatus','tpaytime'].forEach(key => {
+                            const cell = document.createElement('td');
+                            cell.textContent = item[key];
+                            row.appendChild(cell);
+                        });
+                        const actionCell = document.createElement('td');
+
+                        // 查看详情按钮
+                        if(item['tstatus'] === '待支付'){
+                            const houseButton = document.createElement('button');
+                            houseButton.setAttribute('class', 'button');
+                            houseButton.textContent = '支付';
+                            houseButton.addEventListener('click', () => payDeposit(item['transactionId']));
+                            actionCell.appendChild(houseButton);
+                        }
+                        else{
+                            actionCell.textContent = '-';
+                        }
+
+                        row.appendChild(actionCell);
+                        shellTbody.appendChild(row);
+
+                        shellTable.appendChild(shellTbody);
+                        shellSection.appendChild(shellTable);
+                        mainTable.appendChild(shellSection);
+                        resultDiv.appendChild(mainTable);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const resultDiv = document.getElementById('rentInfoSearchResult');
+                    resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+                });
+
+        });
     }
+
 
     // 支付租金函数
     function payDeposit(transactionId) {
@@ -2906,107 +2894,117 @@
 
 
     //房东查看租户租金状态
-    function showLandlordRentInfo() {
-        let content = document.getElementById('content');
+    function showLandlordRentInfo(){
+        // 获取内容容器
+        const content = document.getElementById('content');
 
+        // 渲染表单 HTML
         content.innerHTML = `
-        <h2>房东租金信息</h2>
-        <div id="landlordRentInfoResult"></div>
+        <h2>房租押金信息</h2>
+        <form id="searchRentForm">
+            <select id="ttransactionType" name="ttransactionType" class="three" required>
+                <option value="">交易类型</option>
+                <option value="押金支付">押金支付</option>
+                <option value="租金支付">租金支付</option>
+            </select>
+            <select id="tStatus" name="tStatus" class="three" required>
+                <option value="">交易状态</option>
+                <option value="待支付">待支付</option>
+                <option value="已支付">已支付</option>
+            </select>
+            <input type="datetime-local" id="startTime" name="startTime" class="three" placeholder="开始时间" required>
+            <input type="datetime-local" id="endTime" name="endTime" class="three" placeholder="结束时间" required>
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="rentInfoSearchResult"></div>
     `;
+        // 绑定表单提交事件
+        const searchRentForm = document.getElementById('searchRentForm');
+        searchRentForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
 
-        const token = "<%= token %>";
-
-        if (!token) {
-            alert("用户未登录，请先登录！");
-            return;
-        }
-
-        fetch('/rent/viewRentLandlord', {
-            method: 'POST',
-            headers: {
-                'Authorization': token
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById('landlordRentInfoResult');
-                resultDiv.innerHTML = '';
-
-                if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
-                    return;
-                }
-
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
-                ['交易ID', '租户ID', '交易类型', '租金金额', '租金状态', '支付时间'].forEach(headerText => {
-                    const th = document.createElement('th');
-                    th.textContent = headerText;
-                    th.style.border = '1px solid #ddd';
-                    th.style.padding = '8px';
-                    th.style.textAlign = 'left';
-                    headerRow.appendChild(th);
-                });
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
-
-                const tbody = document.createElement('tbody');
-
-                data.data.rentList.forEach(rentInfo => {
-                    const row = document.createElement('tr');
-
-                    const paytime = rentInfo.tpaytime ? new Date(rentInfo.tpaytime) : null; // 支付时间
-                    const now = new Date(); // 当前时间
-
-                    // 动态计算租金状态
-                    let rentStatus = '';
-                    if (paytime) {
-                        if (paytime < now) {
-                            rentStatus = rentInfo.tstatus === '已支付' ? '已支付' : '待支付';
-                        } else {
-                            rentStatus = '未到支付时间';
-                        }
-                    } else {
-                        rentStatus = '未支付';
-                    }
-
-                    // 创建每一列
-                    [
-                        rentInfo.transactionId,
-                        rentInfo.tenantId,
-                        rentInfo.ttransactionType,
-                        rentInfo.tamount.toFixed(2),
-                        rentStatus,
-                        paytime ? paytime.toLocaleString() : '未支付'
-                    ].forEach(cellData => {
-                        const td = document.createElement('td');
-                        td.textContent = cellData;
-                        td.style.border = '1px solid #ddd';
-                        td.style.padding = '8px';
-                        row.appendChild(td);
-                    });
-
-                    tbody.appendChild(row);
-                });
-
-                table.appendChild(tbody);
-                resultDiv.appendChild(table);
+            // 获取表单数据
+            const formData = new FormData(this);
+            const QueryTransactionReq = {
+                ttransactionType: formData.get('ttransactionType') === "" ? null : formData.get('ttransactionType'),
+                tstatus: formData.get('tStatus') === "" ? null : formData.get('tStatus'),
+                startTime: formData.get('startTime') === "" ? null : formData.get('startTime').replace('T', ' ')+':00',
+                endTime: formData.get('endTime') === "" ? null : formData.get('endTime').replace('T', ' ')+':00',
+            };
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+            // 发送 POST 请求
+            fetch('/rent/queryRentLandlord', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(QueryTransactionReq)
             })
-            .catch(error => {
-                console.error('Error:', error);
-                const resultDiv = document.getElementById('landlordRentInfoResult');
-                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
-            });
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    const resultDiv = document.getElementById('rentInfoSearchResult');
+                    resultDiv.innerHTML = '';
+
+                    if (data.code !== 200) {
+                        resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                        return;
+                    }
+                    // 创建主表格
+                    const mainTable = document.createElement('main');
+                    mainTable.setAttribute('class', 'table');
+                    const headerSection = document.createElement('section');
+                    headerSection.setAttribute('class', 'header');
+                    const headTitle = document.createElement('h1');
+                    headTitle.textContent = '查询结果';
+                    headerSection.appendChild(headTitle);
+                    mainTable.appendChild(headerSection);
+                    const shellSection = document.createElement('section');
+                    shellSection.setAttribute('class', 'shell');
+                    const shellTable = document.createElement('table');
+                    const shellThead = document.createElement('thead');
+                    const headRow = document.createElement('tr');
+                    ['房东姓名', '租户姓名', '交易类型', '交易金额','交易状态','支付时间'].forEach(headerText => {
+                        const shellCell = document.createElement('th');
+                        shellCell.textContent = headerText;
+                        headRow.appendChild(shellCell);
+                        shellThead.appendChild(headRow);
+                    });
+                    shellTable.appendChild(shellThead);
+                    const shellTbody = document.createElement('tbody');
+
+                    // 渲染数据
+                    data.data.forEach(item => {
+                        const row = document.createElement('tr');
+                        ['lname', 'tname', 'ttransactionType', 'tamount','tstatus','tpaytime'].forEach(key => {
+                            const cell = document.createElement('td');
+                            cell.textContent = item[key];
+                            row.appendChild(cell);
+                        });
+
+                        shellTbody.appendChild(row);
+
+                        shellTable.appendChild(shellTbody);
+                        shellSection.appendChild(shellTable);
+                        mainTable.appendChild(shellSection);
+                        resultDiv.appendChild(mainTable);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const resultDiv = document.getElementById('rentInfoSearchResult');
+                    resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+                });
+
+        });
     }
-
-
-
-
-
 
 
 

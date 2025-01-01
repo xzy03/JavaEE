@@ -14,6 +14,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class QueryTransactionResp {
+    @Schema(description = "交易ID")
+    private String transactionId;
+
     @Schema(description = "房东姓名")
     private String lName;
 

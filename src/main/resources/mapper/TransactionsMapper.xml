@@ -26,6 +26,7 @@
     </sql>
     <select id="queryRentTenant" resultType="cn.edu.zjut.entity.Transactions.resp.QueryTransactionResp">
         SELECT
+            t.transaction_id AS transactionId,
             l.l_name AS lName,
             tp.t_name AS tName,
             t.t_transaction_type AS tTransactionType,

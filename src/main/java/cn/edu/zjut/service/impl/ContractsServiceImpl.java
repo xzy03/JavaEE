@@ -215,7 +215,7 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
         }
         tenantProfile.setTBalance(tenantProfile.getTBalance().add(contracts.getCDepositAmount()));
         landlordProfile.setLBalance(landlordProfile.getLBalance().subtract(contracts.getCDepositAmount()));
-        landlordProfileService.modifyBalance(contracts.getCLandlordId(),contracts.getCDepositAmount().doubleValue());
+        landlordProfileService.updateById(landlordProfile);
         log.info("房东余额：{}",landlordProfile.getLBalance());
         tenantProfileService.updateById(tenantProfile);
         log.info("租客余额：{}",tenantProfile.getTBalance());

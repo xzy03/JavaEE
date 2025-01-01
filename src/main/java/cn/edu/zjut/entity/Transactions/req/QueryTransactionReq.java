@@ -30,12 +30,13 @@ public class QueryTransactionReq {
     private String tStatus;
 
     @Schema(description = "开始时间")
-
+//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Shanghai")
     @NotNull(message = "开始时间不能为空")
     private Date startTime;
 
     @Schema(description = "结束时间")
     @PastOrPresent(message = "结束时间不能晚于当前时间")
+//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Shanghai")
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
 }
