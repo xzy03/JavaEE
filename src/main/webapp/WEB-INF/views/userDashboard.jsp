@@ -453,13 +453,20 @@
             <c:when test="${user == '大学生租户'}">
                 <li><a href="#TenantProfileManagement" onclick="showTenantManagement()">个人信息管理</a></li>
                 <div id="TenantProfileManagement"></div>
-
+                <li><a href="#TenantRentInfo" onclick="showTenantRentInfo()">查看房租信息</a></li>
+                <div id="TenantRentInfo"></div>
             </c:when>
             <c:when test="${user == '房东'}">
                 <li><a href="#landlordProfileManagement" onclick="showLandlordManagement()">个人信息管理</a></li>
                 <div id="landlordProfileManagement"></div>
                 <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">我的房屋</a></li>
                 <div id="landlordHouseManagement"></div>
+                <li><a href="#showLandlordRentInfo" onclick="showLandlordRentInfo()">查看房租信息</a></li>
+                <div id="showLandlordRentInfo"></div>
+<%--                <li><a href="#teacherInfo" onclick="showTeacherInfo()">教师个人信息</a></li>--%>
+<%--                <li><a href="#searchCourse" onclick="showSearchCourse()"> 课程信息查询</a></li>--%>
+<%--                <li><a href="#searchTeachAtTeacher" onclick="showSearchTeachAtTeacher()"> 个人授课查询</a></li>--%>
+<%--                <li><a href="#showTeacherStudentScore" onclick="showTeacherStudentScoreInfo()"> 学生成绩总览</a></li>--%>
             </c:when>
             <c:otherwise>
 
@@ -2716,6 +2723,293 @@
         <div id="editHouseResult"></div>
     `;
     }
+
+    }
+
+    function showTenantRentInfo() {
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+        <h2>房租信息</h2>
+        <div id="rentInfoResult"></div>
+    `;
+
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        fetch('/rent/viewRentTenant', {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('rentInfoResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['交易ID', '租户ID', '房东ID', '交易类型', '交易金额', '交易状态', '交易名称', '是否收费', '交易费用', '交易来源', '支付时间', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                let isModalOpen = false; // 标志变量，防止多次弹窗
+
+                data.data.rentList.forEach(rentInfo => {
+                    const row = document.createElement('tr');
+
+                    const paytime = new Date(rentInfo.tpaytime); // 支付时间
+                    const now = new Date(); // 当前时间
+
+                    // 创建每一列
+                    [
+                        rentInfo.transactionId,
+                        rentInfo.tenantId,
+                        rentInfo.landlordId,
+                        rentInfo.ttransactionType,
+                        rentInfo.tamount.toFixed(2),
+                        rentInfo.tstatus,
+                        rentInfo.tname,
+                        rentInfo.tcharge || '无',
+                        rentInfo.tfees.toFixed(2),
+                        rentInfo.ttransactionSource || '无',
+                        paytime.toLocaleString()
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    const tdAction = document.createElement('td');
+
+                    // 仅当支付时间小于当前时间时，才展示支付按钮
+                    if (paytime < now) {
+                        const payButton = document.createElement('button');
+                        payButton.textContent = '支付';
+                        payButton.style.padding = '5px 10px';
+                        payButton.style.margin = '5px';
+                        payButton.style.backgroundColor = '#4CAF50';
+                        payButton.style.color = 'white';
+                        payButton.style.border = 'none';
+                        payButton.style.cursor = 'pointer';
+
+                        payButton.addEventListener('click', () => {
+                            if (isModalOpen) {
+                                return; // 如果弹窗已打开，不再执行
+                            }
+                            isModalOpen = true; // 设置弹窗打开标志
+
+                            if (rentInfo.tstatus !== '待支付') {
+                                alert('当前交易不可支付！');
+                                isModalOpen = false; // 关闭标志
+                                return;
+                            }
+
+                            const tenantBalance = parseFloat(rentInfo.tenantBalance); // 假设后端返回了租户余额
+                            const amount = parseFloat(rentInfo.tamount);
+
+                            if (tenantBalance < amount) {
+                                alert('余额不足，请充值！');
+                                isModalOpen = false; // 关闭标志
+                                return;
+                            }
+
+                            console.log('当前交易 ID:', rentInfo.transactionId);
+                            payDeposit(rentInfo.transactionId).then(() => {
+                                isModalOpen = false; // 支付成功后关闭标志
+                            }).catch(() => {
+                                isModalOpen = false; // 支付失败后关闭标志
+                            });
+                        });
+
+                        tdAction.appendChild(payButton);
+                    } else {
+                        tdAction.textContent = '未到支付时间'; // 显示提示信息
+                    }
+
+                    row.appendChild(tdAction);
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('rentInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+            });
+    }
+
+    // 支付租金函数
+    function payDeposit(transactionId) {
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return Promise.reject();
+        }
+
+        const payload = {
+            transactionId: transactionId
+        };
+
+        return fetch('/rent/payRent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('支付成功！');
+                    showTenantRentInfo(); // 重新加载数据
+                    return Promise.resolve(); // 返回一个成功的 Promise
+                } else {
+                    alert('支付失败：' + data.message);
+                    return Promise.reject(); // 返回一个失败的 Promise
+                }
+            })
+            .catch(error => {
+                console.error('支付请求异常:', error);
+                alert('支付失败，请稍后再试。');
+                return Promise.reject(); // 返回一个失败的 Promise
+            });
+    }
+
+
+
+    //房东查看租户租金状态
+    function showLandlordRentInfo() {
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+        <h2>房东租金信息</h2>
+        <div id="landlordRentInfoResult"></div>
+    `;
+
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        fetch('/rent/viewRentLandlord', {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('landlordRentInfoResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['交易ID', '租户ID', '交易类型', '租金金额', '租金状态', '支付时间'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+
+                data.data.rentList.forEach(rentInfo => {
+                    const row = document.createElement('tr');
+
+                    const paytime = rentInfo.tpaytime ? new Date(rentInfo.tpaytime) : null; // 支付时间
+                    const now = new Date(); // 当前时间
+
+                    // 动态计算租金状态
+                    let rentStatus = '';
+                    if (paytime) {
+                        if (paytime < now) {
+                            rentStatus = rentInfo.tstatus === '已支付' ? '已支付' : '待支付';
+                        } else {
+                            rentStatus = '未到支付时间';
+                        }
+                    } else {
+                        rentStatus = '未支付';
+                    }
+
+                    // 创建每一列
+                    [
+                        rentInfo.transactionId,
+                        rentInfo.tenantId,
+                        rentInfo.ttransactionType,
+                        rentInfo.tamount.toFixed(2),
+                        rentStatus,
+                        paytime ? paytime.toLocaleString() : '未支付'
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('landlordRentInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+            });
+    }
+
+
+
+
+
+
+
 
 </script>
 </body>
