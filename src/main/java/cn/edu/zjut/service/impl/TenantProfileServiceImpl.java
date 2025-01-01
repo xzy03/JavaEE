@@ -1,5 +1,6 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantConverter;
 import cn.edu.zjut.entity.TenantProfile.req.*;
 import cn.edu.zjut.entity.TenantProfile.resq.TenantListInfo;
@@ -199,6 +200,15 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
                 .tenantList(tenantList)
                 .build();
         return tenantListInfo;
+    }
+
+    @Override
+    public String getTNameByTenantId(String tenantId) {
+        TenantProfile tenantProfile = baseMapper.selectById(tenantId);
+        if (tenantProfile == null) {
+            throw new BusiException("租户不存在");
+        }
+        return tenantProfile.getTName();
     }
 
 }

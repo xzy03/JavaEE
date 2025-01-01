@@ -22,5 +22,5 @@ public interface LandlordProfileService extends IService<LandlordProfile> {
     LandlordListInfo getLandlordList(QueryLandlordReq req);
     // LandlordProfileService.java
     void modifyBalance(String landlordId, Double amount);
-
+    public String getLNameByLandlordId(String landlordId);
 }

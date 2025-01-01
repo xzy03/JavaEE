@@ -2,6 +2,7 @@ package cn.edu.zjut.service;
 
 import cn.edu.zjut.entity.Appointments.Appointments;
 import cn.edu.zjut.entity.Appointments.req.AppointmentReq;
+import cn.edu.zjut.entity.Appointments.resp.*;
 import cn.edu.zjut.entity.Appointments.req.AppointmentsConfirmReq;
 import cn.edu.zjut.entity.Appointments.req.AppointmentsSubmitReq;
 import cn.edu.zjut.entity.Appointments.req.AppointmentsUpdateReq;
@@ -18,8 +19,8 @@ public interface AppointmentsService extends IService<Appointments> {
     void submitAppointment(AppointmentsSubmitReq req,String tenantId);
     void updateAppointment(AppointmentsUpdateReq req);
     void cancelAppointment(String appointmentId);
-    List<Appointments> viewTenantAppointments(String tenantId);
-    List<Appointments> viewLandlordAppointments(String tenantId);
+    List<AppointmentViewTenantResp> viewTenantAppointments(String tenantId);
+    List<AppointmentViewLandlordResp> viewLandlordAppointments(String tenantId);
     void confirmAppointment(AppointmentsConfirmReq req);
     Appointments getAppointmentDetail(String appointmentId);
 }

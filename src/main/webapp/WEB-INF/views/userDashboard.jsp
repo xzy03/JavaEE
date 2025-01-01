@@ -455,6 +455,9 @@
                 <div id="TenantProfileManagement"></div>
                 <li><a href="#TenantRentInfo" onclick="showTenantRentInfo()">查看房租信息</a></li>
                 <div id="TenantRentInfo"></div>
+                <li><a href="#TenantRentalManagement" onclick="showRentalManagement()">租房板块</a></li>
+                <div id="TenantRentalManagement"></div>
+
             </c:when>
             <c:when test="${user == '房东'}">
                 <li><a href="#landlordProfileManagement" onclick="showLandlordManagement()">个人信息管理</a></li>
@@ -631,7 +634,6 @@
 
     // 确认操作
     function handleApprove(Id, url) {
-        console.log('确认操作，租户ID：', Id);
 
         // 获取 token
         const token = "<%= token %>";
@@ -645,9 +647,6 @@
             content: "已审核",
             id: Id
         }
-
-        // console.log(requestBody);
-        // console.log(url);
 
         // 发送 POST 请求
         fetch(url, {
@@ -676,7 +675,6 @@
 
     // 拒绝操作
     function handleReject(Id, url) {
-        console.log('拒绝操作，租户ID：', Id);
 
         // 获取 token
         const token = "<%= token %>";
@@ -755,8 +753,6 @@
             .then(response => response.json())
             .then(data => {
 
-                console.log(data);
-
                 const resultDiv = document.getElementById('tenantStudentCardList');
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
@@ -785,7 +781,6 @@
 
                 // 渲染数据
                 data.data.tenantList.forEach(tenant => {
-                    console.log(tenant);
                     const row = document.createElement('tr');
 
                     // 学生账号
@@ -913,8 +908,6 @@
             .then(response => response.json())
             .then(data => {
 
-                console.log(data);
-
                 const resultDiv = document.getElementById('tenantIDCardList');
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
@@ -943,7 +936,6 @@
 
                 // 渲染数据
                 data.data.tenantList.forEach(tenant => {
-                    console.log(tenant);
                     const row = document.createElement('tr');
 
                     // 学生账号
@@ -1083,8 +1075,6 @@
             .then(response => response.json())
             .then(data => {
 
-                console.log(data);
-
                 const resultDiv = document.getElementById('landlordIDCardList');
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
@@ -1113,7 +1103,6 @@
 
                 // 渲染数据
                 data.data.landlordList.forEach(landlord => {
-                    console.log(landlord);
                     const row = document.createElement('tr');
 
                     // 房东账号
@@ -1242,8 +1231,6 @@
             .then(response => response.json())
             .then(data => {
 
-                console.log(data);
-
                 const resultDiv = document.getElementById('landlordPropertyCertificateList');
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
@@ -1272,7 +1259,6 @@
 
                 // 渲染数据
                 data.data.houseList.forEach(house => {
-                    console.log(house);
                     const row = document.createElement('tr');
 
                     // 房源标题
@@ -1386,6 +1372,8 @@
     function TenantClean() {
         let content = document.getElementById('TenantProfileManagement');
         content.innerHTML = '';
+        content = document.getElementById('TenantRentalManagement');
+        content.innerHTML = '';
     }
 
     function showTenantManagement() {
@@ -1412,8 +1400,6 @@
             alert("用户未登录，请先登录！");
             return;
         }
-        console.log(token);
-
         // 发送 POST 请求
         fetch('/tenant/tenantInfo', {
             method: 'POST',
@@ -1425,7 +1411,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 const resultDiv = document.getElementById('searchTenantResult');
                 resultDiv.innerHTML = '';
 
@@ -1869,6 +1854,608 @@
         });
     }
 
+    function showRentalManagement(){
+        TenantClean();
+        let content = document.getElementById('TenantRentalManagement');
+        content.innerHTML = '<li><a onclick="showTenantHouseSearch()" class="small-text">查看在售房屋</a></li>'+
+            '<li><a onclick="showTenantAppointment()" class="small-text">我的预约</a></li>';
+    }
+
+    function showTenantHouseSearch() {
+        let content = document.getElementById('content');
+
+        content.innerHTML = `
+    <h2>房源信息查询</h2>
+    <div id="searchTenantHouseResult"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        const QueryHouseReq = {
+            lhouseLicenseState: '已审核',
+        };
+        // 发送 POST 请求
+        fetch('/house/getHouseList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(QueryHouseReq)
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                const resultDiv = document.getElementById('searchTenantHouseResult');
+                resultDiv.innerHTML = '';
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+                if (data.data.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无房源信息</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('main');
+                mainTable.setAttribute('class', 'table');
+                const headerSection = document.createElement('section');
+                headerSection.setAttribute('class', 'header');
+                const headTitle = document.createElement('h1');
+                headTitle.textContent = '查询结果';
+                headerSection.appendChild(headTitle);
+                mainTable.appendChild(headerSection);
+                const shellSection = document.createElement('section');
+                shellSection.setAttribute('class', 'shell');
+                const shellTable = document.createElement('table');
+                const shellThead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房源名称', '房产证验证状态', '总租户数量', '剩余空闲数量', '操作'].forEach(headerText => {
+                    const shellCell = document.createElement('th');
+                    shellCell.textContent = headerText;
+                    headRow.appendChild(shellCell);
+                    shellThead.appendChild(headRow);
+                });
+                shellTable.appendChild(shellThead);
+                const shellTbody = document.createElement('tbody');
+
+                // 渲染数据
+                const houseList = data.data.houseList;
+                houseList.forEach(item => {
+                    const row = document.createElement('tr');
+                    ['htitle', 'lhouseLicenseState', 'htotalTenants', 'hremainingVacancies'].forEach(key => {
+                        const cell = document.createElement('td');
+                        cell.textContent = item[key];
+                        row.appendChild(cell);
+                    });
+                    const actionCell = document.createElement('td');
+
+                    // 查看详情按钮
+                    const houseButton = document.createElement('button');
+                    houseButton.setAttribute('class', 'button');
+                    houseButton.textContent = '查看详情';
+                    houseButton.addEventListener('click', () => showHouseDetails(item['houseId']));
+                    actionCell.appendChild(houseButton);
+
+                    // 查看房源对应租客按钮
+                    const TenantButton = document.createElement('button');
+                    TenantButton.setAttribute('class', 'button');
+                    TenantButton.textContent = '查看租客';
+                    TenantButton.addEventListener('click', () => showHouseTenant(item['houseId']));
+                    actionCell.appendChild(TenantButton);
+
+                    // 提交预约按钮
+                    const AppointmentButton = document.createElement('button');
+                    AppointmentButton.setAttribute('class', 'button');
+                    AppointmentButton.textContent = '预约';
+                    AppointmentButton.addEventListener('click', () => showHouseAppointment(item['houseId']));
+                    actionCell.appendChild(AppointmentButton);
+
+                    // 提交入住申请按钮
+                    const RentButton = document.createElement('button');
+                    RentButton.setAttribute('class', 'button');
+                    RentButton.textContent = '入住申请';
+                    RentButton.addEventListener('click', () => showHouseRent(item['houseId']));
+                    actionCell.appendChild(RentButton);
+
+                    row.appendChild(actionCell);
+                    shellTbody.appendChild(row);
+
+                    shellTable.appendChild(shellTbody);
+                    shellSection.appendChild(shellTable);
+                    mainTable.appendChild(shellSection);
+                    resultDiv.appendChild(mainTable);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('searchTenantHouseResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
+            });
+    }
+
+    function showHouseTenant(houseId) {
+        const content = document.getElementById('content');
+
+        // 清空内容并设置标题
+        content.innerHTML = `
+    <h2>房屋租户信息</h2>
+    <div id="tenantListResult"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造查询条件
+        const queryParams = {
+            houseId: houseId
+        };
+
+        // 发送 POST 请求获取租户列表
+        fetch('/tenant/getTenantListByHouseId', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(queryParams)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                const resultDiv = document.getElementById('tenantListResult');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                if (data.data.tenantList.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无租户信息</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['租户姓名', '性别', '学校', '联系方式', '个人介绍'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.tenantList.forEach(tenant => {
+                    const row = document.createElement('tr');
+
+                    // 租户姓名
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = tenant.tname || '未知';
+                    row.appendChild(nameCell);
+
+                    // 性别
+                    const sexCell = document.createElement('td');
+                    sexCell.textContent = tenant.tsex || '未知';
+                    row.appendChild(sexCell);
+
+                    // 学校
+                    const universityCell = document.createElement('td');
+                    universityCell.textContent = tenant.tuniversity || '未知';
+                    row.appendChild(universityCell);
+
+                    // 联系方式（仅展示部分信息）
+                    const contactCell = document.createElement('td');
+                    const maskedPhoneNumber = tenant.tphoneNumber
+                        ? tenant.tphoneNumber.slice(0, 3) + '****' + tenant.tphoneNumber.slice(-4)
+                        : '未知';
+                    contactCell.textContent = maskedPhoneNumber;
+                    row.appendChild(contactCell);
+
+                    // 个人介绍
+                    const introductionCell = document.createElement('td');
+                    introductionCell.textContent = tenant.tintroduction || '无';
+                    row.appendChild(introductionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('tenantListResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
+    }
+
+    function showHouseAppointment(houseId) {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>预约房源</h2>
+        <form id="houseAppointmentForm" class="simple-form">
+            <label for="appointmentDate">选择预约日期：</label>
+            <input type="datetime-local" id="appointmentDate" name="appointmentDate" class="one" required>
+            <button type="submit" class="submit-button">提交预约</button>
+        </form>
+        <div id="appointmentResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const houseAppointmentForm = document.getElementById('houseAppointmentForm');
+        houseAppointmentForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            let appointmentDate = formData.get('appointmentDate');
+
+            if (!appointmentDate) {
+                alert('请选择预约日期');
+                return;
+            }
+
+            // 不进行时区转换，直接使用用户输入的时间
+            // 格式化预约日期为符合要求的格式 (yyyy-MM-dd HH:mm:ss)
+            appointmentDate = appointmentDate.replace('T', ' ') + ':00';
+
+            // 构造请求参数
+            const requestBody = {
+                houseId: houseId,
+                appointmentDate: appointmentDate
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/appointments/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showTenantHouseSearch');
+                    } else {
+                        // 调用失败回调函数，传递失败原因
+                        handleFail('showTenantHouseSearch', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showTenantHouseSearch', '网络错误，请稍后重试');
+                });
+        });
+    }
+
+    function showHouseRent(houseId) {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>租赁房源</h2>
+        <form id="houseRentForm" class="simple-form">
+            <p>确认要租赁该房源吗？</p>
+            <button type="submit" class="submit-button">提交租赁请求</button>
+        </form>
+        <div id="rentResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const houseRentForm = document.getElementById('houseRentForm');
+        houseRentForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 构造请求参数
+            const requestBody = {
+                houseId: houseId
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/house/rentHouse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('rentResult');
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showTenantHouseSearch');
+                    } else {
+                        // 调用失败回调函数，传递失败原因
+                        handleFail('showTenantHouseSearch', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showTenantHouseSearch', '网络错误，请稍后重试');
+                });
+        });
+    }
+
+    function showTenantAppointment() {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染标题和结果容器
+        content.innerHTML = `
+        <h2>我的预约</h2>
+        <div id="tenantAppointmentList"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 发送 POST 请求获取预约列表
+        fetch('/appointments/view/tenant', {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                const resultDiv = document.getElementById('tenantAppointmentList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：`+data.message+`</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房源名称', '房东姓名', '预约日期', '状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.forEach(appointment => {
+                    const row = document.createElement('tr');
+
+                    // 房源名称
+                    const houseIdCell = document.createElement('td');
+                    houseIdCell.textContent = appointment.htitle || '无';
+                    row.appendChild(houseIdCell);
+
+                    // 房东姓名
+                    const landlordIdCell = document.createElement('td');
+                    landlordIdCell.textContent = appointment.lname || '无';
+                    row.appendChild(landlordIdCell);
+
+                    // 预约日期
+                    const appointmentDateCell = document.createElement('td');
+                    appointmentDateCell.textContent = new Date(appointment.appointmentDate).toLocaleString() || '无';
+                    row.appendChild(appointmentDateCell);
+
+                    // 状态
+                    const statusCell = document.createElement('td');
+                    statusCell.textContent = appointment.status || '无';
+                    row.appendChild(statusCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+
+                    // 修改按钮
+                    const modifyButton = document.createElement('button');
+                    modifyButton.textContent = '修改';
+                    modifyButton.setAttribute('class', 'button modify-button');
+                    modifyButton.addEventListener('click', () => handleModifyAppointment(appointment.appointmentId));
+                    actionCell.appendChild(modifyButton);
+
+                    // 取消按钮
+                    const cancelButton = document.createElement('button');
+                    cancelButton.textContent = '取消';
+                    cancelButton.setAttribute('class', 'button cancel-button');
+                    cancelButton.addEventListener('click', () => handleCancelAppointment(appointment.appointmentId));
+                    actionCell.appendChild(cancelButton);
+
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('tenantAppointmentList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
+    }
+
+    // 修改预约
+    function handleModifyAppointment(appointmentId) {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>修改预约时间</h2>
+        <form id="modifyAppointmentForm" class="simple-form">
+            <label for="appointmentDate">选择新的预约日期：</label>
+            <input type="datetime-local" id="appointmentDate" name="appointmentDate" class="one" required>
+            <button type="submit" class="submit-button">提交修改</button>
+        </form>
+        <div id="modifyAppointmentResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const modifyAppointmentForm = document.getElementById('modifyAppointmentForm');
+        modifyAppointmentForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            let appointmentDate = formData.get('appointmentDate');
+
+            if (!appointmentDate) {
+                alert('请选择新的预约日期');
+                return;
+            }
+
+            // 不进行时区转换，直接使用用户输入的时间
+            // 格式化预约日期为符合要求的格式 (yyyy-MM-dd HH:mm:ss)
+            appointmentDate = appointmentDate.replace('T', ' ') + ':00';
+
+            // 构造请求参数
+            const requestBody = {
+                appointmentId: appointmentId,
+                appointmentDate: appointmentDate
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/appointments/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showTenantAppointment');
+                    } else {
+                        // 调用失败回调函数，传递失败原因
+                        handleFail('showTenantAppointment', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showTenantAppointment', '网络错误，请稍后重试');
+                });
+        });
+    }
+
+    // 取消预约
+    function handleCancelAppointment(appointmentId) {
+        // 确认取消操作
+        if (!confirm('您确定要取消此预约吗？')) {
+            return;
+        }
+
+        // 构造请求参数
+        const requestBody = {
+            appointmentId: appointmentId
+        };
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 发送 POST 请求
+        fetch('/appointments/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    // 调用成功回调函数
+                    handleSuccess('showTenantAppointment');
+                } else {
+                    // 调用失败回调函数，传递失败原因
+                    handleFail('showTenantAppointment', data.message || '取消失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 调用失败回调函数
+                handleFail('showTenantAppointment', '网络错误，请稍后重试');
+            });
+    }
+
     function LandlordClean() {
         let content = document.getElementById('landlordProfileManagement');
         content.innerHTML = '';
@@ -1888,7 +2475,8 @@
         LandlordClean();
         let content = document.getElementById('landlordHouseManagement');
         content.innerHTML = '<li><a onclick="showLandlordHouseSearch()" class="small-text">个人房源查询</a></li>' +
-            '<li><a onclick="showLandlordHouseAdd()" class="small-text">添加房源</a></li>';
+            '<li><a onclick="showLandlordHouseAdd()" class="small-text">添加房源</a></li>'+
+            '<li><a onclick="showLandlordAppointment()" class="small-text">查看预约</a></li>';
     }
 
     function showLandlordSearchInfo() {
@@ -1906,7 +2494,6 @@
             alert("用户未登录，请先登录！");
             return;
         }
-        console.log(token);
 
         // 发送 POST 请求
         fetch('/landlords/landlordInfo', {
@@ -1919,7 +2506,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 const resultDiv = document.getElementById('searchLandlordResult');
                 resultDiv.innerHTML = '';
 
@@ -2279,7 +2865,6 @@
             alert("用户未登录，请先登录！");
             return;
         }
-        console.log(token);
 
         const QueryHouseReq = {
             landlordId: "<%= userTokenInfoDto.getUserId() %>",
@@ -2297,7 +2882,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 const resultDiv = document.getElementById('searchLandlordHouseResult');
                 resultDiv.innerHTML = '';
 
@@ -2395,7 +2979,6 @@
             alert("用户未登录，请先登录！");
             return;
         }
-        console.log(token);
 
         const HouseIdReq = {
             houseId: houseId,
@@ -2413,7 +2996,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 const resultDiv = document.getElementById('searchHouseDetailResult');
                 resultDiv.innerHTML = '';
 
@@ -2490,7 +3072,6 @@
                             window.open(properties[key]);
                         });
                         valueCell.appendChild(img);
-                        console.log(img);
                     } else valueCell.textContent = properties[key];
                     row.appendChild(valueCell);
 
@@ -2722,7 +3303,6 @@
         </form>
         <div id="editHouseResult"></div>
     `;
-
     }
 
     function showTenantRentInfo(){
@@ -3006,6 +3586,196 @@
         });
     }
 
+
+
+    function showLandlordAppointment() {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染标题和结果容器
+        content.innerHTML = `
+    <h2>租户预约列表</h2>
+    <div id="landlordAppointmentList"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 发送 POST 请求获取预约列表
+        fetch('/appointments/view/landlord', {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                const resultDiv = document.getElementById('landlordAppointmentList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房源名称', '租户姓名', '预约日期', '状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.forEach(appointment => {
+                    const row = document.createElement('tr');
+
+                    // 房源名称
+                    const houseTitleCell = document.createElement('td');
+                    houseTitleCell.textContent = appointment.htitle || '无';
+                    row.appendChild(houseTitleCell);
+
+                    // 租户姓名
+                    const tenantNameCell = document.createElement('td');
+                    tenantNameCell.textContent = appointment.tname || '无';
+                    row.appendChild(tenantNameCell);
+
+                    // 预约日期
+                    const appointmentDateCell = document.createElement('td');
+                    appointmentDateCell.textContent = new Date(appointment.appointmentDate).toLocaleString() || '无';
+                    row.appendChild(appointmentDateCell);
+
+                    // 状态
+                    const statusCell = document.createElement('td');
+                    statusCell.textContent = appointment.status || '无';
+                    row.appendChild(statusCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+                    if (appointment.status === '待确认') {
+                        // 接受按钮
+                        const acceptButton = document.createElement('button');
+                        acceptButton.textContent = '接受';
+                        acceptButton.setAttribute('class', 'button accept-button');
+                        acceptButton.addEventListener('click', () => handleAcceptAppointment(appointment.appointmentId));
+                        actionCell.appendChild(acceptButton);
+
+                        // 拒绝按钮
+                        const rejectButton = document.createElement('button');
+                        rejectButton.textContent = '拒绝';
+                        rejectButton.setAttribute('class', 'button reject-button');
+                        rejectButton.addEventListener('click', () => handleRejectAppointment(appointment.appointmentId));
+                        actionCell.appendChild(rejectButton);
+                    } else {
+                        // actionCell.textContent = '无可用操作'; // 如果状态不是“待确认”，显示提示信息
+                    }
+
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('landlordAppointmentList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
+    }
+
+    function handleAcceptAppointment(appointmentId) {
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造请求参数
+        const requestBody = {
+            appointmentId: appointmentId,
+            status: "已接受" // 状态为接受
+        };
+
+        // 发送 POST 请求
+        fetch('/appointments/confirm', {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    // 操作成功
+                    handleSuccess('showLandlordAppointment'); // 刷新页面
+                } else {
+                    // 操作失败
+                    handleFail('showLandlordAppointment', data.message || '操作失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                handleFail('showLandlordAppointment', '网络错误，请稍后重试');
+            });
+    }
+
+    function handleRejectAppointment(appointmentId) {
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造请求参数
+        const requestBody = {
+            appointmentId: appointmentId,
+            status: "已拒绝" // 状态为拒绝
+        };
+
+        // 发送 POST 请求
+        fetch('/appointments/confirm', {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    // 操作成功
+                    handleSuccess('showLandlordAppointment'); // 刷新页面
+                } else {
+                    // 操作失败
+                    handleFail('showLandlordAppointment', data.message || '操作失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                handleFail('showLandlordAppointment', '网络错误，请稍后重试');
+            });
+    }
 
 
 </script>
