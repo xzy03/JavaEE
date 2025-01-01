@@ -6,8 +6,10 @@ import cn.edu.zjut.entity.House.req.HousePublishReq;
 import cn.edu.zjut.entity.House.req.QueryHouseReq;
 import cn.edu.zjut.entity.House.resp.HouseDetail;
 import cn.edu.zjut.entity.House.resp.HouseListInfo;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.service.ContractsService;
+import cn.edu.zjut.service.TenantProfileService;
 import cn.edu.zjut.utils.UploadGiteeImgBed;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
@@ -41,6 +43,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     @Lazy
     @Resource
     ContractsService contractsService;
+    @Lazy
+    @Resource
+    TenantProfileService tenantProfileService;
     @Override
     public void publish(HousePublishReq req, String landlordId){
         House house = House.builder()
@@ -168,6 +173,16 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     }
     @Override
     public void rentHouse(String houseId, String tenantId) {
+        TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
+        if(tenantProfile.getTIdentityStatus()==null){
+            throw new BusiException("请先进行实名认证");
+        }
+        if(tenantProfile.getTStatus()==null){
+            throw new BusiException("请先进行学生认证");
+        }
+        if(tenantProfile.getTIdentityStatus().equals("等待审核")||tenantProfile.getTStatus().equals("等待审核")){
+            throw new BusiException("请等待审核通过后再进行租房");
+        }
         House house = houseService.getById(houseId);
         if (house == null) {
             throw new BusiException("房源不存在");
