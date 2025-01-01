@@ -2,6 +2,7 @@ package cn.edu.zjut.controller;
 
 import cn.edu.zjut.entity.Appointments.Appointments;
 import cn.edu.zjut.entity.Appointments.req.*;
+import cn.edu.zjut.entity.Appointments.resp.*;
 import cn.edu.zjut.entity.dto.UserTokenInfoDto;
 import cn.edu.zjut.entity.resp.CommonResult;
 import cn.edu.zjut.service.AppointmentsService;
@@ -55,17 +56,17 @@ public class AppointmentsController {
 
     @Operation(summary = "大学生租户查看预约")
     @PostMapping("/view/tenant")
-    public CommonResult<List<Appointments>> viewTenantAppointments() {
+    public CommonResult<List<AppointmentViewTenantResp>> viewTenantAppointments() {
         UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-        List<Appointments> appointments = appointmentService.viewTenantAppointments(userTokenInfoDto.getUserId());
+        List<AppointmentViewTenantResp> appointments = appointmentService.viewTenantAppointments(userTokenInfoDto.getUserId());
         return CommonResult.success(appointments);
     }
 
     @Operation(summary = "房东查看预约")
     @PostMapping("/view/landlord")
-    public CommonResult<List<Appointments>> viewLandlordAppointments() {
+    public CommonResult<List<AppointmentViewLandlordResp>> viewLandlordAppointments() {
         UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
-        List<Appointments> appointments = appointmentService.viewLandlordAppointments(userTokenInfoDto.getUserId());
+        List<AppointmentViewLandlordResp> appointments = appointmentService.viewLandlordAppointments(userTokenInfoDto.getUserId());
         return CommonResult.success(appointments);
     }
 

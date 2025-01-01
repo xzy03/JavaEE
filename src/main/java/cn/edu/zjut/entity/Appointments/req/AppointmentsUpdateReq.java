@@ -23,10 +23,6 @@ public class AppointmentsUpdateReq {
     @Schema(description = "预约ID")
     private String appointmentId;
 
-    @Schema(description = "房源ID")
-    @NotBlank
-    private String houseId;
-
     @Schema(description = "预约时间")
     private Date appointmentDate;
 }

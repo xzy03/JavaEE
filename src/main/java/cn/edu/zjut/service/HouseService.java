@@ -20,6 +20,7 @@ public interface HouseService extends IService<House> {
     HouseListInfo getHouseList(QueryHouseReq req);
     void addHouseCard(String house_id,MultipartFile l_house_photo, MultipartFile l_house_license_photo);
     public String getLandlordIdByHouseId(String houseId);
+    public String getHTitleByHouseId(String houseId);
     House changeHouseInfo(HouseInfoReq req, String landlordId);
     void rentHouse(String houseId, String tenantId);
 }

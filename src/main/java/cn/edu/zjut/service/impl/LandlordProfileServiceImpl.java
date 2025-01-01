@@ -1,5 +1,6 @@
 package cn.edu.zjut.service.impl;
 
+import cn.edu.zjut.entity.House.House;
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfileConverter;
 import cn.edu.zjut.entity.LandlordProfile.req.*;
 import cn.edu.zjut.entity.LandlordProfile.resp.LandlordProfileLoginResp;
@@ -158,6 +159,16 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         landlord.setLBalance(landlord.getLBalance().add(BigDecimal.valueOf(amount)));
         this.updateById(landlord);
     }
+
+    @Override
+    public String getLNameByLandlordId(String landlordId) {
+        LandlordProfile landlordProfile = baseMapper.selectById(landlordId);
+        if (landlordProfile == null) {
+            throw new BusiException("房东不存在");
+        }
+        return landlordProfile.getLName();
+    }
+
 
 }
 

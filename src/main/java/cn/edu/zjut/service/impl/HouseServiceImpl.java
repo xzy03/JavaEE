@@ -120,6 +120,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
         }
     }
 
+    @Override
     public String getLandlordIdByHouseId(String houseId) {
         // 查询 house 表，返回 landlordId
         House house = baseMapper.selectById(houseId);
@@ -128,6 +129,17 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
         }
         return house.getLandlordId();
     }
+
+    @Override
+    public String getHTitleByHouseId(String houseId) {
+        // 查询 house 表，返回 landlordId
+        House house = baseMapper.selectById(houseId);
+        if (house == null) {
+            throw new BusiException("房源不存在");
+        }
+        return house.getHTitle();
+    }
+
     @Override
     public House changeHouseInfo(HouseInfoReq req, String landlordId) {
         House house = houseService.getById(req.getHouseId());
