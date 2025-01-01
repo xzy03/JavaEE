@@ -78,6 +78,7 @@ public class HouseController {
      @Operation(summary="修改房源信息")
      @PostMapping("/changeHouseInfo")
      public CommonResult<House> changeHouseInfo(@Validated @RequestBody HouseInfoReq req) {
+         System.out.println("进入/house/changeHouseInfo");
          House house;
          try {
              UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();

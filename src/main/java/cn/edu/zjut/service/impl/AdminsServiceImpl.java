@@ -83,6 +83,7 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         if(adminsService.qureryByUsername(req.getAdUsername()) != null){
             throw new BusiException("用户名存在");
         }
+        admins.setAdUsername(req.getAdUsername());
         admins.setAdEmail(req.getAdEmail());
         admins.setAdPhone(req.getAdPhone());
         adminsService.updateById(admins);

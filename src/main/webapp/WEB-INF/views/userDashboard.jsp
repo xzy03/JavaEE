@@ -7,7 +7,7 @@
     // 从工具类中获取当前用户信息
     String token = request.getParameter("Authorization");
     System.out.println("进入userDashboard,当前用户token为：" + token);
-    String user=request.getParameter("userType");
+    String user = request.getParameter("userType");
     UserTokenInfoDto userTokenInfoDto = UserInfoUtils.getCurrentUser();
     request.setAttribute("userTokenInfoDto", userTokenInfoDto);
     // 将 userTokenInfoDto 放入 request 范围中
@@ -26,6 +26,7 @@
             display: flex;
             height: 100vh;
         }
+
         .sidebar {
             width: 250px;
             background-color: lightgrey;
@@ -33,35 +34,43 @@
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
+
         .sidebar h2 {
             text-align: center;
             font-size: 45px;
         }
+
         .sidebar ul {
             list-style-type: none;
             padding: 0;
         }
+
         .sidebar li {
             padding: 10px;
             text-align: center;
             font-weight: bold;
         }
+
         .sidebar a {
             color: white;
             text-decoration: none;
             display: block;
             font-size: 24px;
         }
+
         .sidebar a:hover {
             background-color: darkgrey;
         }
-        .sidebar a.small-text{
+
+        .sidebar a.small-text {
             font-size: 18px;
         }
+
         .logout-btn {
             margin-top: 20px;
             text-align: center;
         }
+
         .logout-btn button {
             padding: 10px 20px;
             font-size: 16px;
@@ -71,9 +80,11 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .logout-btn button.password {
             background-color: blue;
         }
+
         .content {
             flex: 1;
             padding: 20px;
@@ -83,12 +94,14 @@
             background-position: center; /* 居中显示图片 */
             background-repeat: no-repeat; /* 防止图片重复 */
         }
+
         .button-group button {
             padding: 10px 20px;
             font-size: 16px;
             margin: 5px;
             cursor: pointer;
         }
+
         .wide-textarea {
             width: 100%; /* 占满父容器宽度 */
             height: auto; /* 自适应高度 */
@@ -105,7 +118,7 @@
             margin-bottom: 10px;
         }
 
-        .simple-form{
+        .simple-form {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
@@ -143,6 +156,7 @@
             border-radius: 16px;
             overflow: hidden;
         }
+
         .header {
             width: 100%;
             height: 10%;
@@ -152,6 +166,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .header .input-group {
             width: 35%;
             height: 50%;
@@ -164,22 +179,27 @@
             transition: .2s;
             margin-right: 100px;
         }
+
         .header .input-group:hover {
             width: 45%;
-            background-color:#fff8;
-            box-shadow:0 5px 40px #0002;
+            background-color: #fff8;
+            box-shadow: 0 5px 40px #0002;
         }
+
         .header .input-group img {
             width: 20px;
             height: 20px;
         }
+
         .header .input-group input {
             width: 100%;
-            background-color:transparent;
+            background-color: transparent;
         }
+
         .header .input-group button {
             width: 120%;
         }
+
         .shell {
             width: 95%;
             max-height: calc(90% - 25px);
@@ -188,10 +208,12 @@
             border-radius: 10px;
             overflow: auto;
         }
+
         .shell::-webkit-scrollbar {
             width: 10px;
             height: 10px;
         }
+
         table {
             width: 100%;
         }
@@ -221,8 +243,8 @@
         }
 
         /*偶数行背景色 */
-        tbody tr:nth-child(even){
-            background-color:#0000000b;
+        tbody tr:nth-child(even) {
+            background-color: #0000000b;
         }
 
         tbody tr:hover {
@@ -234,19 +256,23 @@
             border-radius: 40px;
             text-align: left;
         }
+
         tr:nth-child(4n) .button {
-            background-color:#86e49d;
-            color:#006b21;
+            background-color: #86e49d;
+            color: #006b21;
         }
+
         tr:nth-child(4n-1) .button {
-            background-color:#ebc474;
+            background-color: #ebc474;
         }
+
         tr:nth-child(4n+1) .button {
-            background-color:#d893a3;
-            color:#b30021;
+            background-color: #d893a3;
+            color: #b30021;
         }
+
         tr:nth-child(4n+2) .button {
-            background-color:#6fcaea;
+            background-color: #6fcaea;
         }
 
         /* 样式表单 */
@@ -257,7 +283,7 @@
         }
 
         form input {
-            flex: 0 1 calc(25% - 10px);  /*每行四列，间距为10px */
+            flex: 0 1 calc(25% - 10px); /*每行四列，间距为10px */
             box-sizing: border-box;
             padding: 10px;
             margin: 0;
@@ -265,24 +291,24 @@
             border-radius: 4px;
         }
 
-        form input.three{
-            flex: 0 1 calc(33% - 10px);  /*每行三列，间距为10px */
+        form input.three {
+            flex: 0 1 calc(33% - 10px); /*每行三列，间距为10px */
         }
 
-        form input.two{
-            flex: 0 1 calc(50% - 10px);  /*每行两列，间距为10px */
+        form input.two {
+            flex: 0 1 calc(50% - 10px); /*每行两列，间距为10px */
         }
 
-        form input.one{
-            flex: 0 1 calc(100% - 10px);  /*每行一列，间距为10px */
+        form input.one {
+            flex: 0 1 calc(100% - 10px); /*每行一列，间距为10px */
         }
 
-        form input.five{
-            flex: 0 1 calc(20% - 10px);  /*每行五列，间距为10px */
+        form input.five {
+            flex: 0 1 calc(20% - 10px); /*每行五列，间距为10px */
         }
 
         form select {
-            flex: 0 1 calc(25% - 10px);  /*每行四列，间距为10px */
+            flex: 0 1 calc(25% - 10px); /*每行四列，间距为10px */
             box-sizing: border-box;
             padding: 10px;
             margin: 0;
@@ -290,20 +316,20 @@
             border-radius: 4px;
         }
 
-        form select.three{
-            flex: 0 1 calc(33% - 10px);  /*每行三列，间距为10px */
+        form select.three {
+            flex: 0 1 calc(33% - 10px); /*每行三列，间距为10px */
         }
 
-        form select.two{
-            flex: 0 1 calc(50% - 10px);  /*每行两列，间距为10px */
+        form select.two {
+            flex: 0 1 calc(50% - 10px); /*每行两列，间距为10px */
         }
 
-        form select.five{
-            flex: 0 1 calc(20% - 10px);  /*每行五列，间距为10px */
+        form select.five {
+            flex: 0 1 calc(20% - 10px); /*每行五列，间距为10px */
         }
 
-        form option{
-            flex: 0 1 calc(25% - 10px);  /*每行四列，间距为10px */
+        form option {
+            flex: 0 1 calc(25% - 10px); /*每行四列，间距为10px */
             box-sizing: border-box;
             padding: 10px;
             margin: 0;
@@ -311,16 +337,16 @@
             border-radius: 4px;
         }
 
-        form option.three{
-            flex: 0 1 calc(33% - 10px);  /*每行三列，间距为10px */
+        form option.three {
+            flex: 0 1 calc(33% - 10px); /*每行三列，间距为10px */
         }
 
-        form option.two{
-            flex: 0 1 calc(50% - 10px);  /*每行两列，间距为10px */
+        form option.two {
+            flex: 0 1 calc(50% - 10px); /*每行两列，间距为10px */
         }
 
-        form option.five{
-            flex: 0 1 calc(20% - 10px);  /*每行五列，间距为10px */
+        form option.five {
+            flex: 0 1 calc(20% - 10px); /*每行五列，间距为10px */
         }
 
         form button {
@@ -335,7 +361,7 @@
         }
 
         form button.four {
-            flex: 0 1 calc(25% - 10px);  /*每行四列，间距为10px */
+            flex: 0 1 calc(25% - 10px); /*每行四列，间距为10px */
         }
 
         button {
@@ -419,6 +445,8 @@
     <ul>
         <c:choose>
             <c:when test="${user == '管理员'}">
+                <li><a href="#AdminProfileManagement" onclick="showAdminManagement()">个人信息管理</a></li>
+                <div id="AdminProfileManagement"></div>
                 <li><a href="#AdminReviewManagement" onclick="showAdminReviewManagement()">审核管理</a></li>
                 <div id="AdminReviewManagement"></div>
             </c:when>
@@ -430,12 +458,8 @@
             <c:when test="${user == '房东'}">
                 <li><a href="#landlordProfileManagement" onclick="showLandlordManagement()">个人信息管理</a></li>
                 <div id="landlordProfileManagement"></div>
-                <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">房源信息管理</a></li>
+                <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">我的房屋</a></li>
                 <div id="landlordHouseManagement"></div>
-<%--                <li><a href="#teacherInfo" onclick="showTeacherInfo()">教师个人信息</a></li>--%>
-<%--                <li><a href="#searchCourse" onclick="showSearchCourse()"> 课程信息查询</a></li>--%>
-<%--                <li><a href="#searchTeachAtTeacher" onclick="showSearchTeachAtTeacher()"> 个人授课查询</a></li>--%>
-<%--                <li><a href="#showTeacherStudentScore" onclick="showTeacherStudentScoreInfo()"> 学生成绩总览</a></li>--%>
             </c:when>
             <c:otherwise>
 
@@ -444,7 +468,7 @@
 
     </ul>
 </div>
-<div class="content" id="content" >
+<div class="content" id="content">
     <div class="user-info">
         <h1>欢迎!</h1>
     </div>
@@ -488,7 +512,7 @@
 
         // 显示失败提示
         const failMessage = document.createElement('div');
-        failMessage.textContent = `操作失败：`+ (failReason || '未知原因'); // 如果没有提供原因，显示"未知原因"
+        failMessage.textContent = `操作失败：` + (failReason || '未知原因'); // 如果没有提供原因，显示"未知原因"
         failMessage.style.position = 'fixed';
         failMessage.style.top = '50%';
         failMessage.style.left = '50%';
@@ -513,9 +537,80 @@
         }, 2000);
     }
 
-    function AdminClean(){
+    function AdminClean() {
         let content = document.getElementById('AdminReviewManagement');
-        content.innerHTML='';
+        content.innerHTML = '';
+        content = document.getElementById('AdminProfileManagement');
+        content.innerHTML = '';
+    }
+
+    function showAdminManagement() {
+        AdminClean();
+        let content = document.getElementById('AdminProfileManagement');
+        content.innerHTML = '<li><a onclick="showAdminEditInfo()" class="small-text">修改个人信息</a></li>';
+    }
+
+    function showAdminEditInfo() {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+        <h2>修改管理员信息</h2>
+        <form id="editAdminForm" class="simple-form">
+            <input type="text" id="adUsername" name="adUsername" placeholder="用户名" class="one" required>
+            <input type="text" id="adPhone" name="adPhone" placeholder="手机号" class="one">
+            <input type="email" id="adEmail" name="adEmail" placeholder="邮箱" class="one">
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="editAdminResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const editAdminForm = document.getElementById('editAdminForm');
+        editAdminForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            const adminUpdateReq = {
+                adUsername: formData.get('adUsername') === "" ? null : formData.get('adUsername'),
+                adPhone: formData.get('adPhone') === "" ? null : formData.get('adPhone'),
+                adEmail: formData.get('adEmail') === "" ? null : formData.get('adEmail'),
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/admins/changeUserInfo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(adminUpdateReq)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showAdminEditInfo');
+                    } else {
+                        // 调用失败回调函数，传递失败原因
+                        handleFail('showAdminEditInfo', data.message || '修改失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数，传递错误信息
+                    handleFail('showAdminEditInfo', '网络错误，请稍后重试');
+                });
+        });
     }
 
     function showAdminReviewManagement() {
@@ -526,6 +621,7 @@
             '<li><a onclick="auditLandlordIDCard()" class="small-text">审核房东身份证</a></li>' +
             '<li><a onclick="auditLandlordPropertyCertificate()" class="small-text">审核房东房产证</a></li>';
     }
+
     // 确认操作
     function handleApprove(Id, url) {
         console.log('确认操作，租户ID：', Id);
@@ -570,6 +666,7 @@
                 alert('网络错误，请稍后重试。');
             });
     }
+
     // 拒绝操作
     function handleReject(Id, url) {
         console.log('拒绝操作，租户ID：', Id);
@@ -1105,13 +1202,183 @@
             });
     }
 
-    function auditLandlordPropertyCertificate(){
+    function auditLandlordPropertyCertificate() {
+        const content = document.getElementById('content');
 
+        // 清空内容并设置标题
+        content.innerHTML = `
+    <h2>房东房产证审核</h2>
+    <div id="landlordPropertyCertificateList"></div>
+    `;
+
+        // 获取 token
+        const token = "<%= token %>";
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 构造查询条件
+        const queryParams = {
+            lhouseLicenseState: "未审核" // 只查询未审核的房产证
+        };
+
+        // 发送 POST 请求获取房源列表
+        fetch('/house/getHouseList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(queryParams)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                const resultDiv = document.getElementById('landlordPropertyCertificateList');
+                resultDiv.innerHTML = ''; // 清空之前的结果
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 创建主表格
+                const mainTable = document.createElement('table');
+                mainTable.setAttribute('class', 'table');
+
+                // 创建表头
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                ['房源标题', '房源位置', '面积（平方米）', '房间布局', '朝向', '楼层', '房屋图片', '房产证图片', '房产证验证状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headRow.appendChild(th);
+                });
+                thead.appendChild(headRow);
+                mainTable.appendChild(thead);
+
+                // 创建表体
+                const tbody = document.createElement('tbody');
+
+                // 渲染数据
+                data.data.houseList.forEach(house => {
+                    console.log(house);
+                    const row = document.createElement('tr');
+
+                    // 房源标题
+                    const titleCell = document.createElement('td');
+                    titleCell.textContent = house.htitle || '无';
+                    row.appendChild(titleCell);
+
+                    // 房源位置
+                    const locationCell = document.createElement('td');
+                    locationCell.textContent = house.hlocation || '无';
+                    row.appendChild(locationCell);
+
+                    // 面积（平方米）
+                    const areaCell = document.createElement('td');
+                    areaCell.textContent = house.harea || '无';
+                    row.appendChild(areaCell);
+
+                    // 房间布局
+                    const roomsCell = document.createElement('td');
+                    roomsCell.textContent = house.hrooms || '无';
+                    row.appendChild(roomsCell);
+
+                    // 朝向
+                    const directionCell = document.createElement('td');
+                    directionCell.textContent = house.hdirection || '无';
+                    row.appendChild(directionCell);
+
+                    // 楼层
+                    const floorCell = document.createElement('td');
+                    floorCell.textContent = house.hfloor || '无';
+                    row.appendChild(floorCell);
+
+                    // 房屋图片
+                    const housePhotoCell = document.createElement('td');
+                    if (house.lhousePhoto) {
+                        const img = document.createElement('img');
+                        img.src = house.lhousePhoto;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '房屋图片预览';
+                        img.addEventListener('click', function () {
+                            window.open(house.lhousePhoto);
+                        });
+                        housePhotoCell.appendChild(img);
+                    } else {
+                        housePhotoCell.textContent = '无';
+                    }
+                    row.appendChild(housePhotoCell);
+
+                    // 房产证图片
+                    const licensePhotoCell = document.createElement('td');
+                    if (house.lhouseLicensePhoto) {
+                        const img = document.createElement('img');
+                        img.src = house.lhouseLicensePhoto;
+                        img.style.width = 'auto';
+                        img.style.height = 'auto';
+                        img.style.maxWidth = '300px';
+                        img.style.maxHeight = '200px';
+                        img.style.marginTop = '10px';
+                        img.style.borderRadius = '0';
+                        img.style.cursor = 'pointer';
+                        img.alt = '房产证图片预览';
+                        img.addEventListener('click', function () {
+                            window.open(house.lhouseLicensePhoto);
+                        });
+                        licensePhotoCell.appendChild(img);
+                    } else {
+                        licensePhotoCell.textContent = '无';
+                    }
+                    row.appendChild(licensePhotoCell);
+
+                    // 房产证验证状态
+                    const licenseStateCell = document.createElement('td');
+                    licenseStateCell.textContent = house.lhouseLicenseState || '无';
+                    row.appendChild(licenseStateCell);
+
+                    // 操作按钮
+                    const actionCell = document.createElement('td');
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = '确认';
+                    approveButton.setAttribute('class', 'button approve-button');
+                    approveButton.addEventListener('click', () => handleApprove(house.houseId, '/admins/landlordHouseCardCheck'));
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = '拒绝';
+                    rejectButton.setAttribute('class', 'button reject-button');
+                    rejectButton.addEventListener('click', () => handleReject(house.houseId, '/admins/landlordHouseCardCheck'));
+
+                    actionCell.appendChild(approveButton);
+                    actionCell.appendChild(rejectButton);
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                });
+
+                mainTable.appendChild(tbody);
+                resultDiv.appendChild(mainTable);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('landlordPropertyCertificateList');
+                resultDiv.innerHTML = `<p>加载失败，请稍后重试。</p>`;
+            });
     }
 
-    function TenantClean(){
+    function TenantClean() {
         let content = document.getElementById('TenantProfileManagement');
-        content.innerHTML='';
+        content.innerHTML = '';
     }
 
     function showTenantManagement() {
@@ -1250,7 +1517,7 @@
         modal.innerHTML = `
         <div class="modal-content">
             <h2>钱包详情</h2>
-            <p>当前余额：<span id="currentBalance">`+balance+`</span> 元</p>
+            <p>当前余额：<span id="currentBalance">` + balance + `</span> 元</p>
             <div class="wallet-actions">
                 <button id="rechargeButton">充值</button>
                 <button id="withdrawButton">提现</button>
@@ -1285,7 +1552,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': "<%= token %>" // 添加 token
                     },
-                    body: JSON.stringify({ amount: Number(amount) })
+                    body: JSON.stringify({amount: Number(amount)})
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -1310,7 +1577,7 @@
         withdrawButton.addEventListener('click', () => {
             const amountString = prompt('请输入提现金额(提现手续费1%)：'); // 获取输入的字符串
             let amount = parseFloat(amountString); // 将字符串转换为浮点数
-            amount=amount*1.01;
+            amount = amount * 1.01;
             if (amount && !isNaN(amount) && Number(amount) > 0 && Number(amount) <= balance) {
                 fetch('/payment/tenant', {
                     method: 'POST',
@@ -1318,7 +1585,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': "<%= token %>" // 添加 token
                     },
-                    body: JSON.stringify({ amount: Number(-amount) })
+                    body: JSON.stringify({amount: Number(-amount)})
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -1595,30 +1862,26 @@
         });
     }
 
-
-    function LandlordClean(){
+    function LandlordClean() {
         let content = document.getElementById('landlordProfileManagement');
-        content.innerHTML='';
+        content.innerHTML = '';
+        content = document.getElementById('landlordHouseManagement');
+        content.innerHTML = '';
     }
-    function LandlordHouseClean(){
-        let content = document.getElementById('landlordHouseManagement');
-        content.innerHTML='';
-    }
+
     function showLandlordManagement() {
         LandlordClean();
         let content = document.getElementById('landlordProfileManagement');
         content.innerHTML = '<li><a onclick="showLandlordSearchInfo()" class="small-text">查看个人信息</a></li>' +
             '<li><a onclick="showLandlordEditInfo()" class="small-text">修改个人信息</a></li>' +
-            '<li><a onclick="showLandlordIDCertification()" class="small-text">身份证认证</a></li>' ;
+            '<li><a onclick="showLandlordIDCertification()" class="small-text">身份证认证</a></li>';
     }
 
     function showLandlordHouseManagement() {
-        LandlordHouseClean();
+        LandlordClean();
         let content = document.getElementById('landlordHouseManagement');
-        content.innerHTML='<li><a onclick="showLandlordHouseSearch()" class="small-text">房源信息查询</a></li>'+
-            '<li><a onclick="showLandlordHouseAdd()" class="small-text">添加房源</a></li>'+
-            '<li><a onclick="showLandlordHouseEdit()" class="small-text">修改房源信息</a></li>'+
-            '<li><a onclick="showLandlordHouseCertification()" class="small-text">房产证认证</a></li>';
+        content.innerHTML = '<li><a onclick="showLandlordHouseSearch()" class="small-text">个人房源查询</a></li>' +
+            '<li><a onclick="showLandlordHouseAdd()" class="small-text">添加房源</a></li>';
     }
 
     function showLandlordSearchInfo() {
@@ -1741,7 +2004,7 @@
         modal.innerHTML = `
         <div class="modal-content">
             <h2>钱包详情</h2>
-            <p>当前余额：<span id="currentBalance">`+balance+`</span> 元</p>
+            <p>当前余额：<span id="currentBalance">` + balance + `</span> 元</p>
             <div class="wallet-actions">
                 <button id="rechargeButton">充值</button>
                 <button id="withdrawButton">提现</button>
@@ -1776,7 +2039,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': "<%= token %>" // 添加 token
                     },
-                    body: JSON.stringify({ amount: Number(amount) })
+                    body: JSON.stringify({amount: Number(amount)})
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -1801,7 +2064,7 @@
         withdrawButton.addEventListener('click', () => {
             const amountString = prompt('请输入提现金额(提现手续费1%)：'); // 获取输入的字符串
             let amount = parseFloat(amountString); // 将字符串转换为浮点数
-            amount=amount*1.01;
+            amount = amount * 1.01;
             if (amount && !isNaN(amount) && Number(amount) > 0 && Number(amount) <= balance) {
                 fetch('/payment/landlord', {
                     method: 'POST',
@@ -1809,7 +2072,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': "<%= token %>" // 添加 token
                     },
-                    body: JSON.stringify({ amount: Number(-amount) })
+                    body: JSON.stringify({amount: Number(-amount)})
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -1896,7 +2159,7 @@
         });
     }
 
-    function showLandlordIDCertification(){
+    function showLandlordIDCertification() {
         // 获取内容容器
         const content = document.getElementById('content');
 
@@ -1994,12 +2257,12 @@
         });
     }
 
-    function showLandlordHouseSearch(){
+    function showLandlordHouseSearch() {
         let content = document.getElementById('content');
 
         content.innerHTML = `
-        <h2>房源信息查询</h2>
-        <div id="searchLandlordHouseResult"></div>
+    <h2>房源信息查询</h2>
+    <div id="searchLandlordHouseResult"></div>
     `;
 
         // 获取 token
@@ -2054,7 +2317,7 @@
                 const shellTable = document.createElement('table');
                 const shellThead = document.createElement('thead');
                 const headRow = document.createElement('tr');
-                ['房源ID', '房产证验证状态', '总租户数量','剩余空闲数量','操作'].forEach(headerText => {
+                ['房源ID', '房产证验证状态', '总租户数量', '剩余空闲数量', '操作'].forEach(headerText => {
                     const shellCell = document.createElement('th');
                     shellCell.textContent = headerText;
                     headRow.appendChild(shellCell);
@@ -2073,11 +2336,28 @@
                         row.appendChild(cell);
                     });
                     const actionCell = document.createElement('td');
+
+                    // 查看详情按钮
                     const houseButton = document.createElement('button');
-                    houseButton.setAttribute('class','button');
+                    houseButton.setAttribute('class', 'button');
                     houseButton.textContent = '查看详情';
                     houseButton.addEventListener('click', () => showHouseDetails(item['houseId']));
                     actionCell.appendChild(houseButton);
+
+                    // 编辑房源按钮
+                    const editButton = document.createElement('button');
+                    editButton.setAttribute('class', 'button');
+                    editButton.textContent = '编辑房源';
+                    editButton.addEventListener('click', () => showLandlordHouseEdit(item['houseId']));
+                    actionCell.appendChild(editButton);
+
+                    // 上传房产证按钮
+                    const certificationButton = document.createElement('button');
+                    certificationButton.setAttribute('class', 'button');
+                    certificationButton.textContent = '上传房产证';
+                    certificationButton.addEventListener('click', () => showLandlordHouseCertification(item['houseId']));
+                    actionCell.appendChild(certificationButton);
+
                     row.appendChild(actionCell);
                     shellTbody.appendChild(row);
 
@@ -2092,10 +2372,9 @@
                 const resultDiv = document.getElementById('searchLandlordHouseResult');
                 resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`;
             });
-
     }
 
-    function showHouseDetails(houseId){
+    function showHouseDetails(houseId) {
         let content = document.getElementById('content');
 
         content.innerHTML = `
@@ -2190,7 +2469,7 @@
 
                     // 值列
                     const valueCell = document.createElement('td');
-                    if(key==='房产证图片'||key==='房屋图片'){
+                    if (key === '房产证图片' || key === '房屋图片') {
                         const img = document.createElement('img');
                         img.src = properties[key];
                         img.style.width = 'auto'; // 按图片原比例宽度
@@ -2200,13 +2479,12 @@
                         img.style.marginTop = '10px';
                         img.style.borderRadius = '0'; // 去除圆角，防止椭圆形
                         img.alt = '图片预览';
-                        img.addEventListener('click', function() {
+                        img.addEventListener('click', function () {
                             window.open(properties[key]);
                         });
                         valueCell.appendChild(img);
                         console.log(img);
-                    }
-                    else valueCell.textContent = properties[key];
+                    } else valueCell.textContent = properties[key];
                     row.appendChild(valueCell);
 
                     shellTbody.appendChild(row);
@@ -2220,7 +2498,195 @@
 
     }
 
-    function showLandlordHouseAdd(){
+    function showLandlordHouseEdit(houseId) {
+        const content = document.getElementById('content');
+
+        // 渲染空表单 HTML
+        content.innerHTML = `
+        <h2>修改房源信息</h2>
+        <form id="editHouseForm">
+            <input type="text" id="htitle" name="htitle" class="three" placeholder="房源标题">
+            <input type="number" id="hfloor" name="hfloor" class="three" placeholder="楼层">
+            <input type="number" id="htotalFloors" name="htotalFloors" class="three" placeholder="总楼层数">
+            <input type="number" id="hrent" name="hrent" class="three" placeholder="租金">
+            <input type="number" id="harea" name="harea" class="three" placeholder="面积（平方米）">
+            <input type="number" id="htotalTenants" name="htotalTenants" class="three" placeholder="总租户数量">
+            <input type="number" id="hremainingVacancies" name="hremainingVacancies" class="three" placeholder="剩余空闲数量">
+            <input type="datetime-local" id="havailableFrom" name="havailableFrom" class="three" placeholder="可入住时间">
+            <select id="hpetFriendly" name="hpetFriendly" class="three">
+                <option value="">是否同意养宠物</option>
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select>
+            <textarea id="hrooms" name="hrooms" placeholder="房间布局" class="wide-textarea" rows="2"></textarea>
+            <textarea id="hlocation" name="hlocation" placeholder="房源位置" class="wide-textarea" rows="2"></textarea>
+            <textarea id="hfacilities" name="hfacilities" placeholder="配套设施" class="wide-textarea" rows="4"></textarea>
+            <textarea id="htenantrequired" name="htenantrequired" placeholder="租客要求" class="wide-textarea" rows="4"></textarea>
+            <button type="submit" class="submit-button">提交</button>
+        </form>
+        <div id="editHouseResult"></div>
+    `;
+
+        // 绑定表单提交事件
+        const editHouseForm = document.getElementById('editHouseForm');
+        editHouseForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            const houseUpdateReq = {
+                houseId: houseId, // 当前房源 ID
+                htitle: formData.get('htitle') === "" ? null : formData.get('htitle'),
+                hfloor: formData.get('hfloor') === "" ? null : parseInt(formData.get('hfloor')),
+                htotalFloors: formData.get('htotalFloors') === "" ? null : parseInt(formData.get('htotalFloors')),
+                hrent: formData.get('hrent') === "" ? null : parseFloat(formData.get('hrent')),
+                harea: formData.get('harea') === "" ? null : parseFloat(formData.get('harea')),
+                htotalTenants: formData.get('htotalTenants') === "" ? null : parseInt(formData.get('htotalTenants')),
+                hremainingVacancies: formData.get('hremainingVacancies') === "" ? null : parseInt(formData.get('hremainingVacancies')),
+                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom'),
+                hpetFriendly: formData.get('hpetFriendly') === "" ? null : parseInt(formData.get('hpetFriendly')),
+                hrooms: formData.get('hrooms') === "" ? null : formData.get('hrooms'),
+                hfacilities: formData.get('hfacilities') === "" ? null : formData.get('hfacilities'),
+                htenantrequired: formData.get('htenantrequired') === "" ? null : formData.get('htenantrequired'),
+                hlocation: formData.get('hlocation') === "" ? null : formData.get('hlocation'),
+            };
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+
+            // 发送 POST 请求
+            fetch('/house/changeHouseInfo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(houseUpdateReq)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('editHouseResult');
+                    if (data.code === 200) {
+                        // 成功提示并刷新页面或调用相关函数
+                        resultDiv.innerHTML = `<p>修改成功！</p>`;
+                        alert("房源信息修改成功！");
+                        showLandlordHouseSearch(); // 刷新房源列表
+                    } else {
+                        // 显示错误信息
+                        resultDiv.innerHTML = `<p>修改失败：` + data.message + `</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const resultDiv = document.getElementById('editHouseResult');
+                    resultDiv.innerHTML = `<p>网络错误，请稍后再试。</p>`;
+                });
+        });
+    }
+
+    function showLandlordHouseCertification(houseId) {
+        // 获取内容容器
+        const content = document.getElementById('content');
+
+        // 渲染表单 HTML
+        content.innerHTML = `
+    <h2>上传房产证</h2>
+    <form id="houseCertificationForm" class="simple-form" enctype="multipart/form-data">
+        <label for="lHousePhoto">房屋照片：</label>
+        <input type="file" id="lHousePhoto" name="l_house_photo" accept="image/*" class="one" required>
+        <label for="lHouseLicensePhoto">房产证照片：</label>
+        <input type="file" id="lHouseLicensePhoto" name="l_house_license_photo" accept="image/*" class="one" required>
+        <div id="houseImagePreview" class="image-preview"></div> <!-- 图片预览区域 -->
+        <button type="submit" class="submit-button">提交</button>
+    </form>
+    <div id="houseCertificationResult"></div>
+    `;
+
+        // 实时显示上传的图片
+        const lHousePhotoInput = document.getElementById('lHousePhoto');
+        const lHouseLicensePhotoInput = document.getElementById('lHouseLicensePhoto');
+        const houseImagePreview = document.getElementById('houseImagePreview');
+
+        // 实时显示房屋照片
+        lHousePhotoInput.addEventListener('change', function () {
+            houseImagePreview.innerHTML = ''; // 清空之前的图片预览
+
+            const file = lHousePhotoInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '房屋照片预览';
+                houseImagePreview.appendChild(img);
+            }
+        });
+
+        // 实时显示房产证照片
+        lHouseLicensePhotoInput.addEventListener('change', function () {
+            const file = lHouseLicensePhotoInput.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.maxWidth = '300px';
+                img.style.marginTop = '10px';
+                img.alt = '房产证照片预览';
+                houseImagePreview.appendChild(img);
+            }
+        });
+
+        // 绑定表单提交事件
+        const houseCertificationForm = document.getElementById('houseCertificationForm');
+        houseCertificationForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            // 获取表单数据
+            const formData = new FormData(this);
+            formData.append('house_id', houseId); // 添加 houseId 到表单数据中
+
+            // 获取 token
+            const token = "<%= token %>";
+            if (!token) {
+                alert("用户未登录，请先登录！");
+                return;
+            }
+
+            // 发送 POST 请求
+            fetch('/house/addHouseCard', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token // 设置 Authorization 头部
+                },
+                body: formData // 直接发送 FormData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('houseCertificationResult');
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+                    if (data.code === 200) {
+                        // 调用成功回调函数
+                        handleSuccess('showLandlordHouseCertification');
+                    } else {
+                        // 显示错误信息
+                        handleFail('showLandlordHouseCertification', data.message || '提交失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 调用失败回调函数
+                    handleFail('showLandlordHouseCertification', '网络错误，请稍后重试');
+                });
+        });
+    }
+
+    function showLandlordHouseAdd() {
         // 获取内容容器
         const content = document.getElementById('content');
 
@@ -2228,28 +2694,29 @@
         content.innerHTML = `
         <h2>填写房源信息</h2>
         <form id="editHouseForm">
-            <input type="text" id="htitle" name="htitle" placeholder="房源标题" class="two">
-            <input type="text" id="hrooms" name="hrooms" placeholder="房间布局" class="two">
-            <input type="text" id="hfacilities" name="hfacilities" placeholder="配套设施" class="two">
-            <input type="text" id="htenantrequired" name="htenantrequired" placeholder="租客要求" class="two">
-            <input type="text" id="hlocation" name="hlocation" placeholder="房源位置" class="two">
-            <input type="number" id="hfloor" name="hfloor" placeholder="楼层" class="two">
-            <input type="number" id="htotalFloors" name="htotalFloors" placeholder="总楼层数" class="two">
-            <input type="number" id="hrent" name="hrent" placeholder="租金" class="two">
-            <input type="number" id="harea" name="harea" placeholder="面积（平方米）" class="two">
-            <input type="number" id="htotalTenants" name="htotalTenants" placeholder="总租户数量" class="two">
-            <input type="number" id="hremainingVacancies" name="hremainingVacancies" placeholder="剩余空闲数量" class="two">
-            <input type="datetime-local" id="havailableFrom" name="havailableFrom" placeholder="可入住时间" class="two" required>
-            <label>是否同意养宠物：</label><br>
-            <input type="radio" id="yes" name="hpetFriendly" value="1" required>
-            <label for="yes">是</label><br>
-            <input type="radio" id="no" name="hpetFriendly" value="0" required>
-            <label for="no">否</label><br>
+            <input type="text" id="htitle" name="htitle" class="three" placeholder="房源标题">
+            <input type="number" id="hfloor" name="hfloor" class="three" placeholder="楼层">
+            <input type="number" id="htotalFloors" name="htotalFloors" class="three" placeholder="总楼层数">
+            <input type="number" id="hrent" name="hrent" class="three" placeholder="租金">
+            <input type="number" id="harea" name="harea" class="three" placeholder="面积（平方米）">
+            <input type="number" id="htotalTenants" name="htotalTenants" class="three" placeholder="总租户数量">
+            <input type="number" id="hremainingVacancies" name="hremainingVacancies" class="three" placeholder="剩余空闲数量">
+            <input type="datetime-local" id="havailableFrom" name="havailableFrom" class="three" placeholder="可入住时间" required>
+            <select id="hpetFriendly" name="hpetFriendly" class="three" required>
+                <option value="">是否同意养宠物</option>
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select>
+            <textarea id="hrooms" name="hrooms" placeholder="房间布局" class="wide-textarea" rows="2"></textarea>
+            <textarea id="hlocation" name="hlocation" placeholder="房源位置" class="wide-textarea" rows="2"></textarea>
+            <textarea id="hfacilities" name="hfacilities" placeholder="配套设施" class="wide-textarea" rows="4"></textarea>
+            <textarea id="htenantrequired" name="htenantrequired" placeholder="租客要求" class="wide-textarea" rows="4"></textarea>
             <button type="submit" class="submit-button">提交</button>
         </form>
         <div id="editHouseResult"></div>
     `;
     }
+
 </script>
 </body>
 </html>
