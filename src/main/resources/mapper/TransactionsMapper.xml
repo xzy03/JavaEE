@@ -24,4 +24,37 @@
         t_name,t_charge,t_fees,
         t_transaction_source,t_paytime
     </sql>
+    <select id="queryRentTenant" resultType="cn.edu.zjut.entity.Transactions.resp.QueryTransactionResp">
+        SELECT
+            l.l_name AS lName,
+            tp.t_name AS tName,
+            t.t_transaction_type AS tTransactionType,
+            t.t_amount AS tAmount,
+            t.t_status AS tStatus,
+            t.t_paytime AS tPaytime
+        FROM transactions t
+        INNER JOIN landlord_profile l ON t.landlord_id = l.landlord_id
+        INNER JOIN tenant_profile tp ON t.tenant_id = tp.tenant_id
+        WHERE
+        1=1
+        <if test="req.tenantId != null and req.tenantId != ''">
+            AND t.tenant_id = #{req.tenantId}
+        </if>
+        <if test="req.landlordId != null and req.landlordId != ''">
+            AND t.landlord_id = #{req.landlordId}
+        </if>
+        <if test="req.tTransactionType != null and req.tTransactionType != ''">
+            AND t.t_transaction_type = #{req.tTransactionType}
+        </if>
+        <if test="req.tStatus != null and req.tStatus != ''">
+            AND t.t_status = #{req.tStatus}
+        </if>
+        <if test="req.startTime != null">
+            AND t.t_paytime &gt;= #{req.startTime, jdbcType=DATE}
+        </if>
+        <if test="req.endTime != null">
+            AND t.t_paytime &lt;= #{req.endTime, jdbcType=DATE}
+        </if>
+        ORDER BY t.t_paytime DESC
+    </select>
 </mapper>

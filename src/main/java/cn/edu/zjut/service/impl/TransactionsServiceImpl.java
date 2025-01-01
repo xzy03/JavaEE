@@ -2,7 +2,9 @@ package cn.edu.zjut.service.impl;
 
 import cn.edu.zjut.entity.LandlordProfile.LandlordProfile;
 import cn.edu.zjut.entity.TenantProfile.TenantProfile;
+import cn.edu.zjut.entity.Transactions.req.QueryTransactionReq;
 import cn.edu.zjut.entity.Transactions.resp.DepositListInfo;
+import cn.edu.zjut.entity.Transactions.resp.QueryTransactionResp;
 import cn.edu.zjut.entity.Transactions.resp.RentListInfo;
 import cn.edu.zjut.service.LandlordProfileService;
 import cn.edu.zjut.service.TenantProfileService;
@@ -109,6 +111,11 @@ public class TransactionsServiceImpl extends ServiceImpl<TransactionsMapper, Tra
         tenantProfileService.updateById(tenantProfile);
         landlordProfileService.updateById(landlordProfile);
         this.updateById(transaction);
+    }
+    @Override
+    public List<QueryTransactionResp> queryRentTenant(QueryTransactionReq req) {
+        List<QueryTransactionResp> rentList = baseMapper.queryRentTenant(req);
+        return rentList;
     }
 }
 

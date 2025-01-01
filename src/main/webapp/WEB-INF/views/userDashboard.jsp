@@ -2722,7 +2722,6 @@
         </form>
         <div id="editHouseResult"></div>
     `;
-    }
 
     }
 
