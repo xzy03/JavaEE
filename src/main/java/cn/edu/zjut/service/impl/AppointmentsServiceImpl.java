@@ -6,6 +6,8 @@ import cn.edu.zjut.entity.Appointments.req.AppointmentsConfirmReq;
 import cn.edu.zjut.entity.Appointments.req.AppointmentsSubmitReq;
 import cn.edu.zjut.entity.Appointments.req.AppointmentsUpdateReq;
 import cn.edu.zjut.entity.Appointments.resp.*;
+import cn.edu.zjut.entity.House.House;
+import cn.edu.zjut.entity.TenantProfile.TenantProfile;
 import cn.edu.zjut.entity.admins.Admins;
 import cn.edu.zjut.exception.apiException.BusiException;
 import cn.edu.zjut.mapper.AppointmentsMapper;
@@ -42,10 +44,31 @@ public class AppointmentsServiceImpl extends ServiceImpl<AppointmentsMapper, App
     @Lazy
     @Resource
     TenantProfileService tenantProfileService;
+    @Lazy
+    @Resource
+    AppointmentsService appointmentsService;
+
 
 
     @Override
     public void submitAppointment(AppointmentsSubmitReq req,String tenantId) {
+        TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
+        if(tenantProfile.getTIdentityStatus()==null){
+            throw new BusiException("请先进行实名认证");
+        }
+        if(tenantProfile.getTStatus()==null){
+            throw new BusiException("请先进行学生认证");
+        }
+        if(tenantProfile.getTIdentityStatus().equals("等待审核")||tenantProfile.getTStatus().equals("等待审核")){
+            throw new BusiException("请等待审核通过后再进行租房");
+        }
+        Appointments appointments = appointmentsService.lambdaQuery()
+                .eq(Appointments::getHouseId, req.getHouseId())
+                .eq(Appointments::getTenantId, tenantId)
+                .one();
+        if(appointments!=null){
+            throw new BusiException("您已经预约过该房源");
+        }
         Appointments appointment = new Appointments(req,tenantId,houseService.getLandlordIdByHouseId(req.getHouseId()));
         this.save(appointment);
     }

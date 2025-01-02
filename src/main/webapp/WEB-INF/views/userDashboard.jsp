@@ -1745,7 +1745,7 @@
                         handleSuccess('showTenantStudentCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showTenantStudentCertification', data.data || '提交失败');
+                        handleFail('showTenantStudentCertification', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -1850,7 +1850,7 @@
                         handleSuccess('showTenantIDCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showTenantIDCertification', data.data || '提交失败');
+                        handleFail('showTenantIDCertification', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2162,7 +2162,7 @@
                         handleSuccess('showTenantHouseSearch');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantHouseSearch', data.data || '提交失败');
+                        handleFail('showTenantHouseSearch', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2223,7 +2223,7 @@
                         handleSuccess('showTenantHouseSearch');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantHouseSearch', data.data || '提交失败');
+                        handleFail('showTenantHouseSearch', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2407,7 +2407,7 @@
                         handleSuccess('showTenantAppointment');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantAppointment', data.data || '提交失败');
+                        handleFail('showTenantAppointment', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2453,7 +2453,7 @@
                     handleSuccess('showTenantAppointment');
                 } else {
                     // 调用失败回调函数，传递失败原因
-                    handleFail('showTenantAppointment', data.data || '取消失败');
+                    handleFail('showTenantAppointment', data.message || '取消失败');
                 }
             })
             .catch(error => {
@@ -3232,7 +3232,7 @@
                         handleSuccess('showLandlordIDCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showLandlordIDCertification', data.data || '提交失败');
+                        handleFail('showLandlordIDCertification', data.message || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -3562,7 +3562,7 @@
                         handleSuccess('showLandlordHouseSearch');
                     } else {
                         // 失败提示
-                        handleFail('showLandlordHouseSearch', data.message || '修改失败');
+                        handleFail('showLandlordHouseSearch', data.data || '修改失败');
                     }
                 })
                 .catch(error => {
@@ -3753,7 +3753,7 @@
                         handleSuccess('showLandlordHouseSearch');
                     } else {
                         // 调用失败回调
-                        handleFail('showLandlordHouseSearch', data.message || '添加失败');
+                        handleFail('showLandlordHouseSearch', data.data || '添加失败');
                     }
                 })
                 .catch(error => {
@@ -3919,7 +3919,7 @@
                     handleSuccess('showTenantRentInfo'); // 成功回调
                     return Promise.resolve(); // 返回一个成功的 Promise
                 } else {
-                    handleFail('showTenantRentInfo', data.data || '支付失败'); // 失败回调
+                    handleFail('showTenantRentInfo', data.message || '支付失败'); // 失败回调
                     return Promise.reject(); // 返回一个失败的 Promise
                 }
             })
