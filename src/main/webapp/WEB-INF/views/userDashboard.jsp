@@ -4313,6 +4313,7 @@
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const resultDiv = document.getElementById('contractsInfoResult');
                 resultDiv.innerHTML = ''; // 清空容器
 
@@ -4359,9 +4360,9 @@
                         contract.contractId,
                         contract.cstartDate,
                         contract.cendDate,
-                        contract.crentAmount.toFixed(2),
+                        contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2),  // 处理 rentAmount 为 null 的情况
                         contract.chouseId,
-                        contract.cdepositAmount.toFixed(2),
+                        contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2),  // 处理 depositAmount 为 null 的情况
                         contract.ctenantId,
                         contract.cstatus
                     ].forEach(cellData => {
@@ -5047,31 +5048,6 @@
                 alert("发布失败，请稍后重试。");
             });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </script>
 </body>
