@@ -453,10 +453,15 @@
             <c:when test="${user == '大学生租户'}">
                 <li><a href="#TenantProfileManagement" onclick="showTenantManagement()">个人信息管理</a></li>
                 <div id="TenantProfileManagement"></div>
-                <li><a href="#TenantRentInfo" onclick="showTenantRentInfo()">查看房租信息</a></li>
-                <div id="TenantRentInfo"></div>
+<%--                <li><a href="#TenantRentInfo" onclick="showTenantRentInfo()">查看房租信息</a></li>--%>
+<%--                <div id="TenantRentInfo"></div>--%>
                 <li><a href="#TenantRentalManagement" onclick="showRentalManagement()">租房板块</a></li>
                 <div id="TenantRentalManagement"></div>
+                <li><a href="#TenantRentManagement" onclick="showTenantRentManagement()">租房服务管理</a></li>
+                <div id="TenantRentManagement"></div>
+                <li><a href="#TenantContactsManagement" onclick="showTenantContactsManagement()">合同管理</a></li>
+                <div id="TenantContactsManagement"></div>
+
 
             </c:when>
             <c:when test="${user == '房东'}">
@@ -464,12 +469,13 @@
                 <div id="landlordProfileManagement"></div>
                 <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">我的房屋</a></li>
                 <div id="landlordHouseManagement"></div>
-                <li><a href="#showLandlordRentInfo" onclick="showLandlordRentInfo()">查看房租信息</a></li>
-                <div id="showLandlordRentInfo"></div>
-<%--                <li><a href="#teacherInfo" onclick="showTeacherInfo()">教师个人信息</a></li>--%>
-<%--                <li><a href="#searchCourse" onclick="showSearchCourse()"> 课程信息查询</a></li>--%>
-<%--                <li><a href="#searchTeachAtTeacher" onclick="showSearchTeachAtTeacher()"> 个人授课查询</a></li>--%>
-<%--                <li><a href="#showTeacherStudentScore" onclick="showTeacherStudentScoreInfo()"> 学生成绩总览</a></li>--%>
+<%--                <li><a href="#showLandlordRentInfo" onclick="showLandlordRentInfo()">查看房租信息</a></li>--%>
+<%--                <div id="showLandlordRentInfo"></div>--%>
+                <li><a href="#RentManagement" onclick="showRentManagement()">租房服务管理</a></li>
+                <div id="RentManagement"></div>
+                <li><a href="#LandlordContactsManagement" onclick="showLandlordContactsManagement()">合同管理</a></li>
+                <div id="LandlordContactsManagement"></div>
+
             </c:when>
             <c:otherwise>
 
@@ -2456,6 +2462,416 @@
             });
     }
 
+
+
+
+    function TenantRentClean() {
+        let content = document.getElementById('TenantRentManagement');
+        content.innerHTML = '';
+    }
+    function showTenantRentManagement() {
+        TenantRentClean();
+        let content = document.getElementById('TenantRentManagement');
+        content.innerHTML = '' +
+            '<li><a onclick="showTenantRentInfo()" class="small-text">查看并支付房租押金</a></li>';
+    }
+
+    // 支付租金函数
+    function payDeposit(transactionId) {
+        const token = "<%= token %>";
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return Promise.reject();
+        }
+
+        const payload = {
+            transactionId: transactionId
+        };
+
+        return fetch('/rent/payRent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('支付成功！');
+                    showTenantRentInfo(); // 重新加载数据
+                    return Promise.resolve(); // 返回一个成功的 Promise
+                } else {
+                    alert('支付失败：' + data.message);
+                    return Promise.reject(); // 返回一个失败的 Promise
+                }
+            })
+            .catch(error => {
+                console.error('支付请求异常:', error);
+                alert('支付失败，请稍后再试。');
+                return Promise.reject(); // 返回一个失败的 Promise
+            });
+    }
+
+
+    function TenantContactsClean(){
+        let content = document.getElementById('TenantContactsManagement');
+        content.innerHTML='';
+    }
+
+    function showTenantContactsManagement() {
+        TenantContactsClean(); // 如果需要清除其他内容，调用清理函数
+
+        let content = document.getElementById('TenantContactsManagement');
+        content.innerHTML = `<li><a onclick="showTenantContractList()" class="small-text">查看合同列表</a></li>
+
+        `;
+    }
+
+
+
+    // 租户查看合同列表
+    function showTenantContractList() {
+        const content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+        <h2>租户合同列表</h2>
+        <div id="tenantContractsInfoResult"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用租户查看合同列表接口
+        fetch('/contacts/viewTenantContracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('tenantContractsInfoResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    // 如果接口返回错误信息，显示错误
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同列表
+                const contractsList = data.data.contractsList;
+
+                if (contractsList.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无合同信息</p>`;
+                    return;
+                }
+
+                // 创建表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['合同ID', '开始时间', '结束时间', '租金金额', '房屋ID', '押金金额', '附加条款', '合同状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractsList.forEach(contract => {
+                    const row = document.createElement('tr');
+
+                    // 合同字段映射到表格中
+                    [
+                        contract.contractId,
+                        contract.cstartDate,
+                        contract.cendDate,
+                        contract.crentAmount.toFixed(2),
+                        contract.chouseId,
+                        contract.cdepositAmount.toFixed(2),
+                        contract.cadditions || '无',
+                        contract.cstatus
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    // 添加"查看详情"按钮
+                    const tdAction = document.createElement('td');
+                    const detailButton = document.createElement('button');
+                    detailButton.textContent = '查看详情';
+                    detailButton.style.padding = '5px 10px';
+                    detailButton.style.margin = '5px';
+                    detailButton.style.backgroundColor = '#4CAF50';
+                    detailButton.style.color = 'white';
+                    detailButton.style.border = 'none';
+                    detailButton.style.cursor = 'pointer';
+
+                    // 为每个按钮添加点击事件，传递合同ID
+                    detailButton.addEventListener('click', () => {
+                        showTenantContractDetails(contract.contractId); // 调用查看详情的函数
+                    });
+
+                    tdAction.appendChild(detailButton);
+
+                    // 只有当合同状态为"未生效"，才显示确认和拒绝按钮
+                    if (contract.cstatus === '未生效') {
+                        // 确认合同按钮
+                        const confirmButton = document.createElement('button');
+                        confirmButton.textContent = '确认合同';
+                        confirmButton.style.padding = '5px 10px';
+                        confirmButton.style.margin = '5px';
+                        confirmButton.style.backgroundColor = '#007BFF';
+                        confirmButton.style.color = 'white';
+                        confirmButton.style.border = 'none';
+                        confirmButton.style.cursor = 'pointer';
+
+                        // 为每个"确认合同"按钮添加点击事件，传递合同ID
+                        confirmButton.addEventListener('click', () => {
+                            confirmContract(contract.contractId); // 调用确认合同的函数
+                        });
+
+                        tdAction.appendChild(confirmButton);
+
+                        // 拒绝合同按钮
+                        const rejectButton = document.createElement('button');
+                        rejectButton.textContent = '拒绝合同';
+                        rejectButton.style.padding = '5px 10px';
+                        rejectButton.style.margin = '5px';
+                        rejectButton.style.backgroundColor = '#FF5733';
+                        rejectButton.style.color = 'white';
+                        rejectButton.style.border = 'none';
+                        rejectButton.style.cursor = 'pointer';
+
+                        // 为每个"拒绝合同"按钮添加点击事件，传递合同ID
+                        rejectButton.addEventListener('click', () => {
+                            rejectContract(contract.contractId); // 调用拒绝合同的函数
+                        });
+
+                        tdAction.appendChild(rejectButton);
+                    }
+
+                    row.appendChild(tdAction);
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                const resultDiv = document.getElementById('tenantContractsInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+
+    // 租户确认合同
+    function confirmContract(contractId) {
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用确认合同接口
+        fetch('/contacts/confirmContract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('合同确认成功！');
+                    showTenantContractList(); // 确认成功后刷新合同列表
+                } else {
+                    alert('合同确认失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                alert('合同确认失败，请稍后重试。');
+            });
+    }
+
+    // 租户拒绝合同
+    function rejectContract(contractId) {
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用拒绝合同接口
+        fetch('/contacts/rejectContract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('合同已拒绝！');
+                    showTenantContractList(); // 拒绝成功后刷新合同列表
+                } else {
+                    alert('合同拒绝失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                alert('合同拒绝失败，请稍后重试。');
+            });
+    }
+
+
+    // 租户查看合同详情
+    // 租户查看合同详情
+    function showTenantContractDetails(contractId) {
+        let content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+        <h2>合同详细信息</h2>
+        <button onclick="goBackToTenantContracts()" class="back-button">返回合同列表</button>
+        <div id="tenantContractDetailResult"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用合同详细信息接口
+        fetch('/contacts/getContractsDetail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('tenantContractDetailResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    // 如果接口返回错误信息，显示错误
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同详情
+                const contract = data.data;
+
+                // 构建合同详情表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 合同详情的键值对
+                const contractDetails = [
+                    { key: '合同名称', value: contract.tname || '未提供' },
+                    { key: '开始时间', value: contract.cstartDate },
+                    { key: '结束时间', value: contract.cendDate },
+                    { key: '租金金额', value: contract.crentAmount.toFixed(2) },
+                    { key: '押金金额', value: contract.cdepositAmount.toFixed(2) },
+                    { key: '附加条款', value: contract.cadditions || '无' },
+                    { key: '房东名称', value: contract.lname || '未提供' }
+                ];
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['字段', '值'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractDetails.forEach(detail => {
+                    const row = document.createElement('tr');
+
+                    // 字段名
+                    const keyCell = document.createElement('td');
+                    keyCell.textContent = detail.key;
+                    keyCell.style.border = '1px solid #ddd';
+                    keyCell.style.padding = '8px';
+
+                    // 字段值
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = detail.value;
+                    valueCell.style.border = '1px solid #ddd';
+                    valueCell.style.padding = '8px';
+
+                    row.appendChild(keyCell);
+                    row.appendChild(valueCell);
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                const resultDiv = document.getElementById('tenantContractDetailResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+
+
+
+
+    // 返回租户合同列表的函数
+    function goBackToTenantContracts() {
+        // 返回到租户合同列表页面
+        showTenantContractList(); // 直接调用查看租户合同列表的函数
+    }
+
+
+
+
     function LandlordClean() {
         let content = document.getElementById('landlordProfileManagement');
         content.innerHTML = '';
@@ -3840,6 +4256,821 @@
                 handleFail('showLandlordAppointment', '网络错误，请稍后重试');
             });
     }
+
+    function RentClean() {
+        let content = document.getElementById('RentManagement');
+        content.innerHTML = '';
+    }
+    function showRentManagement() {
+        RentClean();
+        let content = document.getElementById('RentManagement');
+        content.innerHTML = '' +
+            '<li><a onclick="showLandlordRentInfo()" class="small-text">查看租户房租押金记录</a></li>';
+    }
+
+
+
+    function LandlordContactsClean(){
+        let content = document.getElementById('LandlordContactsManagement');
+        content.innerHTML='';
+    }
+
+    //房东查看合同管理
+    function showLandlordContactsManagement() {
+        LandlordContactsClean(); // 如果需要清除其他内容，调用清理函数
+
+        let content = document.getElementById('LandlordContactsManagement');
+        content.innerHTML = ``+
+            `<li><a onclick="showLandlordContracts()" class="small-text">查看合同列表</a></li>`+`
+            <li><a onclick="showPublicLandlordContracts()" class="small-text">发布合同</a></li>`
+        ;
+    }
+
+    // 房东查看合同列表
+    function showLandlordContracts() {
+        const content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+        <h2>房东合同列表</h2>
+        <div id="contractsInfoResult"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用房东查看合同列表接口
+        fetch('/contacts/viewLandlordContracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    // 如果接口返回错误信息，显示错误
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同列表
+                const contractsList = data.data.contractsList;
+
+                if (contractsList.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无合同信息</p>`;
+                    return;
+                }
+
+                // 创建表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['合同ID', '开始时间', '结束时间', '租金金额', '房屋ID', '押金金额', '租户ID', '合同状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractsList.forEach(contract => {
+                    const row = document.createElement('tr');
+
+                    // 合同字段映射到表格中
+                    [
+                        contract.contractId,
+                        contract.cstartDate,
+                        contract.cendDate,
+                        contract.crentAmount.toFixed(2),
+                        contract.chouseId,
+                        contract.cdepositAmount.toFixed(2),
+                        contract.ctenantId,
+                        contract.cstatus
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    // 添加"查看详情"按钮
+                    const tdAction = document.createElement('td');
+                    const detailButton = document.createElement('button');
+                    detailButton.textContent = '查看详情';
+                    detailButton.style.padding = '5px 10px';
+                    detailButton.style.margin = '5px';
+                    detailButton.style.backgroundColor = '#4CAF50';
+                    detailButton.style.color = 'white';
+                    detailButton.style.border = 'none';
+                    detailButton.style.cursor = 'pointer';
+
+                    // 为每个按钮添加点击事件，传递合同ID
+                    detailButton.addEventListener('click', () => {
+                        showLandlordContractDetail(contract.contractId); // 调用查看详情的函数
+                    });
+
+                    tdAction.appendChild(detailButton);
+
+                    // 只有当合同状态为"未生效"，才显示确认和拒绝按钮
+                    if (contract.cstatus === '已生效' ) {
+                        // 违约终止合同按钮
+                        const terminateButton = document.createElement('button');
+                        terminateButton.textContent = '违约终止';
+                        terminateButton.style.padding = '5px 10px';
+                        terminateButton.style.margin = '5px';
+                        terminateButton.style.backgroundColor = '#FF5733';
+                        terminateButton.style.color = 'white';
+                        terminateButton.style.border = 'none';
+                        terminateButton.style.cursor = 'pointer';
+
+                        // 为每个"违约终止"按钮添加点击事件，传递合同ID
+                        terminateButton.addEventListener('click', () => {
+                            terminateContract(contract.contractId); // 调用违约终止的函数
+                        });
+
+                        tdAction.appendChild(terminateButton);
+
+                        // 正常结束合同按钮
+                        const endButton = document.createElement('button');
+                        endButton.textContent = '结束合同';
+                        endButton.style.padding = '5px 10px';
+                        endButton.style.margin = '5px';
+                        endButton.style.backgroundColor = '#007BFF';
+                        endButton.style.color = 'white';
+                        endButton.style.border = 'none';
+                        endButton.style.cursor = 'pointer';
+
+                        // 为每个"结束合同"按钮添加点击事件，传递合同ID
+                        endButton.addEventListener('click', () => {
+                            endContract(contract.contractId); // 调用结束合同的函数
+                        });
+
+                        tdAction.appendChild(endButton);
+                    }
+
+                    row.appendChild(tdAction);
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+    // 违约终止合同
+    function terminateContract(contractId) {
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用违约终止合同接口
+        fetch('/contacts/terminateContract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('合同已违约终止！');
+                    showLandlordContracts(); // 终止合同后刷新合同列表
+                } else {
+                    alert('合同终止失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                alert('合同终止失败，请稍后重试。');
+            });
+    }
+
+    // 正常结束合同
+    function endContract(contractId) {
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用结束合同接口
+        fetch('/contacts/endContract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert('合同已结束！');
+                    showLandlordContracts(); // 结束合同后刷新合同列表
+                } else {
+                    alert('合同结束失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                alert('合同结束失败，请稍后重试。');
+            });
+    }
+
+
+    // 房东查看租户合同详情
+    function showLandlordContractDetail(contractId) {
+        let content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+        <h2>合同详细信息</h2>
+        <button onclick="goBack()" class="back-button">返回合同列表</button>
+        <div id="contractDetailResult"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 调用合同详细信息接口
+        fetch('/contacts/getContractsDetail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ contractsId: contractId }) // 传递合同ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('contractDetailResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    // 如果接口返回错误信息，显示错误
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同详情
+                const contract = data.data;
+
+                // 构建合同详情表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 合同详情的键值对
+                const contractDetails = [
+                    { key: '合同名称', value: contract.tname || '未提供' },
+                    { key: '开始时间', value: contract.cstartDate },
+                    { key: '结束时间', value: contract.cendDate },
+                    { key: '租金金额', value: contract.crentAmount.toFixed(2) },
+                    { key: '押金金额', value: contract.cdepositAmount.toFixed(2) },
+                    { key: '附加条款', value: contract.cadditions || '无' },
+                    { key: '房东名称', value: contract.lname || '未提供' }
+                ];
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['字段', '值'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractDetails.forEach(detail => {
+                    const row = document.createElement('tr');
+
+                    // 字段名
+                    const keyCell = document.createElement('td');
+                    keyCell.textContent = detail.key;
+                    keyCell.style.border = '1px solid #ddd';
+                    keyCell.style.padding = '8px';
+
+                    // 字段值
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = detail.value;
+                    valueCell.style.border = '1px solid #ddd';
+                    valueCell.style.padding = '8px';
+
+                    row.appendChild(keyCell);
+                    row.appendChild(valueCell);
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error); // 打印错误信息到控制台
+                const resultDiv = document.getElementById('contractDetailResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+    // 返回合同列表的函数
+    function goBack() {
+        // 返回到合同列表页面
+        showLandlordContracts(); // 直接调用查看合同列表的函数
+    }
+
+    // CSS 样式：为返回按钮添加样式
+    const style = document.createElement('style');
+    style.innerHTML = `
+    .back-button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    .back-button:hover {
+        background-color: #0056b3;
+    }
+`;
+    document.head.appendChild(style);
+
+
+
+
+    function showPublicLandlordContracts() {
+        const content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+    <h2>房东合同列表</h2>
+    <div id="contractsInfoResult"></div>
+`;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 获取房东合同列表
+        fetch('/contacts/viewLandlordContracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同列表
+                const contractsList = data.data.contractsList;
+
+                if (contractsList.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无合同信息</p>`;
+                    return;
+                }
+
+                // 创建表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['合同ID', '开始时间', '结束时间', '租金金额', '房屋ID', '押金金额', '租户ID', '合同状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractsList.forEach(contract => {
+                    const row = document.createElement('tr');
+
+                    // 合同字段映射到表格中
+                    [
+                        contract.contractId,
+                        contract.cstartDate,
+                        contract.cendDate,
+                        contract.crentAmount.toFixed(2),
+                        contract.chouseId,
+                        contract.cdepositAmount.toFixed(2),
+                        contract.ctenantId,
+                        contract.cstatus
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    // 创建操作列
+                    const tdAction = document.createElement('td');
+
+                    // 创建发布合同按钮
+                    const publishButton = document.createElement('button');
+                    publishButton.textContent = '发布合同';
+                    publishButton.style.padding = '5px 10px';
+                    publishButton.style.margin = '5px';
+                    publishButton.style.backgroundColor = '#4CAF50';
+                    publishButton.style.color = 'white';
+                    publishButton.style.border = 'none';
+                    publishButton.style.cursor = 'pointer';
+
+                    // 使用箭头函数传递合同ID、房屋ID和租户ID
+                    publishButton.addEventListener('click', () => handlePublishContract(contract.contractId, contract.chouseId, contract.ctenantId));
+
+                    tdAction.appendChild(publishButton);
+                    row.appendChild(tdAction); // 将按钮放置在表格的最右侧
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+    function showLandlordPublishContractPage() {
+        const content = document.getElementById('content');
+
+        // 动态设置页面结构
+        content.innerHTML = `
+    <h2>房东合同列表</h2>
+    <div id="contractsInfoResult"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 获取房东合同列表
+        fetch('/contacts/viewLandlordContracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = ''; // 清空容器
+
+                if (data.code !== 200) {
+                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    return;
+                }
+
+                // 获取合同列表
+                const contractsList = data.data.contractsList;
+
+                if (contractsList.length === 0) {
+                    resultDiv.innerHTML = `<p>暂无合同信息</p>`;
+                    return;
+                }
+
+                // 创建表格
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                // 表头
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                ['合同ID', '开始时间', '结束时间', '租金金额', '房屋ID', '押金金额', '租户ID', '合同状态', '操作'].forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.border = '1px solid #ddd';
+                    th.style.padding = '8px';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 表体
+                const tbody = document.createElement('tbody');
+                contractsList.forEach(contract => {
+                    const row = document.createElement('tr');
+
+                    // 合同字段映射到表格中
+                    [
+                        contract.contractId,
+                        contract.cstartDate,
+                        contract.cendDate,
+                        contract.crentAmount.toFixed(2),
+                        contract.chouseId,
+                        contract.cdepositAmount.toFixed(2),
+                        contract.ctenantId,
+                        contract.cstatus
+                    ].forEach(cellData => {
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        td.style.border = '1px solid #ddd';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    // 创建操作列
+                    const tdAction = document.createElement('td');
+
+                    // 创建发布合同按钮
+                    const publishButton = document.createElement('button');
+                    publishButton.textContent = '发布合同';
+                    publishButton.style.padding = '5px 10px';
+                    publishButton.style.margin = '5px';
+                    publishButton.style.backgroundColor = '#4CAF50';
+                    publishButton.style.color = 'white';
+                    publishButton.style.border = 'none';
+                    publishButton.style.cursor = 'pointer';
+
+                    // 使用箭头函数传递合同ID、房屋ID和租户ID
+                    publishButton.addEventListener('click', () => handlePublishContract(contract.contractId));
+
+                    tdAction.appendChild(publishButton);
+                    row.appendChild(tdAction); // 将按钮放置在表格的最右侧
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                resultDiv.appendChild(table);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('contractsInfoResult');
+                resultDiv.innerHTML = `<p>加载失败，请稍后再试。</p>`; // 显示错误信息
+            });
+    }
+
+    function handlePublishContract(contractId) {
+        console.log("发布合同，合同ID:", contractId);
+
+        // 动态创建发布合同页面
+        let content = document.getElementById('content');
+
+        // 动态设置页面结构，添加返回按钮
+        content.innerHTML = `
+    <h2>发布合同</h2>
+    <button onclick="goBackToLandlordContracts()" class="back-button">返回合同列表</button>
+    <div id="publishContractForm"></div>
+    `;
+
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        // 创建发布合同表单
+        const form = document.createElement('form');
+        form.id = 'publishContractForm';
+        form.innerHTML = `
+    <div class="form-group">
+        <label for="contractId">合同ID:</label>
+        <input type="text" id="contractId" name="contractId" value="" readonly />
+        <br>
+    </div>
+    <div class="form-group">
+        <label for="cStartDate">合同开始日期:</label>
+        <input type="date" id="cStartDate" name="cStartDate" required />
+        <br>
+    </div>
+    <div class="form-group">
+        <label for="cEndDate">合同结束日期:</label>
+        <input type="date" id="cEndDate" name="cEndDate" required />
+        <br>
+    </div>
+    <div class="form-group">
+        <label for="cRentAmount">租金金额:</label>
+        <input type="number" id="cRentAmount" name="cRentAmount" min="0" max="9999" required />
+        <br>
+    </div>
+    <div class="form-group">
+        <label for="cDepositAmount">押金金额:</label>
+        <input type="number" id="cDepositAmount" name="cDepositAmount" min="0" max="9999" required />
+        <br>
+    </div>
+    <div class="form-group">
+        <label for="cAdditions">附加条款:</label>
+        <textarea id="cAdditions" name="cAdditions"></textarea>
+        <br>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="publish-button">发布合同</button>
+    </div>
+    `;
+
+        content.appendChild(form);
+
+        // 设置 contractId 的 value 为传入的 contractId
+        document.getElementById('contractId').value = contractId;
+
+        // 提交表单
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // 阻止默认表单提交
+
+            // 获取表单数据
+            const contractData = {
+                contractId: document.getElementById('contractId').value,
+                cStartDate: document.getElementById('cStartDate').value,
+                cEndDate: document.getElementById('cEndDate').value,
+                cRentAmount: parseFloat(document.getElementById('cRentAmount').value),
+                cDepositAmount: parseFloat(document.getElementById('cDepositAmount').value),
+                cAdditions: document.getElementById('cAdditions').value || null
+            };
+
+            // 调用发布合同接口
+            publishContract(contractData);
+        });
+
+        // 添加样式
+        const style = document.createElement('style');
+        style.innerHTML = `
+    #publishContractForm {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+    .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center; /* 标签和输入框在垂直方向居中 */
+    }
+    .form-group label {
+        margin-bottom: 0;
+        margin-right: 15px; /* 为标签和输入框之间添加间距 */
+        width: 150px; /* 标签固定宽度 */
+        font-weight: bold;
+    }
+    .form-group input, .form-group textarea {
+        width: calc(100% - 170px); /* 留出标签的宽度 */
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .publish-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .publish-button:hover {
+        background-color: #45a049;
+    }
+    .back-button {
+        background-color: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    .back-button:hover {
+        background-color: #e53935;
+    }
+    `;
+        document.head.appendChild(style);
+    }
+
+    // 返回合同列表的函数
+    function goBackToLandlordContracts() {
+        showLandlordPublishContractPage();
+    }
+
+
+
+
+    // 你可以创建一个函数来处理实际的发布合同请求
+    function publishContract(contractData) {
+        const token = "<%= token %>"; // 从服务器模板获取 token
+
+        if (!token) {
+            alert("用户未登录，请先登录！");
+            return;
+        }
+
+        fetch('/contacts/publish', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify(contractData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    alert("合同发布成功！");
+                    // 在这里你可以根据需求刷新页面或跳转到其他页面
+                    window.location.href = "/landlord/contract-list"; // 示例：跳转到合同列表页
+                } else {
+                    alert("发布失败：" + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("发布失败，请稍后重试。");
+            });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </script>
