@@ -68,8 +68,14 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
 //        if(tenantProfile == null){
 //            throw new BusiException("租客不存在");
 //        }
+        if(!contracts.getCStatus().equals("未生效")){
+            throw new BusiException("无法发布合同");
+        }
         if(house.getHRemainingVacancies()<=0){
             throw new BusiException("该房屋已无空余房间");
+        }
+        if(contracts.getCDepositAmount()==null){
+            house.setHRemainingVacancies(house.getHRemainingVacancies()-1);
         }
         contracts.setCStartDate(req.getCStartDate());
         contracts.setCEndDate(req.getCEndDate());
@@ -77,7 +83,7 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
         contracts.setCDepositAmount(req.getCDepositAmount());
         contracts.setCAdditions(req.getCAdditions());
         this.updateById(contracts);
-        house.setHRemainingVacancies(house.getHRemainingVacancies()-1);
+
         houseService.updateById(house);
     }
     @Override
@@ -110,6 +116,9 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
         Contracts contracts = this.getById(req.getContractsId());
         if(contracts == null){
             throw new BusiException("合同不存在");
+        }
+        if(contracts.getCDepositAmount()==null){
+            throw new BusiException("房东未发布合同，无法确认");
         }
         contracts.setCStatus("已生效");
         HouseTenants houseTenants = HouseTenants.builder()
@@ -178,6 +187,9 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
         Contracts contracts = this.getById(req.getContractsId());
         if(contracts == null){
             throw new BusiException("合同不存在");
+        }
+        if(contracts.getCDepositAmount()==null){
+            throw new BusiException("房东未发布合同，无法拒绝");
         }
         House house = houseService.getById(contracts.getCHouseId());
         house.setHRemainingVacancies(house.getHRemainingVacancies()+1);

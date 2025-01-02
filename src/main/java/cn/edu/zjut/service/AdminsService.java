@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface AdminsService extends IService<Admins> {
     Admins qureryByUsername(String adUsername);
     Admins qureryByPhoneNum(String adPhoneNum);
+    Admins qureryByEmail(String adEmail);
     void registerAdmin(AdminsRegisterReq req);
     AdminsLoginResp login(AdminsLoginReq req);
     void changeUserInfo(AdminsInfoReq req, String userId);

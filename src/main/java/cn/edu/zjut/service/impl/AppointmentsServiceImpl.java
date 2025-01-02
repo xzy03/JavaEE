@@ -56,6 +56,9 @@ public class AppointmentsServiceImpl extends ServiceImpl<AppointmentsMapper, App
         if (appointment == null) {
             throw new BusiException("预约不存在");
         }
+        if(appointment.getStatus().equals("已接受")){
+            throw new BusiException("已接受的预约不能修改");
+        }
         appointment.setAppointmentDate(req.getAppointmentDate());
         appointment.setStatus("待确认");
         this.updateById(appointment);
@@ -63,6 +66,13 @@ public class AppointmentsServiceImpl extends ServiceImpl<AppointmentsMapper, App
 
     @Override
     public void cancelAppointment(String appointmentId) {
+        Appointments appointment = this.getById(appointmentId);
+        if (appointment == null) {
+            throw new BusiException("预约不存在");
+        }
+        if (appointment.getStatus().equals("已接受")) {
+            throw new BusiException("已接受的预约不能取消");
+        }
         this.removeById(appointmentId);
     }
 

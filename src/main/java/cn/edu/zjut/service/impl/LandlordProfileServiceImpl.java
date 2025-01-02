@@ -59,6 +59,10 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         return landlordProfileService.lambdaQuery().eq(LandlordProfile::getLPhoneNumber,lPhoneNumber).one();
     }
     @Override
+    public LandlordProfile qureryByEmail(String lEmail) {
+        return landlordProfileService.lambdaQuery().eq(LandlordProfile::getLEmail,lEmail).one();
+    }
+    @Override
     public LandlordProfileLoginResp loginLandlord(LandlordProfileLoginReq req) {
         LandlordProfile landlordProfile = landlordProfileService.qureryByPhoneNum(req.getLPhoneNumber());
         if(landlordProfile == null) {
@@ -75,6 +79,12 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
     }
     @Override
     public LandlordProfile updateLandlordProfile(LandlordProfileUpdateReq req, String landlordId) {
+        if(landlordProfileService.qureryByPhoneNum(req.getLPhoneNumber()) != null) {
+            throw new BusiException("手机号已存在");
+        }
+        if(landlordProfileService.qureryByEmail(req.getLEmail()) != null) {
+            throw new BusiException("邮箱已存在");
+        }
         LandlordProfile landlordProfile = landlordProfileService.getById(landlordId);
         landlordProfile.setLAccount(req.getLAccount());
         landlordProfile.setLPhoneNumber(req.getLPhoneNumber());
@@ -100,6 +110,14 @@ public class LandlordProfileServiceImpl extends ServiceImpl<LandlordProfileMappe
         LandlordProfile landlordProfile = landlordProfileService.getById(landlordId);
         if (landlordProfile == null) {
             throw new BusiException("用户不存在");
+        }
+        if(landlordProfile.getLStatus()!=null){
+            if(landlordProfile.getLStatus().equals("已审核")) {
+                throw new BusiException("已审核，无需重复提交");
+            }
+            else if(landlordProfile.getLStatus().equals("等待审核")) {
+                throw new BusiException("审核中，请耐心等待");
+            }
         }
         landlordProfile.setLCardNumber(req.getTCardNumber());
         landlordProfile.setLName(req.getTName());

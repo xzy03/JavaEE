@@ -17,6 +17,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -107,7 +110,14 @@ public class TransactionsServiceImpl extends ServiceImpl<TransactionsMapper, Tra
             throw new RuntimeException("余额不足");
         }
         transaction.setTStatus("已支付");
-        transaction.setTPaytime(new Date());
+        // 获取今天的日期
+        LocalDate today = LocalDate.now();
+        // 转换为当天0点的LocalDateTime
+        LocalDateTime midnightLocalDateTime = today.atStartOfDay();
+        // 将 LocalDateTime 转换为 Date
+        Date midnight = Date.from(midnightLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        // 设置交易时间为当天0点
+        transaction.setTPaytime(midnight);
         tenantProfile.setTBalance(tenantProfile.getTBalance().subtract(transaction.getTAmount()));
         landlordProfile.setLBalance(landlordProfile.getLBalance().add(transaction.getTAmount()));
         tenantProfileService.updateById(tenantProfile);

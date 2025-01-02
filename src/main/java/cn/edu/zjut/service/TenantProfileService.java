@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface TenantProfileService extends IService<TenantProfile> {
     void registerTenant(TenantRegisterReq req);
     TenantProfile qureryByPhoneNum(String tPhoneNumber);
+    TenantProfile qureryByEmail(String tEmail);
     TenantLoginResp loginTenant(TenantLoginReq req);
     TenantProfile updateTenateProfile(TenantUpdateReq req, String tenantId);
     void findPwd(PwdChangeReq req);

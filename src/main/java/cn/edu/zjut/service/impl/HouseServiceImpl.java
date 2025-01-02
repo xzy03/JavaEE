@@ -89,6 +89,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, House>
     @Override
     public void addHouseCard(String house_id, MultipartFile l_house_photo, MultipartFile l_house_license_photo){
         House house = houseService.getById(house_id);
+        if (house == null) {
+            throw new BusiException("房源不存在");
+        }
+        if(house.getLHouseLicenseState()!=null){
+            if(house.getLHouseLicenseState().equals("已审核")){
+                throw new BusiException("已审核通过，无需再次上传");
+            }
+            else if(house.getLHouseLicenseState().equals("等待审核")){
+                throw new BusiException("正在审核中，请勿重复上传");
+            }
+        }
+
         String originalFilename = l_house_photo.getOriginalFilename();
         String originalFilename1 = l_house_license_photo.getOriginalFilename();
         if (originalFilename == null || originalFilename1 == null) {

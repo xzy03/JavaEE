@@ -2603,11 +2603,11 @@
                     // 合同字段映射到表格中
                     [
                         contract.contractId,
-                        contract.cstartDate,
-                        contract.cendDate,
-                        contract.crentAmount.toFixed(2),
+                        contract.cstartDate || '无',
+                        contract.cendDate || '无',
+                        contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2),
                         contract.chouseId,
-                        contract.cdepositAmount.toFixed(2),
+                        contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2),
                         contract.cadditions || '无',
                         contract.cstatus
                     ].forEach(cellData => {
@@ -2807,8 +2807,8 @@
                     { key: '合同名称', value: contract.tname || '未提供' },
                     { key: '开始时间', value: contract.cstartDate },
                     { key: '结束时间', value: contract.cendDate },
-                    { key: '租金金额', value: contract.crentAmount.toFixed(2) },
-                    { key: '押金金额', value: contract.cdepositAmount.toFixed(2) },
+                    { key: '租金金额', value: contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2) },
+                    { key: '押金金额', value: contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2)},
                     { key: '附加条款', value: contract.cadditions || '无' },
                     { key: '房东名称', value: contract.lname || '未提供' }
                 ];
@@ -3547,7 +3547,7 @@
                 harea: formData.get('harea') === "" ? null : parseFloat(formData.get('harea')),
                 htotalTenants: formData.get('htotalTenants') === "" ? null : parseInt(formData.get('htotalTenants')),
                 hremainingVacancies: formData.get('hremainingVacancies') === "" ? null : parseInt(formData.get('hremainingVacancies')),
-                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom'),
+                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom').replace('T', ' ')+':00',
                 hpetFriendly: formData.get('hpetFriendly') === "" ? null : parseInt(formData.get('hpetFriendly')),
                 hrooms: formData.get('hrooms') === "" ? null : formData.get('hrooms'),
                 hfacilities: formData.get('hfacilities') === "" ? null : formData.get('hfacilities'),
@@ -4557,11 +4557,11 @@
 
                 // 合同详情的键值对
                 const contractDetails = [
-                    { key: '合同名称', value: contract.tname || '未提供' },
+                    { key: '租户名称', value: contract.tname || '未提供' },
                     { key: '开始时间', value: contract.cstartDate },
                     { key: '结束时间', value: contract.cendDate },
-                    { key: '租金金额', value: contract.crentAmount.toFixed(2) },
-                    { key: '押金金额', value: contract.cdepositAmount.toFixed(2) },
+                    { key: '租金金额', value: contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2) },
+                    { key: '押金金额', value: contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2) },
                     { key: '附加条款', value: contract.cadditions || '无' },
                     { key: '房东名称', value: contract.lname || '未提供' }
                 ];
@@ -4708,9 +4708,9 @@
                         contract.contractId,
                         contract.cstartDate,
                         contract.cendDate,
-                        contract.crentAmount.toFixed(2),
+                        contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2),
                         contract.chouseId,
-                        contract.cdepositAmount.toFixed(2),
+                        contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2),
                         contract.ctenantId,
                         contract.cstatus
                     ].forEach(cellData => {
@@ -4824,9 +4824,9 @@
                         contract.contractId,
                         contract.cstartDate,
                         contract.cendDate,
-                        contract.crentAmount.toFixed(2),
+                        contract.crentAmount === null ? '无' : contract.crentAmount.toFixed(2),
                         contract.chouseId,
-                        contract.cdepositAmount.toFixed(2),
+                        contract.cdepositAmount === null ? '无' : contract.cdepositAmount.toFixed(2),
                         contract.ctenantId,
                         contract.cstatus
                     ].forEach(cellData => {
@@ -4900,12 +4900,12 @@
     </div>
     <div class="form-group">
         <label for="cStartDate">合同开始日期:</label>
-        <input type="date" id="cStartDate" name="cStartDate" required />
+        <input type="datetime-local" id="cStartDate" name="cStartDate" required />
         <br>
     </div>
     <div class="form-group">
         <label for="cEndDate">合同结束日期:</label>
-        <input type="date" id="cEndDate" name="cEndDate" required />
+        <input type="datetime-local" id="cEndDate" name="cEndDate" required />
         <br>
     </div>
     <div class="form-group">
@@ -4940,11 +4940,11 @@
             // 获取表单数据
             const contractData = {
                 contractId: document.getElementById('contractId').value,
-                cStartDate: document.getElementById('cStartDate').value,
-                cEndDate: document.getElementById('cEndDate').value,
-                cRentAmount: parseFloat(document.getElementById('cRentAmount').value),
-                cDepositAmount: parseFloat(document.getElementById('cDepositAmount').value),
-                cAdditions: document.getElementById('cAdditions').value || null
+                cstartDate: document.getElementById('cStartDate').value.replace('T', ' ')+':00',
+                cendDate: document.getElementById('cEndDate').value.replace('T', ' ')+':00',
+                crentAmount: parseFloat(document.getElementById('cRentAmount').value),
+                cdepositAmount: parseFloat(document.getElementById('cDepositAmount').value),
+                cadditions: document.getElementById('cAdditions').value || null
             };
 
             // 调用发布合同接口
@@ -5038,9 +5038,9 @@
                 if (data.code === 200) {
                     alert("合同发布成功！");
                     // 在这里你可以根据需求刷新页面或跳转到其他页面
-                    window.location.href = "/landlord/contract-list"; // 示例：跳转到合同列表页
+                    showLandlordContracts();
                 } else {
-                    alert("发布失败：" + data.message);
+                    alert("发布失败：" + data.message + data.data);
                 }
             })
             .catch(error => {

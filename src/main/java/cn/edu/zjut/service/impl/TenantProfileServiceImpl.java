@@ -45,6 +45,9 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         if(tenantProfileService.qureryByPhoneNum(req.getTPhoneNumber()) != null) {
             throw new BusiException("手机号已存在");
         }
+        if(tenantProfileService.qureryByEmail(req.getTEmail()) != null) {
+            throw new BusiException("邮箱已存在");
+        }
         TenantProfile tenantProfile = TenantProfile.builder()
                 .tAccount(req.getTAccount())
                 .tPassword(PasswordUtils.encrypt(req.getTPassword()))
@@ -57,6 +60,10 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
     @Override
     public TenantProfile qureryByPhoneNum(String tPhoneNumber) {
         return tenantProfileService.lambdaQuery().eq(TenantProfile::getTPhoneNumber,tPhoneNumber).one();
+    }
+    @Override
+    public TenantProfile qureryByEmail(String tEmail) {
+        return tenantProfileService.lambdaQuery().eq(TenantProfile::getTEmail,tEmail).one();
     }
 
     @Override
@@ -75,6 +82,12 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
 
     @Override
     public TenantProfile updateTenateProfile(TenantUpdateReq req, String tenantId) {
+        if (tenantProfileService.qureryByPhoneNum(req.getTPhoneNumber()) != null) {
+            throw new BusiException("手机号已存在");
+        }
+        if (tenantProfileService.qureryByEmail(req.getTEmail()) != null) {
+            throw new BusiException("邮箱已存在");
+        }
         TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
         tenantProfile.setTAccount(req.getTAccount());
         tenantProfile.setTPhoneNumber(req.getTPhoneNumber());
@@ -101,6 +114,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
         if (tenantProfile == null) {
             throw new BusiException("用户不存在");
+        }
+        if(tenantProfile.getTIdentityStatus()!=null){
+            if(tenantProfile.getTIdentityStatus().equals("已审核")) {
+                throw new BusiException("已审核，无需重复提交");
+            }
+            else if(tenantProfile.getTIdentityStatus().equals("等待审核")) {
+                throw new BusiException("正在审核中，请耐心等待");
+            }
         }
         tenantProfile.setTCardNumber(req.getTCardNumber());
         tenantProfile.setTName(req.getTName());
@@ -149,6 +170,14 @@ public class TenantProfileServiceImpl extends ServiceImpl<TenantProfileMapper, T
         TenantProfile tenantProfile = tenantProfileService.getById(tenantId);
         if (tenantProfile == null) {
             throw new BusiException("用户不存在");
+        }
+        if(tenantProfile.getTStatus()!=null){
+            if(tenantProfile.getTStatus().equals("已审核")){
+                throw new BusiException("已审核，无需重复提交");
+            }
+            else if(tenantProfile.getTStatus().equals("等待审核")){
+                throw new BusiException("正在审核中，请耐心等待");
+            }
         }
         tenantProfile.setTUniversity(tUniversity);
         tenantProfile.setTMajor(tMajor);

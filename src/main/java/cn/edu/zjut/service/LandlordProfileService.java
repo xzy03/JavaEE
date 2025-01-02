@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface LandlordProfileService extends IService<LandlordProfile> {
     LandlordProfile qureryByPhoneNum(String lAccount);
+    LandlordProfile qureryByEmail(String lEmail);
     void registerLandlord(LandlordProfileRegisterReq req);
     LandlordProfileLoginResp loginLandlord(LandlordProfileLoginReq req);
     LandlordProfile updateLandlordProfile(LandlordProfileUpdateReq req, String landlordId);

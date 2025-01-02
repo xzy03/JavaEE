@@ -51,9 +51,19 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
         return adminsService.lambdaQuery().eq(Admins::getAdPhone, adPhoneNum).one();
     }
     @Override
+    public Admins qureryByEmail(String adEmail) {
+        return adminsService.lambdaQuery().eq(Admins::getAdEmail, adEmail).one();
+    }
+    @Override
     public void registerAdmin(AdminsRegisterReq req) {
         if(adminsService.qureryByPhoneNum(req.getAdPhone()) != null) {
             throw new BusiException("手机号已存在");
+        }
+        if(adminsService.qureryByEmail(req.getAdEmail()) != null) {
+            throw new BusiException("邮箱已存在");
+        }
+        if(adminsService.qureryByUsername(req.getAdUsername()) != null) {
+            throw new BusiException("用户名已存在");
         }
         Admins admins = new Admins(req);
         admins.setAdPasswordHash(PasswordUtils.encrypt(req.getAdPasswordHash()));
@@ -130,7 +140,7 @@ public class AdminsServiceImpl extends ServiceImpl<AdminsMapper, Admins>
     @Override
     public void landlordHouseCardCheck(CheckReq req){
         House house = houseService.getById(req.getId());
-        LandlordProfile landlordProfile = landlordProfileService.getById(house.getLandlordId());
+//        LandlordProfile landlordProfile = landlordProfileService.getById(house.getLandlordId());
         if (house == null){
             throw new BusiException("房屋不存在");
         }
