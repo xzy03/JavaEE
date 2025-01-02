@@ -112,13 +112,13 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             throw new BusiException("合同不存在");
         }
         contracts.setCStatus("已生效");
-        HouseTenants houseTenants = HouseTenants.builder()
-                .houseId(contracts.getCHouseId())
-                .tenantId(contracts.getCTenantId())
-                .htRentAmount(contracts.getCRentAmount())
-                .htDepositAmount(contracts.getCDepositAmount())
-                .build();
-        houseTenantsService.save(houseTenants);
+//        HouseTenants houseTenants = HouseTenants.builder()
+//                .houseId(contracts.getCHouseId())
+//                .tenantId(contracts.getCTenantId())
+//                .htRentAmount(contracts.getCRentAmount())
+//                .htDepositAmount(contracts.getCDepositAmount())
+//                .build();
+//        houseTenantsService.save(houseTenants);
         this.updateById(contracts);
         generateTransactionRecords(contracts);
     }

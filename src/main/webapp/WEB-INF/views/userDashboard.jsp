@@ -316,6 +316,10 @@
             border-radius: 4px;
         }
 
+        form select.one {
+            flex: 0 1 calc(100% - 10px); /*每行三列，间距为10px */
+        }
+
         form select.three {
             flex: 0 1 calc(33% - 10px); /*每行三列，间距为10px */
         }
@@ -453,8 +457,6 @@
             <c:when test="${user == '大学生租户'}">
                 <li><a href="#TenantProfileManagement" onclick="showTenantManagement()">个人信息管理</a></li>
                 <div id="TenantProfileManagement"></div>
-<%--                <li><a href="#TenantRentInfo" onclick="showTenantRentInfo()">查看房租信息</a></li>--%>
-<%--                <div id="TenantRentInfo"></div>--%>
                 <li><a href="#TenantRentalManagement" onclick="showRentalManagement()">租房板块</a></li>
                 <div id="TenantRentalManagement"></div>
                 <li><a href="#TenantRentManagement" onclick="showTenantRentManagement()">租房服务管理</a></li>
@@ -469,8 +471,6 @@
                 <div id="landlordProfileManagement"></div>
                 <li><a href="#landlordHouseManagement" onclick="showLandlordHouseManagement()">我的房屋</a></li>
                 <div id="landlordHouseManagement"></div>
-<%--                <li><a href="#showLandlordRentInfo" onclick="showLandlordRentInfo()">查看房租信息</a></li>--%>
-<%--                <div id="showLandlordRentInfo"></div>--%>
                 <li><a href="#RentManagement" onclick="showRentManagement()">租房服务管理</a></li>
                 <div id="RentManagement"></div>
                 <li><a href="#LandlordContactsManagement" onclick="showLandlordContactsManagement()">合同管理</a></li>
@@ -618,7 +618,7 @@
                         handleSuccess('showAdminEditInfo');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showAdminEditInfo', data.message || '修改失败');
+                        handleFail('showAdminEditInfo', data.data || '修改失败');
                     }
                 })
                 .catch(error => {
@@ -670,7 +670,7 @@
                     // 刷新页面
                     location.reload();
                 } else {
-                    alert('审核失败：' + data.message);
+                    alert('审核失败：' + data.data);
                 }
             })
             .catch(error => {
@@ -711,7 +711,7 @@
                     // 刷新页面
                     location.reload();
                 } else {
-                    alert('拒绝失败：' + data.message);
+                    alert('拒绝失败：' + data.data);
                 }
             })
             .catch(error => {
@@ -763,7 +763,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -913,12 +913,11 @@
         })
             .then(response => response.json())
             .then(data => {
-
                 const resultDiv = document.getElementById('tenantIDCardList');
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -1085,7 +1084,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -1241,7 +1240,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -1380,6 +1379,10 @@
         content.innerHTML = '';
         content = document.getElementById('TenantRentalManagement');
         content.innerHTML = '';
+        content = document.getElementById('TenantRentManagement');
+        content.innerHTML = '';
+        content = document.getElementById('TenantContactsManagement');
+        content.innerHTML = '';
     }
 
     function showTenantManagement() {
@@ -1421,7 +1424,7 @@
                 resultDiv.innerHTML = '';
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -1559,7 +1562,7 @@
                             currentBalanceElement.textContent = (parseFloat(balance) + amount).toFixed(2);
                             balance = parseFloat(currentBalanceElement.textContent);
                         } else {
-                            alert('充值失败：' + data.message);
+                            alert('充值失败：' + data.data);
                         }
                     })
                     .catch(error => {
@@ -1592,7 +1595,7 @@
                             currentBalanceElement.textContent = (parseFloat(balance) - amount).toFixed(2);
                             balance = parseFloat(currentBalanceElement.textContent);
                         } else {
-                            alert('提现失败：' + data.message);
+                            alert('提现失败：' + data.data);
                         }
                     })
                     .catch(error => {
@@ -1614,11 +1617,10 @@
         // 渲染表单 HTML
         content.innerHTML = `
         <h2>修改个人信息</h2>
-        <form id="editTenantForm">
-            <input type="text" id="tAccount" name="tAccount" placeholder="用户名" class="two">
-            <input type="text" id="tPhoneNumber" name="tPhoneNumber" placeholder="手机号" class="two">
-            <input type="email" id="tEmail" name="tEmail" placeholder="邮箱" class="two">
-            <input type="text" id="tProfilePicture" name="tProfilePicture" placeholder="头像 URL" class="two">
+        <form id="editTenantForm" class="simple-form">
+            <input type="text" id="tAccount" name="tAccount" placeholder="用户名" class="one">
+            <input type="text" id="tPhoneNumber" name="tPhoneNumber" placeholder="手机号" class="one">
+            <input type="email" id="tEmail" name="tEmail" placeholder="邮箱" class="one">
             <textarea id="tIntroduction" name="tIntroduction" placeholder="个人介绍" class="wide-textarea" rows="4"></textarea>
             <button type="submit" class="submit-button">提交</button>
         </form>
@@ -1636,7 +1638,6 @@
                 taccount: formData.get('tAccount') === "" ? null : formData.get('tAccount'),
                 tphoneNumber: formData.get('tPhoneNumber') === "" ? null : formData.get('tPhoneNumber'),
                 temail: formData.get('tEmail') === "" ? null : formData.get('tEmail'),
-                tprofilePicture: formData.get('tProfilePicture') === "" ? null : formData.get('tProfilePicture'),
                 tintroduction: formData.get('tIntroduction') === "" ? null : formData.get('tIntroduction'),
             };
 
@@ -1663,7 +1664,7 @@
                         handleSuccess('showTenantSearchInfo');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantEditInfo', data.message || '修改失败');
+                        handleFail('showTenantEditInfo', data.data || '修改失败');
                     }
                 })
                 .catch(error => {
@@ -1744,7 +1745,7 @@
                         handleSuccess('showTenantStudentCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showTenantStudentCertification', data.message || '提交失败');
+                        handleFail('showTenantStudentCertification', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -1849,7 +1850,7 @@
                         handleSuccess('showTenantIDCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showTenantIDCertification', data.message || '提交失败');
+                        handleFail('showTenantIDCertification', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -1903,7 +1904,7 @@
                 resultDiv.innerHTML = '';
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
                 if (data.data.length === 0) {
@@ -2027,7 +2028,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -2161,7 +2162,7 @@
                         handleSuccess('showTenantHouseSearch');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantHouseSearch', data.message || '提交失败');
+                        handleFail('showTenantHouseSearch', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2214,6 +2215,7 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     const resultDiv = document.getElementById('rentResult');
                     resultDiv.innerHTML = ''; // 清空之前的结果
 
@@ -2222,7 +2224,7 @@
                         handleSuccess('showTenantHouseSearch');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantHouseSearch', data.message || '提交失败');
+                        handleFail('showTenantHouseSearch', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2265,7 +2267,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：`+data.message+`</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：`+data.data+`</p>`;
                     return;
                 }
 
@@ -2406,7 +2408,7 @@
                         handleSuccess('showTenantAppointment');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantAppointment', data.message || '提交失败');
+                        handleFail('showTenantAppointment', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -2452,7 +2454,7 @@
                     handleSuccess('showTenantAppointment');
                 } else {
                     // 调用失败回调函数，传递失败原因
-                    handleFail('showTenantAppointment', data.message || '取消失败');
+                    handleFail('showTenantAppointment', data.data || '取消失败');
                 }
             })
             .catch(error => {
@@ -2462,18 +2464,10 @@
             });
     }
 
-
-
-
-    function TenantRentClean() {
-        let content = document.getElementById('TenantRentManagement');
-        content.innerHTML = '';
-    }
     function showTenantRentManagement() {
-        TenantRentClean();
+        TenantClean();
         let content = document.getElementById('TenantRentManagement');
-        content.innerHTML = '' +
-            '<li><a onclick="showTenantRentInfo()" class="small-text">查看并支付房租押金</a></li>';
+        content.innerHTML = '<li><a onclick="showTenantRentInfo()" class="small-text">查看并支付房租押金</a></li>';
     }
 
     // 支付租金函数
@@ -2504,7 +2498,7 @@
                     showTenantRentInfo(); // 重新加载数据
                     return Promise.resolve(); // 返回一个成功的 Promise
                 } else {
-                    alert('支付失败：' + data.message);
+                    alert('支付失败：' + data.data);
                     return Promise.reject(); // 返回一个失败的 Promise
                 }
             })
@@ -2515,22 +2509,14 @@
             });
     }
 
-
-    function TenantContactsClean(){
-        let content = document.getElementById('TenantContactsManagement');
-        content.innerHTML='';
-    }
-
     function showTenantContactsManagement() {
-        TenantContactsClean(); // 如果需要清除其他内容，调用清理函数
+        TenantClean(); // 如果需要清除其他内容，调用清理函数
 
         let content = document.getElementById('TenantContactsManagement');
         content.innerHTML = `<li><a onclick="showTenantContractList()" class="small-text">查看合同列表</a></li>
 
         `;
     }
-
-
 
     // 租户查看合同列表
     function showTenantContractList() {
@@ -2559,12 +2545,13 @@
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const resultDiv = document.getElementById('tenantContractsInfoResult');
                 resultDiv.innerHTML = ''; // 清空容器
 
                 if (data.code !== 200) {
                     // 如果接口返回错误信息，显示错误
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -2605,9 +2592,9 @@
                         contract.contractId,
                         contract.cstartDate,
                         contract.cendDate,
-                        contract.crentAmount.toFixed(2),
+                        contract.crentAmount ? contract.crentAmount.toFixed(2) : "0.00",
                         contract.chouseId,
-                        contract.cdepositAmount.toFixed(2),
+                        contract.cdepositAmount ? contract.cdepositAmount.toFixed(2) : "0.00",
                         contract.cadditions || '无',
                         contract.cstatus
                     ].forEach(cellData => {
@@ -2687,7 +2674,6 @@
             });
     }
 
-
     // 租户确认合同
     function confirmContract(contractId) {
         const token = "<%= token %>"; // 从服务器模板获取 token
@@ -2708,16 +2694,16 @@
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.code === 200) {
-                    alert('合同确认成功！');
-                    showTenantContractList(); // 确认成功后刷新合同列表
+                    handleSuccess('showTenantContractList'); // 成功回调
                 } else {
-                    alert('合同确认失败：' + data.message);
+                    handleFail('showTenantContractList', data.data || '合同确认失败'); // 失败回调
                 }
             })
             .catch(error => {
                 console.error('Error:', error); // 打印错误信息到控制台
-                alert('合同确认失败，请稍后重试。');
+                handleFail('showTenantContractList', '合同确认失败，请稍后重试'); // 网络异常时调用失败回调
             });
     }
 
@@ -2742,20 +2728,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    alert('合同已拒绝！');
-                    showTenantContractList(); // 拒绝成功后刷新合同列表
+                    handleSuccess('showTenantContractList'); // 成功回调
                 } else {
-                    alert('合同拒绝失败：' + data.message);
+                    handleFail('showTenantContractList', data.data || '合同拒绝失败'); // 失败回调
                 }
             })
             .catch(error => {
                 console.error('Error:', error); // 打印错误信息到控制台
-                alert('合同拒绝失败，请稍后重试。');
+                handleFail('showTenantContractList', '合同拒绝失败，请稍后重试'); // 网络异常时调用失败回调
             });
     }
 
-
-    // 租户查看合同详情
     // 租户查看合同详情
     function showTenantContractDetails(contractId) {
         let content = document.getElementById('content');
@@ -2790,7 +2773,7 @@
 
                 if (data.code !== 200) {
                     // 如果接口返回错误信息，显示错误
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -2859,23 +2842,20 @@
             });
     }
 
-
-
-
-
     // 返回租户合同列表的函数
     function goBackToTenantContracts() {
         // 返回到租户合同列表页面
         showTenantContractList(); // 直接调用查看租户合同列表的函数
     }
 
-
-
-
     function LandlordClean() {
         let content = document.getElementById('landlordProfileManagement');
         content.innerHTML = '';
         content = document.getElementById('landlordHouseManagement');
+        content.innerHTML = '';
+        content = document.getElementById('RentManagement');
+        content.innerHTML = '';
+        content = document.getElementById('LandlordContactsManagement');
         content.innerHTML = '';
     }
 
@@ -2926,7 +2906,7 @@
                 resultDiv.innerHTML = '';
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -3057,7 +3037,7 @@
                             currentBalanceElement.textContent = (parseFloat(balance) + amount).toFixed(2);
                             balance = parseFloat(currentBalanceElement.textContent);
                         } else {
-                            alert('充值失败：' + data.message);
+                            alert('充值失败：' + data.data);
                         }
                     })
                     .catch(error => {
@@ -3090,7 +3070,7 @@
                             currentBalanceElement.textContent = (parseFloat(balance) - amount).toFixed(2);
                             balance = parseFloat(currentBalanceElement.textContent);
                         } else {
-                            alert('提现失败：' + data.message);
+                            alert('提现失败：' + data.data);
                         }
                     })
                     .catch(error => {
@@ -3112,10 +3092,10 @@
         // 渲染表单 HTML
         content.innerHTML = `
         <h2>修改个人信息</h2>
-        <form id="editLandlordForm">
-            <input type="text" id="laccount" name="laccount" placeholder="用户名" class="two">
-            <input type="text" id="lphoneNumber" name="lphoneNumber" placeholder="手机号" class="two">
-            <input type="email" id="lemail" name="lemail" placeholder="邮箱" class="two">
+        <form id="editLandlordForm" class="simple-form">
+            <input type="text" id="laccount" name="laccount" placeholder="用户名" class="one">
+            <input type="text" id="lphoneNumber" name="lphoneNumber" placeholder="手机号" class="one">
+            <input type="email" id="lemail" name="lemail" placeholder="邮箱" class="one">
             <button type="submit" class="submit-button">提交</button>
         </form>
         <div id="editLandlordResult"></div>
@@ -3157,7 +3137,7 @@
                         handleSuccess('showLandlordSearchInfo');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showLandlordEditInfo', data.message || '修改失败');
+                        handleFail('showLandlordEditInfo', data.data || '修改失败');
                     }
                 })
                 .catch(error => {
@@ -3255,7 +3235,7 @@
                         handleSuccess('showLandlordIDCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showLandlordIDCertification', data.message || '提交失败');
+                        handleFail('showLandlordIDCertification', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -3302,7 +3282,7 @@
                 resultDiv.innerHTML = '';
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
                 if (data.data.length === 0) {
@@ -3416,7 +3396,7 @@
                 resultDiv.innerHTML = '';
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -3456,7 +3436,7 @@
                     '总楼层数': house.htotalFloors || '无',
                     '楼层': house.hfloor || '无',
                     '配套设施': house.hfacilities || '无',
-                    '是否允许宠物': house.hpetFriendly || '无',
+                    '是否允许宠物': house.hpetFriendly === 1 ? '是' : house.hpetFriendly === 0 ? '否' : '无',
                     '租客要求': house.htenantrequired || '无',
                     '总租户数量': house.htotalTenants || '无',
                     '剩余空闲数量': house.hremainingVacancies || '无',
@@ -3522,6 +3502,13 @@
                 <option value="1">是</option>
                 <option value="0">否</option>
             </select>
+            <select id="hdirection" name="hdirection" class="three">
+                <option value="">房屋朝向</option>
+                <option value="南">南</option>
+                <option value="北">北</option>
+            </select>
+            <label for="havailableFrom">可入住时间</label>
+            <input type="datetime-local" id="havailableFrom" name="havailableFrom" class="three" placeholder="可入住时间">
             <textarea id="hrooms" name="hrooms" placeholder="房间布局" class="wide-textarea" rows="2"></textarea>
             <textarea id="hlocation" name="hlocation" placeholder="房源位置" class="wide-textarea" rows="2"></textarea>
             <textarea id="hfacilities" name="hfacilities" placeholder="配套设施" class="wide-textarea" rows="4"></textarea>
@@ -3562,7 +3549,6 @@
                 return;
             }
 
-
             // 发送 POST 请求
             fetch('/house/changeHouseInfo', {
                 method: 'POST',
@@ -3574,21 +3560,18 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    const resultDiv = document.getElementById('editHouseResult');
                     if (data.code === 200) {
-                        // 成功提示并刷新页面或调用相关函数
-                        resultDiv.innerHTML = `<p>修改成功！</p>`;
-                        alert("房源信息修改成功！");
-                        showLandlordHouseSearch(); // 刷新房源列表
+                        // 成功提示并刷新页面
+                        handleSuccess('showLandlordHouseSearch');
                     } else {
-                        // 显示错误信息
-                        resultDiv.innerHTML = `<p>修改失败：` + data.message + `</p>`;
+                        // 失败提示
+                        handleFail('showLandlordHouseSearch', data.message || '修改失败');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    const resultDiv = document.getElementById('editHouseResult');
-                    resultDiv.innerHTML = `<p>网络错误，请稍后再试。</p>`;
+                    // 网络错误提示
+                    handleFail('showLandlordHouseSearch', '网络错误，请稍后再试');
                 });
         });
     }
@@ -3679,7 +3662,7 @@
                         handleSuccess('showLandlordHouseCertification');
                     } else {
                         // 显示错误信息
-                        handleFail('showLandlordHouseCertification', data.message || '提交失败');
+                        handleFail('showLandlordHouseCertification', data.data || '提交失败');
                     }
                 })
                 .catch(error => {
@@ -3705,17 +3688,18 @@
             <input type="number" id="harea" name="harea" class="three" placeholder="面积（平方米）">
             <input type="number" id="htotalTenants" name="htotalTenants" class="three" placeholder="总租户数量">
             <input type="number" id="hremainingVacancies" name="hremainingVacancies" class="three" placeholder="剩余空闲数量">
-            <input type="datetime-local" id="havailableFrom" name="havailableFrom" class="three" placeholder="可入住时间" required>
-            <select id="hpetFriendly" name="hpetFriendly" class="three" required>
+            <select id="hpetFriendly" name="hpetFriendly" class="three">
                 <option value="">是否同意养宠物</option>
                 <option value="1">是</option>
                 <option value="0">否</option>
             </select>
-            <select id="hdirection" name="hdirection" class="three" required>
+            <select id="hdirection" name="hdirection" class="three">
                 <option value="">房屋朝向</option>
                 <option value="南">南</option>
                 <option value="北">北</option>
             </select>
+            <label for="havailableFrom">可入住时间</label>
+            <input type="datetime-local" id="havailableFrom" name="havailableFrom" class="three" placeholder="可入住时间">
             <textarea id="hrooms" name="hrooms" placeholder="房间布局" class="wide-textarea" rows="2"></textarea>
             <textarea id="hlocation" name="hlocation" placeholder="房源位置" class="wide-textarea" rows="2"></textarea>
             <textarea id="hfacilities" name="hfacilities" placeholder="配套设施" class="wide-textarea" rows="4"></textarea>
@@ -3724,6 +3708,7 @@
         </form>
         <div id="publishHouseResult"></div>
     `;
+
         // 绑定表单提交事件
         const publishHouseForm = document.getElementById('publishHouseForm');
         publishHouseForm.addEventListener('submit', function (event) {
@@ -3739,7 +3724,7 @@
                 harea: formData.get('harea') === "" ? null : parseFloat(formData.get('harea')),
                 htotalTenants: formData.get('htotalTenants') === "" ? null : parseInt(formData.get('htotalTenants')),
                 hremainingVacancies: formData.get('hremainingVacancies') === "" ? null : parseInt(formData.get('hremainingVacancies')),
-                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom').replace('T', ' ')+':00',
+                havailableFrom: formData.get('havailableFrom') === "" ? null : formData.get('havailableFrom').replace('T', ' ') + ':00',
                 hpetFriendly: formData.get('hpetFriendly') === "" ? null : parseInt(formData.get('hpetFriendly')),
                 hrooms: formData.get('hrooms') === "" ? null : formData.get('hrooms'),
                 hfacilities: formData.get('hfacilities') === "" ? null : formData.get('hfacilities'),
@@ -3766,21 +3751,18 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    const resultDiv = document.getElementById('publishHouseResult');
                     if (data.code === 200) {
-                        // 成功提示并刷新页面或调用相关函数
-                        resultDiv.innerHTML = `<p>添加成功！</p>`;
-                        alert("房源信息添加成功！");
-                        showLandlordHouseSearch(); // 刷新房源列表
+                        // 调用成功回调
+                        handleSuccess('showLandlordHouseSearch');
                     } else {
-                        // 显示错误信息
-                        resultDiv.innerHTML = `<p>添加失败：` + data.message + data.data + `</p>`;
+                        // 调用失败回调
+                        handleFail('showLandlordHouseSearch', data.message || '添加失败');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    const resultDiv = document.getElementById('publishHouseResult');
-                    resultDiv.innerHTML = `<p>网络错误，请稍后再试。</p>`;
+                    // 网络错误提示
+                    handleFail('showLandlordHouseSearch', '网络错误，请稍后再试');
                 });
         });
     }
@@ -3793,18 +3775,20 @@
         content.innerHTML = `
         <h2>房租押金信息</h2>
         <form id="searchRentForm">
-            <select id="ttransactionType" name="ttransactionType" class="three" required>
+            <select id="ttransactionType" name="ttransactionType" class="two">
                 <option value="">交易类型</option>
                 <option value="押金支付">押金支付</option>
                 <option value="租金支付">租金支付</option>
             </select>
-            <select id="tStatus" name="tStatus" class="three" required>
+            <select id="tStatus" name="tStatus" class="two">
                 <option value="">交易状态</option>
                 <option value="待支付">待支付</option>
                 <option value="已支付">已支付</option>
             </select>
-            <input type="datetime-local" id="startTime" name="startTime" class="three" placeholder="开始时间" required>
-            <input type="datetime-local" id="endTime" name="endTime" class="three" placeholder="结束时间" required>
+            <label for="startTime">输入起始时间：</label>
+            <input type="datetime-local" id="startTime" name="startTime" placeholder="开始时间" style="flex: 0 1 calc(41% - 8px);" required>
+            <label for="endTime">输入截止时间：</label>
+            <input type="datetime-local" id="endTime" name="endTime" placeholder="结束时间" style="flex: 0 1 calc(41% - 8px);" required>
             <button type="submit" class="submit-button">提交</button>
         </form>
         <div id="rentInfoSearchResult"></div>
@@ -3845,7 +3829,7 @@
                     resultDiv.innerHTML = '';
 
                     if (data.code !== 200) {
-                        resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                        resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                         return;
                     }
                     // 创建主表格
@@ -3911,7 +3895,6 @@
         });
     }
 
-
     // 支付租金函数
     function payDeposit(transactionId) {
         const token = "<%= token %>";
@@ -3936,22 +3919,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    alert('支付成功！');
-                    showTenantRentInfo(); // 重新加载数据
+                    handleSuccess('showTenantRentInfo'); // 成功回调
                     return Promise.resolve(); // 返回一个成功的 Promise
                 } else {
-                    alert('支付失败：' + data.message);
+                    handleFail('showTenantRentInfo', data.data || '支付失败'); // 失败回调
                     return Promise.reject(); // 返回一个失败的 Promise
                 }
             })
             .catch(error => {
                 console.error('支付请求异常:', error);
-                alert('支付失败，请稍后再试。');
+                handleFail('showTenantRentInfo', '支付失败，请稍后再试'); // 网络异常时调用失败回调
                 return Promise.reject(); // 返回一个失败的 Promise
             });
     }
-
-
 
     //房东查看租户租金状态
     function showLandlordRentInfo(){
@@ -3962,18 +3942,20 @@
         content.innerHTML = `
         <h2>房租押金信息</h2>
         <form id="searchRentForm">
-            <select id="ttransactionType" name="ttransactionType" class="three" required>
+            <select id="ttransactionType" name="ttransactionType" class="two">
                 <option value="">交易类型</option>
                 <option value="押金支付">押金支付</option>
                 <option value="租金支付">租金支付</option>
             </select>
-            <select id="tStatus" name="tStatus" class="three" required>
+            <select id="tStatus" name="tStatus" class="two">
                 <option value="">交易状态</option>
                 <option value="待支付">待支付</option>
                 <option value="已支付">已支付</option>
             </select>
-            <input type="datetime-local" id="startTime" name="startTime" class="three" placeholder="开始时间" required>
-            <input type="datetime-local" id="endTime" name="endTime" class="three" placeholder="结束时间" required>
+            <label for="startTime">输入起始时间：</label>
+            <input type="datetime-local" id="startTime" name="startTime" style="flex: 0 1 calc(41% - 8px);" placeholder="开始时间" required>
+            <label for="endTime">输入截止时间：</label>
+            <input type="datetime-local" id="endTime" name="endTime" style="flex: 0 1 calc(41% - 8px);" placeholder="结束时间" required>
             <button type="submit" class="submit-button">提交</button>
         </form>
         <div id="rentInfoSearchResult"></div>
@@ -4014,7 +3996,7 @@
                     resultDiv.innerHTML = '';
 
                     if (data.code !== 200) {
-                        resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                        resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                         return;
                     }
                     // 创建主表格
@@ -4066,8 +4048,6 @@
         });
     }
 
-
-
     function showLandlordAppointment() {
         // 获取内容容器
         const content = document.getElementById('content');
@@ -4100,7 +4080,7 @@
                 resultDiv.innerHTML = ''; // 清空之前的结果
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -4210,7 +4190,7 @@
                     handleSuccess('showLandlordAppointment'); // 刷新页面
                 } else {
                     // 操作失败
-                    handleFail('showLandlordAppointment', data.message || '操作失败');
+                    handleFail('showLandlordAppointment', data.data || '操作失败');
                 }
             })
             .catch(error => {
@@ -4248,7 +4228,7 @@
                     handleSuccess('showLandlordAppointment'); // 刷新页面
                 } else {
                     // 操作失败
-                    handleFail('showLandlordAppointment', data.message || '操作失败');
+                    handleFail('showLandlordAppointment', data.data || '操作失败');
                 }
             })
             .catch(error => {
@@ -4257,27 +4237,15 @@
             });
     }
 
-    function RentClean() {
-        let content = document.getElementById('RentManagement');
-        content.innerHTML = '';
-    }
     function showRentManagement() {
-        RentClean();
+        LandlordClean();
         let content = document.getElementById('RentManagement');
-        content.innerHTML = '' +
-            '<li><a onclick="showLandlordRentInfo()" class="small-text">查看租户房租押金记录</a></li>';
-    }
-
-
-
-    function LandlordContactsClean(){
-        let content = document.getElementById('LandlordContactsManagement');
-        content.innerHTML='';
+        content.innerHTML = '<li><a onclick="showLandlordRentInfo()" class="small-text">查看租户房租押金记录</a></li>';
     }
 
     //房东查看合同管理
     function showLandlordContactsManagement() {
-        LandlordContactsClean(); // 如果需要清除其他内容，调用清理函数
+        LandlordClean(); // 如果需要清除其他内容，调用清理函数
 
         let content = document.getElementById('LandlordContactsManagement');
         content.innerHTML = ``+
@@ -4319,7 +4287,7 @@
 
                 if (data.code !== 200) {
                     // 如果接口返回错误信息，显示错误
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -4463,15 +4431,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    alert('合同已违约终止！');
-                    showLandlordContracts(); // 终止合同后刷新合同列表
+                    // 调用成功回调
+                    handleSuccess('showLandlordContracts');
                 } else {
-                    alert('合同终止失败：' + data.message);
+                    // 调用失败回调
+                    handleFail('showLandlordContracts', data.message || '合同终止失败');
                 }
             })
             .catch(error => {
                 console.error('Error:', error); // 打印错误信息到控制台
-                alert('合同终止失败，请稍后重试。');
+                // 网络错误提示
+                handleFail('showLandlordContracts', '网络错误，请稍后再试');
             });
     }
 
@@ -4496,18 +4466,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    alert('合同已结束！');
-                    showLandlordContracts(); // 结束合同后刷新合同列表
+                    // 调用成功回调
+                    handleSuccess('showLandlordContracts');
                 } else {
-                    alert('合同结束失败：' + data.message);
+                    // 调用失败回调
+                    handleFail('showLandlordContracts', data.message || '合同结束失败');
                 }
             })
             .catch(error => {
                 console.error('Error:', error); // 打印错误信息到控制台
-                alert('合同结束失败，请稍后重试。');
+                // 网络错误提示
+                handleFail('showLandlordContracts', '网络错误，请稍后再试');
             });
     }
-
 
     // 房东查看租户合同详情
     function showLandlordContractDetail(contractId) {
@@ -4543,7 +4514,7 @@
 
                 if (data.code !== 200) {
                     // 如果接口返回错误信息，显示错误
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -4634,9 +4605,6 @@
 `;
     document.head.appendChild(style);
 
-
-
-
     function showPublicLandlordContracts() {
         const content = document.getElementById('content');
 
@@ -4667,7 +4635,7 @@
                 resultDiv.innerHTML = ''; // 清空容器
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -4783,7 +4751,7 @@
                 resultDiv.innerHTML = ''; // 清空容器
 
                 if (data.code !== 200) {
-                    resultDiv.innerHTML = `<p>查询失败：` + data.message + `</p>`;
+                    resultDiv.innerHTML = `<p>查询失败：` + data.data + `</p>`;
                     return;
                 }
 
@@ -5013,9 +4981,6 @@
         showLandlordPublishContractPage();
     }
 
-
-
-
     // 你可以创建一个函数来处理实际的发布合同请求
     function publishContract(contractData) {
         const token = "<%= token %>"; // 从服务器模板获取 token
@@ -5036,16 +5001,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    alert("合同发布成功！");
-                    // 在这里你可以根据需求刷新页面或跳转到其他页面
-                    window.location.href = "/landlord/contract-list"; // 示例：跳转到合同列表页
+                    // 调用成功回调
+                    handleSuccess('showLandlordContracts');
                 } else {
-                    alert("发布失败：" + data.message);
+                    // 调用失败回调
+                    handleFail('showLandlordContracts', data.message || '发布失败');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert("发布失败，请稍后重试。");
+                console.error('Error:', error); // 打印错误信息到控制台
+                // 网络错误提示
+                handleFail('showLandlordContracts', '网络错误，请稍后重试');
             });
     }
 
