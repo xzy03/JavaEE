@@ -121,13 +121,13 @@ public class ContractsServiceImpl extends ServiceImpl<ContractsMapper, Contracts
             throw new BusiException("房东未发布合同，无法确认");
         }
         contracts.setCStatus("已生效");
-        HouseTenants houseTenants = HouseTenants.builder()
-                .houseId(contracts.getCHouseId())
-                .tenantId(contracts.getCTenantId())
-                .htRentAmount(contracts.getCRentAmount())
-                .htDepositAmount(contracts.getCDepositAmount())
-                .build();
-        houseTenantsService.save(houseTenants);
+//        HouseTenants houseTenants = HouseTenants.builder()
+//                .houseId(contracts.getCHouseId())
+//                .tenantId(contracts.getCTenantId())
+//                .htRentAmount(contracts.getCRentAmount())
+//                .htDepositAmount(contracts.getCDepositAmount())
+//                .build();
+//        houseTenantsService.save(houseTenants);
         this.updateById(contracts);
         generateTransactionRecords(contracts);
     }
