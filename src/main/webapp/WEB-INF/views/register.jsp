@@ -90,18 +90,18 @@
             } else if (userType === '大学生租户') {
                 registerUrl = '/tenant/register';
                 requestBody = {
-                    tAccount: username,
-                    tPassword: password,
-                    tEmail: email,
-                    tPhoneNumber: phone
+                    taccount: username,
+                    tpassword: password,
+                    temail: email,
+                    tphoneNumber: phone
                 };
             } else if (userType === '房东') {
                 registerUrl = '/landlords/register';
                 requestBody = {
-                    lAccount: username,
-                    lPassword: password,
-                    lEmail: email,
-                    lPhoneNumber: phone
+                    laccount: username,
+                    lpassword: password,
+                    lemail: email,
+                    lphoneNumber: phone
                 };
             }
 
@@ -123,7 +123,7 @@
                         }, 2000);
                     } else {
                         // 注册失败，显示错误信息
-                        document.getElementById("message").innerText = result.message;
+                        document.getElementById("message").innerText = result.data;
                     }
                 })
                 .catch(error => {

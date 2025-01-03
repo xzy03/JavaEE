@@ -1664,7 +1664,7 @@
                         handleSuccess('showTenantSearchInfo');
                     } else {
                         // 调用失败回调函数，传递失败原因
-                        handleFail('showTenantEditInfo', data.data || '修改失败');
+                        handleFail('showTenantEditInfo', data.message || '修改失败');
                     }
                 })
                 .catch(error => {
