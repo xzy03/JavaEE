@@ -4,120 +4,62 @@ on:
   push:
     branches: [ "main", "develop" ]
     paths:
-      - 'src/test/java/cn/edu/zjut/controller/**'
-      - 'pom.xml'
+      - 'src/test/java/cn/edu/zjut/controller/**'  # 仅监控controller测试目录
+      - 'pom.xml'                                 # 依赖变更也会影响测试
   pull_request:
     branches: [ "main", "develop" ]
     paths:
       - 'src/test/java/cn/edu/zjut/controller/**'
       - 'pom.xml'
-  workflow_dispatch:
+  workflow_dispatch:   # 允许手动触发
 
 jobs:
-  setup-environment:
-    name: Setup Test Environment
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2  # 需要检出父提交
-
-      - name: Setup Java and Maven
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Install Test Dependencies
-        run: mvn dependency:resolve-plugins dependency:resolve -B
-
-      - name: Prepare Database
-        run: |
-          # 这里添加数据库初始化脚本，例如：
-          # 1. 创建测试数据库
-          # 2. 执行迁移脚本
-          # 3. 插入必要测试数据
-          echo "INSERT INTO admins (adPhone, adPasswordHash) VALUES ('17364563659', '123456');" | mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }}
-
-      - name: Upload Test Environment
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-environment
-          path: target/
-          retention-days: 1
-
   controller-tests:
     name: Run Controller Tests
-    needs: setup-environment
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         test-class: [
           "AdminsControllerTest",
           "ContractsControllerTest",
           "HouseControllerTest",
-          "landlordControllerTest",
+          "LandlordControllerTest",
           "TenantControllerTest"
         ]
 
     steps:
-      - name: Restore Environment
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          name: test-environment
-          path: target/
+          fetch-depth: 1  # 优化检出性能
 
-      - name: Setup Java
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            target/
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Run specific test (${{ matrix.test-class }})
         run: |
-          # 设置确保测试通过的强制标志
-          mvn test -Dtest="cn.edu.zjut.controller.${{ matrix.test-class }}" \
-                   -Dtest.force.success=true \
-                   -DtrimStackTrace=false \
-                   -B
+          mvn test -Dtest="cn.edu.zjut.controller.${{ matrix.test-class }}" -B
         env:
           SPRING_PROFILES_ACTIVE: test
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          TEST_DATA_INITIALIZED: true
 
-      - name: Upload Test Report
+      - name: Upload test report for ${{ matrix.test-class }}
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-report-${{ matrix.test-class }}
           path: target/surefire-reports/TEST-cn.edu.zjut.controller.${{ matrix.test-class }}.xml
-
-  report-success:
-    name: Report Test Success
-    needs: controller-tests
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-      - name: Success Notification
-        run: |
-          echo "✅ All controller tests passed successfully!" > success.md
-          
-          # 可选：添加Markdown格式的测试报告汇总
-          echo "## Test Results Summary" >> success.md
-          echo "| Test Class | Status |" >> success.md
-          echo "|------------|--------|" >> success.md
-          for test in AdminsControllerTest ContractsControllerTest HouseControllerTest landlordControllerTest TenantControllerTest; do
-            echo "| $test | ✅ Passed |" >> success.md
-          done
-          
-          cat success.md
-
-      - name: Create Success Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-success-report
-          path: success.md
