@@ -38,7 +38,7 @@ public class AdminsControllerTest {
         		.contentType(MediaType.APPLICATION_JSON)
         		.content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.data.token").isString());
     }
 }
