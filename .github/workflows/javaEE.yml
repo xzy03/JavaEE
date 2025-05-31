@@ -1,46 +1,70 @@
-name: JavaEE
+name: Test Runner - Run on Test Changes
 
 on:
+  # 只在测试文件变更时触发工作流
   push:
-    branches: [ "main", "develop" ]  # ������֧
+    branches: [ "main", "develop" ]
+    paths:
+      - 'src/test/**'    # 只监控测试文件目录
+      - 'pom.xml'        # 监控依赖变更影响测试
+      - '**/*Test.java'  # 匹配所有测试类文件
   pull_request:
     branches: [ "main", "develop" ]
+    paths:
+      - 'src/test/**'
+      - 'pom.xml'
+  workflow_dispatch:    # 保留手动触发能力
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: 17
-        distribution: 'temurin'
-        cache: 'maven'  # �Զ���������
-    
-    - name: Cache Maven dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.m2
-          target/
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-    
-    - name: Run unit tests
-      run: mvn test -B  # -B ��ʾ������ģʽ
-      env:
-        SPRING_PROFILES_ACTIVE: test  # ʹ�ò��Ի�������
-    
-    - name: Upload test reports
-      if: always()  # ��ʹ����ʧ��Ҳ�ϴ�
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-reports
-        path: |
-          target/surefire-reports/
-          target/failsafe-reports/
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # 优化检出性能，只获取最近提交
+          fetch-depth: 1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            target/
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Detect Test Changes
+        id: test-changed
+        run: |
+          # 检测src/test目录是否变更
+          if git diff --name-only HEAD^ HEAD | grep -q '^src/test/'; then
+            echo "TEST_CHANGED=true" >> $GITHUB_ENV
+          else
+            echo "TEST_CHANGED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Run unit tests
+        # 仅在测试文件变更时运行测试
+        if: env.TEST_CHANGED == 'true'
+        run: mvn test -B
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      - name: Upload test reports
+        if: always() && env.TEST_CHANGED == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
