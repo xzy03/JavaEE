@@ -35,29 +35,4 @@ jobs:
           echo "执行时间: 3.5s"
           echo "错误: 0"
 
-  test-summary:
-    needs: controller-tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate Test Report
-        run: |
-          echo "# JavaEE 控制器测试报告" > report.md
-          echo "" >> report.md
-          echo "## 测试概览" >> report.md
-          echo "✅ 所有控制器测试成功执行" >> report.md
-          echo "" >> report.md
-          echo "### 测试类状态" >> report.md
-          echo "| 测试类 | 状态 | 断言通过 |" >> report.md
-          echo "|-------|------|---------|" >> report.md
-          echo "| AdminsControllerTest | ✅ | 15/15 |" >> report.md
-          echo "| ContractsControllerTest | ✅ | 12/12 |" >> report.md
-          echo "| HouseControllerTest | ✅ | 18/18 |" >> report.md
-          echo "| landlordControllerTest | ✅ | 10/10 |" >> report.md
-          echo "| TenantControllerTest | ✅ | 8/8 |" >> report.md
-          echo "" >> report.md
-          echo "**执行时间**: $(date +'%Y-%m-%d %H:%M:%S')"
-          
-          cat report.md
-
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v3
+  
