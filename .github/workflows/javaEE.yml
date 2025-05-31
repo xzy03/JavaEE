@@ -1,0 +1,11 @@
+name: JavaEE
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+env:
+  MAVEN_OPTS: -Djava.security.egd=file:/dev/./urandom
+  SPRING_PROFILES_ACTIVE: dev
