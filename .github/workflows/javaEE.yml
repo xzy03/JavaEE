@@ -1,0 +1,46 @@
+name: JavaEE
+
+on:
+  push:
+    branches: [ "main", "develop" ]  # ������֧
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        cache: 'maven'  # �Զ���������
+    
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.m2
+          target/
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    
+    - name: Run unit tests
+      run: mvn test -B  # -B ��ʾ������ģʽ
+      env:
+        SPRING_PROFILES_ACTIVE: test  # ʹ�ò��Ի�������
+    
+    - name: Upload test reports
+      if: always()  # ��ʹ����ʧ��Ҳ�ϴ�
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports
+        path: |
+          target/surefire-reports/
+          target/failsafe-reports/
