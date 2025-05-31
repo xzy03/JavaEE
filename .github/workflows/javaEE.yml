@@ -1,11 +1,46 @@
-name: JavaEE
+name: Java Test
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop" ] 
   pull_request:
     branches: [ "main", "develop" ]
 
-env:
-  MAVEN_OPTS: -Djava.security.egd=file:/dev/./urandom
-  SPRING_PROFILES_ACTIVE: dev
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        cache: 'maven'  
+    
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.m2
+          target/
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    
+    - name: Run unit tests
+      run: mvn test -B  
+      env:
+        SPRING_PROFILES_ACTIVE: test  
+    
+    - name: Upload test reports
+      if: always()  
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports
+        path: |
+          target/surefire-reports/
+          target/failsafe-reports/
